@@ -1,0 +1,3994 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>SKYFIRE 3D - Battle Royale v1.1.0</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,500;0,600;0,700;1,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #0b0f19;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      color: #f8fafc;
+    }
+    .font-display {
+      font-family: 'Chakra Petch', system-ui, sans-serif;
+    }
+    #game-canvas-container {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    .hud-glass {
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(148, 163, 184, 0.24);
+    }
+    .lobby-glass {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.90), rgba(30, 41, 59, 0.82));
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .btn-primary-glow {
+      background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.45);
+      transition: all 0.2s ease;
+    }
+    .btn-primary-glow:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 0 35px rgba(245, 158, 11, 0.75);
+    }
+    .btn-primary-glow:active {
+      transform: translateY(0) scale(0.98);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.5);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(245, 158, 11, 0.6);
+      border-radius: 9999px;
+    }
+    @keyframes float-up {
+      0% { opacity: 1; transform: translateY(0) scale(0.9); }
+      30% { opacity: 1; transform: translateY(-14px) scale(1.1); }
+      100% { opacity: 0; transform: translateY(-42px) scale(0.95); }
+    }
+    .dmg-popup {
+      position: absolute;
+      pointer-events: none;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      animation: float-up 0.85s ease-out forwards;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.85);
+      z-index: 35;
+    }
+    .world-tag {
+      position: absolute;
+      transform: translate(-50%, -100%);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body class="relative w-full h-full overflow-hidden">
+
+  <!-- 3D WebGL Container -->
+  <div id="game-canvas-container"></div>
+
+  <!-- 3D World Floating Labels -->
+  <div id="world-labels-layer" class="fixed inset-0 pointer-events-none z-10 overflow-hidden"></div>
+
+  <!-- Floating Damage Layer -->
+  <div id="damage-layer" class="fixed inset-0 pointer-events-none z-30 overflow-hidden"></div>
+
+  <!-- ==================== MAIN LOBBY SCREEN ==================== -->
+  <div id="lobby-screen" class="fixed inset-0 z-40 flex flex-col justify-between p-3 sm:p-5 pointer-events-auto bg-gradient-to-b from-slate-950/80 via-slate-900/35 to-slate-950/90 overflow-y-auto">
+    
+    <!-- Top Navigation Bar -->
+    <div class="flex flex-wrap items-center justify-between gap-2.5">
+      <!-- Game Brand & Prime Badge -->
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30 border border-amber-300/40">
+          <span class="font-display font-bold text-2xl text-slate-950">SF</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-display font-bold text-xl sm:text-2xl tracking-wider text-white">SKYFIRE 3D</h1>
+            <span class="px-2 py-0.5 text-[11px] font-bold rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">v1.1.0</span>
+          </div>
+          <div class="flex items-center gap-2 mt-0.5">
+            <button id="btn-open-prime" class="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-xs font-semibold text-white shadow border border-purple-300/40 hover:brightness-110 transition">
+              <span>👑 PRIME CẤP <span id="lobby-prime-level">1</span></span>
+            </button>
+            <span class="text-xs text-slate-300">Đã chơi: <strong id="lobby-matches-count" class="text-amber-400">0</strong> trận</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Currency, Giftcode & Audio -->
+      <div class="flex items-center gap-2 sm:gap-2.5 flex-wrap">
+        <!-- Giftcode Button -->
+        <button id="btn-open-giftcode" class="lobby-glass px-3 py-2 rounded-xl flex items-center gap-1.5 text-xs font-bold text-amber-300 hover:border-amber-400/60 transition">
+          <span>🎟️ GIFTCODE</span>
+        </button>
+
+        <!-- Gold -->
+        <div class="lobby-glass px-3 py-1.5 rounded-xl flex items-center gap-2">
+          <span class="text-amber-400 text-base">🪙</span>
+          <div>
+            <div class="text-[10px] uppercase tracking-wider text-slate-400 leading-none">Vàng</div>
+            <div id="lobby-gold" class="font-display font-bold text-sm sm:text-base text-amber-300">2,500</div>
+          </div>
+        </div>
+
+        <!-- Diamonds + Top-up Button -->
+        <div class="lobby-glass pl-3 pr-1.5 py-1 rounded-xl flex items-center gap-2 border-cyan-400/30">
+          <span class="text-cyan-400 text-base">💎</span>
+          <div>
+            <div class="text-[10px] uppercase tracking-wider text-slate-400 leading-none">Kim Cương</div>
+            <div id="lobby-diamonds" class="font-display font-bold text-sm sm:text-base text-cyan-300">100</div>
+          </div>
+          <button id="btn-open-topup" class="ml-1 px-2.5 py-1 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition shadow">
+            + NẠP
+          </button>
+        </div>
+
+        <!-- Audio Mute Toggle -->
+        <button id="btn-toggle-audio" class="lobby-glass w-10 h-10 rounded-xl flex items-center justify-center text-lg hover:bg-slate-800/80 transition" title="Bật/Tắt Âm Thanh">
+          🔊
+        </button>
+      </div>
+    </div>
+
+    <!-- Center Lobby Content -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 my-auto py-2 items-center">
+      
+      <!-- Left Column: Sự Kiện, Kỹ Năng Nhân Vật, Kho Súng & Skin -->
+      <div class="lg:col-span-4 flex flex-col gap-2.5">
+        
+        <!-- Event Card -->
+        <div class="lobby-glass rounded-2xl p-3.5 border-l-4 border-l-amber-400 relative overflow-hidden">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="inline-block px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold text-[10px] uppercase tracking-wider">Chuỗi Sự Kiện cày Chay v1.1.0</span>
+              <h2 class="font-display font-bold text-base sm:text-lg text-white mt-0.5">SỰ KIỆN MỞ KHÓA SKIN SÚNG</h2>
+              <p class="text-[11px] text-slate-300 mt-0.5">Tích lũy số trận đấu (10 / 40 / 60 / 80 trận) để nhận miễn phí loạt Skin tăng chỉ số!</p>
+            </div>
+          </div>
+          <div class="mt-2.5">
+            <div class="flex justify-between text-xs mb-1">
+              <span class="text-slate-300">Mốc gần nhất (UMP Phong Cách):</span>
+              <span class="font-bold text-amber-300"><span id="lobby-event-progress-text">0</span> / 10 trận</span>
+            </div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden p-0.5">
+              <div id="lobby-event-progress-bar" class="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+          <div class="mt-2.5 flex items-center gap-2">
+            <button id="btn-open-event" class="flex-1 py-2 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 text-amber-200 font-bold text-xs transition">
+              🎁 MỞ SỰ KIỆN & NHẬN SKIN
+            </button>
+          </div>
+        </div>
+
+        <!-- Character Skills, Armory & Guide Buttons -->
+        <div class="grid grid-cols-3 gap-2">
+          <button id="btn-open-skills" class="lobby-glass p-3 rounded-2xl text-left hover:border-purple-400/60 transition group">
+            <div class="text-xl mb-0.5">⚡</div>
+            <div class="font-display font-bold text-xs sm:text-sm text-white group-hover:text-purple-300">KỸ NĂNG</div>
+            <div class="text-[10px] text-slate-400">1 Chủ động + 3 Bị động</div>
+          </button>
+
+          <button id="btn-open-armory" class="lobby-glass p-3 rounded-2xl text-left hover:border-amber-400/60 transition group">
+            <div class="text-xl mb-0.5">🔫</div>
+            <div class="font-display font-bold text-xs sm:text-sm text-white group-hover:text-amber-300">KHO SÚNG</div>
+            <div class="text-[10px] text-slate-400">17 Súng & 5 Skin</div>
+          </button>
+
+          <button id="btn-open-guide" class="lobby-glass p-3 rounded-2xl text-left hover:border-cyan-400/60 transition group">
+            <div class="text-xl mb-0.5">🗺️</div>
+            <div class="font-display font-bold text-xs sm:text-sm text-white group-hover:text-cyan-300">LUẬT CHƠI</div>
+            <div class="text-[10px] text-slate-400">6 Vùng & Cơ chế</div>
+          </button>
+        </div>
+
+        <!-- Active Loadout Summary Box (Skills + Skins) -->
+        <div class="lobby-glass rounded-xl p-3 space-y-2">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-[10px] uppercase text-slate-400 font-bold">Tổ Hợp Kỹ Năng Đang Mang</div>
+              <div id="lobby-skills-summary" class="text-xs font-bold text-purple-300 mt-0.5">Chủ động: Orion | Bị động: Kelly, Maxim, Ama</div>
+            </div>
+            <button id="btn-quick-skills" class="px-2.5 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-xs font-semibold text-purple-200 border border-purple-400/40 transition">
+              Đổi
+            </button>
+          </div>
+          <div class="border-t border-slate-700/70 pt-1.5 flex items-center justify-between">
+            <div>
+              <div class="text-[10px] uppercase text-slate-400 font-bold">Skin Súng Đang Trang Bị</div>
+              <div id="lobby-equipped-skin-name" class="text-xs font-bold text-cyan-300 truncate max-w-[230px]">Chưa trang bị Skin</div>
+            </div>
+            <button id="btn-quick-skin-toggle" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-600 transition">
+              Kho Skin
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center 3D Character Preview Callout -->
+      <div class="lg:col-span-4 hidden lg:flex flex-col items-center justify-end h-full pointer-events-none">
+        <div class="lobby-glass px-4 py-2 rounded-full text-xs text-slate-200 border border-white/15 shadow-lg">
+          🏔️ Địa Hình Cao Thấp 3D • 6 Khu Vực • 13 Kỹ Năng • 17 Súng
+        </div>
+      </div>
+
+      <!-- Right Column: 6 Map Zones & Match Config Summary -->
+      <div class="lg:col-span-4 flex flex-col gap-3">
+        <div class="lobby-glass rounded-2xl p-4">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="font-display font-bold text-sm uppercase tracking-wider text-amber-300">Bản Đồ 6 Khu Vực & Đồi Cao</h3>
+            <span class="text-[11px] px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">Ngẫu nhiên 1 Vùng Xanh</span>
+          </div>
+          <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-center text-[10px] mb-3">
+            <div class="p-1.5 rounded-lg bg-slate-800/90 border border-slate-700">
+              <div class="text-sm">🪨</div>
+              <div class="font-semibold text-slate-200 mt-0.5">Nhà Đá</div>
+            </div>
+            <div class="p-1.5 rounded-lg bg-slate-800/90 border border-slate-700">
+              <div class="text-sm">🌲</div>
+              <div class="font-semibold text-slate-200 mt-0.5">Làng Thông</div>
+            </div>
+            <div class="p-1.5 rounded-lg bg-slate-800/90 border border-slate-700">
+              <div class="text-sm">🌴</div>
+              <div class="font-semibold text-slate-200 mt-0.5">Đảo Dừa</div>
+            </div>
+            <div class="p-1.5 rounded-lg bg-slate-800/90 border border-slate-700">
+              <div class="text-sm">⛩️</div>
+              <div class="font-semibold text-slate-200 mt-0.5">Cổng Trời</div>
+            </div>
+            <div class="p-1.5 rounded-lg bg-slate-800/90 border border-slate-700">
+              <div class="text-sm">☁️</div>
+              <div class="font-semibold text-slate-200 mt-0.5">Làng Mây</div>
+            </div>
+            <div class="p-1.5 rounded-lg bg-sky-950/90 border border-sky-400/50">
+              <div class="text-sm">❄️</div>
+              <div class="font-semibold text-sky-200 mt-0.5">Làng Tuyết</div>
+            </div>
+          </div>
+
+          <div class="space-y-1.5 text-xs text-slate-300 border-t border-slate-700/70 pt-2.5">
+            <div class="flex justify-between">
+              <span>• Súng mới v1.1.0:</span>
+              <span class="font-semibold text-amber-300">Gatling, SCAR, Kar98, M590, Phá Keo</span>
+            </div>
+            <div class="flex justify-between">
+              <span>• Kỹ năng nhân vật:</span>
+              <span class="font-semibold text-purple-300">1 Chủ động [Phím E] + 3 Bị động</span>
+            </div>
+            <div class="flex justify-between">
+              <span>• Địa hình & Bot AI:</span>
+              <span class="font-semibold text-emerald-400">Đồi cao thấp [Space Nhảy] • Bot có kỹ năng</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Bar: Keybind Summary & START MATCH Button -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
+      <div class="lobby-glass px-3.5 py-2 rounded-2xl text-[11px] text-slate-300 flex flex-wrap items-center gap-x-3 gap-y-1">
+        <span><kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 font-bold border border-slate-600">WASD / Joystick</kbd> Di chuyển (A/D đi ngang)</span>
+        <span><kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-lime-300 font-bold border border-slate-600">Space</kbd> Nhảy</span>
+        <span><kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-purple-300 font-bold border border-slate-600">E</kbd> Kỹ năng chủ động</span>
+        <span><kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-rose-400 font-bold border border-slate-600">R</kbd> Bắn</span>
+        <span><kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-cyan-300 font-bold border border-slate-600">Q</kbd> Thay đạn</span>
+        <span><kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-bold border border-slate-600">F</kbd> Nhặt</span>
+        <span><kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 font-bold border border-slate-600">T</kbd> Máy bán hàng</span>
+        <span><kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-sky-300 font-bold border border-slate-600">4</kbd> Bom keo</span>
+        <span><kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-lime-300 font-bold border border-slate-600">3</kbd> Bình máu</span>
+      </div>
+
+      <button id="btn-start-match" class="w-full sm:w-auto min-w-[240px] py-3.5 px-7 rounded-2xl btn-primary-glow font-display font-bold text-xl tracking-wider text-slate-950 flex items-center justify-center gap-2">
+        <span>🔥 BẮT ĐẦU VÀO TRẬN</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== IN-GAME HUD ==================== -->
+  <div id="ingame-hud" class="fixed inset-0 z-20 pointer-events-none hidden flex-col justify-between p-2 sm:p-4">
+    
+    <!-- Top Row: Left Mini-Map | Center Match Status | Right Dual Weapon Slots -->
+    <div class="flex items-start justify-between gap-2">
+      
+      <!-- TOP-LEFT: MINI-MAP + ZONE INFO -->
+      <div class="flex flex-col gap-1.5 pointer-events-auto">
+        <div class="hud-glass p-1.5 rounded-2xl shadow-xl relative">
+          <canvas id="minimap-canvas" width="168" height="168" class="rounded-xl block bg-slate-950 border border-slate-700/80"></canvas>
+          <div class="mt-1 flex items-center justify-between px-1 text-[10px] text-slate-300">
+            <span id="hud-current-zone" class="font-bold text-amber-300">📍 Làng Mây</span>
+            <span id="hud-bluezone-label" class="text-cyan-300 font-semibold">🔵 Vùng Xanh: --</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOP-CENTER: Match Alive Count, Kills, Coins, Respawn Badge, Camera View Toggle -->
+      <div class="flex flex-col items-center gap-1.5 pointer-events-auto">
+        <div class="hud-glass px-3.5 py-1.5 rounded-2xl flex items-center gap-3 sm:gap-4 text-xs sm:text-sm shadow-lg">
+          <div class="flex items-center gap-1" title="Số kẻ địch còn lại">
+            <span class="text-rose-400">👾 Địch:</span>
+            <span id="hud-enemies-alive" class="font-display font-bold text-base text-white">12</span>
+          </div>
+          <div class="h-4 w-px bg-slate-700"></div>
+          <div class="flex items-center gap-1">
+            <span class="text-amber-400">💀 Hạ:</span>
+            <span id="hud-kills" class="font-display font-bold text-base text-amber-300">0</span>
+          </div>
+          <div class="h-4 w-px bg-slate-700"></div>
+          <div class="flex items-center gap-1">
+            <span class="text-yellow-400">🪙 Xu:</span>
+            <span id="hud-coins" class="font-display font-bold text-base text-yellow-300">0</span>
+          </div>
+          <div class="h-4 w-px bg-slate-700 hidden sm:block"></div>
+          <div class="hidden sm:flex items-center gap-1" title="Lượt hồi sinh của bạn">
+            <span class="text-cyan-400">🔄 HS:</span>
+            <span id="hud-respawns" class="font-display font-bold text-cyan-300">1</span>
+          </div>
+        </div>
+
+        <!-- Banner Notification -->
+        <div id="hud-banner-msg" class="px-4 py-1 rounded-full bg-slate-900/90 border border-cyan-400/50 text-xs font-bold text-cyan-300 shadow-lg transition-opacity duration-300 opacity-0 pointer-events-none text-center">
+          Thông báo trận đấu
+        </div>
+
+        <!-- Utility Row: Camera Mode + Leave Match -->
+        <div class="flex items-center gap-2">
+          <button id="btn-camera-mode" class="hud-glass px-2.5 py-1 rounded-lg text-[11px] font-semibold text-slate-200 hover:bg-slate-800 transition">
+            🎥 Góc nhìn: Sau lưng (3D)
+          </button>
+          <button id="btn-leave-match" class="hud-glass px-2.5 py-1 rounded-lg text-[11px] font-semibold text-rose-300 hover:bg-rose-950/60 border-rose-500/30 transition">
+            ✕ Thoát trận
+          </button>
+        </div>
+      </div>
+
+      <!-- TOP-RIGHT: WEAPON SLOTS (Max 2 Guns) + BUFFS -->
+      <div class="flex flex-col items-end gap-1.5 pointer-events-auto">
+        <div class="flex flex-col sm:flex-row gap-2">
+          <!-- Weapon Slot 1 -->
+          <button id="weapon-slot-0" class="hud-glass w-36 sm:w-44 p-2 rounded-2xl text-left border-2 border-amber-400 transition relative">
+            <div class="flex items-center justify-between text-[10px] text-slate-400">
+              <span class="font-bold text-amber-300">[PHÍM 1] SÚNG 1</span>
+              <span id="slot-0-type" class="uppercase">SMG</span>
+            </div>
+            <div id="slot-0-name" class="font-display font-bold text-sm sm:text-base text-white truncate mt-0.5">Trống</div>
+            <div class="flex items-center justify-between mt-0.5">
+              <span id="slot-0-ammo" class="font-display font-bold text-xs text-amber-300">-- / ∞</span>
+              <span id="slot-0-skin-badge" class="hidden px-1.5 py-0.2 text-[9px] rounded bg-cyan-500/30 text-cyan-200 border border-cyan-400/40">Skin</span>
+            </div>
+          </button>
+
+          <!-- Weapon Slot 2 -->
+          <button id="weapon-slot-1" class="hud-glass w-36 sm:w-44 p-2 rounded-2xl text-left border-2 border-transparent transition relative">
+            <div class="flex items-center justify-between text-[10px] text-slate-400">
+              <span class="font-bold text-slate-300">[PHÍM 2] SÚNG 2</span>
+              <span id="slot-1-type" class="uppercase">--</span>
+            </div>
+            <div id="slot-1-name" class="font-display font-bold text-sm sm:text-base text-slate-400 truncate mt-0.5">Chưa có súng</div>
+            <div class="flex items-center justify-between mt-0.5">
+              <span id="slot-1-ammo" class="font-display font-bold text-xs text-slate-400">-- / ∞</span>
+              <span id="slot-1-skin-badge" class="hidden px-1.5 py-0.2 text-[9px] rounded bg-cyan-500/30 text-cyan-200 border border-cyan-400/40">Skin</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- Accuracy / Bloom Indicator & Active Buffs -->
+        <div class="flex items-center gap-1.5 flex-wrap justify-end">
+          <div id="hud-accuracy-badge" class="px-2 py-0.5 rounded-lg bg-slate-900/85 border border-slate-700 text-[10px] font-semibold text-emerald-300">
+            🎯 Chính xác: <span id="hud-accuracy-val">80%</span> (Độ nở: <span id="hud-bloom-val">0%</span>)
+          </div>
+          <div id="hud-chip-badge" class="hidden px-2 py-0.5 rounded-lg bg-purple-950/90 border border-purple-400/60 text-[10px] font-bold text-purple-200 shadow">
+            ⚡ CHIP MAX 99
+          </div>
+          <div id="hud-skin-badge" class="hidden px-2 py-0.5 rounded-lg bg-cyan-950/90 border border-cyan-400/60 text-[10px] font-bold text-cyan-200 shadow">
+            🎨 Đang có Skin
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER SCREEN: Dynamic Crosshair (Expands with Recoil Bloom), Cast Bar, Prompts -->
+    <div class="relative flex flex-col items-center justify-center my-auto pointer-events-none">
+      <div id="crosshair" class="w-9 h-9 relative flex items-center justify-center transition-transform duration-75">
+        <div class="w-1.5 h-1.5 rounded-full bg-amber-400 shadow"></div>
+        <div class="absolute top-0 w-0.5 h-2.5 bg-white/80"></div>
+        <div class="absolute bottom-0 w-0.5 h-2.5 bg-white/80"></div>
+        <div class="absolute left-0 h-0.5 w-2.5 bg-white/80"></div>
+        <div class="absolute right-0 h-0.5 w-2.5 bg-white/80"></div>
+      </div>
+
+      <!-- Channeling Bar (Reloading Q or Medkit) -->
+      <div id="cast-bar-container" class="hidden mt-4 w-56 hud-glass p-2 rounded-xl text-center">
+        <div id="cast-bar-label" class="text-xs font-bold text-amber-300 mb-1">Đang thay đạn...</div>
+        <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+          <div id="cast-bar-fill" class="h-full bg-amber-400 transition-all duration-75" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Nearby Loot / Vending Prompt -->
+      <div class="mt-4 flex flex-col items-center gap-1.5 pointer-events-auto">
+        <button id="prompt-pickup" class="hidden px-4 py-1.5 rounded-xl bg-emerald-600/90 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg border border-emerald-300/50 animate-bounce">
+          [Phím F] Nhặt: <span id="prompt-pickup-name">Vật phẩm</span>
+        </button>
+        <button id="prompt-vending" class="hidden px-4 py-1.5 rounded-xl bg-amber-500/95 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-lg border border-amber-200">
+          🛒 [Phím T] Mở Máy Bán Hàng Khu Vực
+        </button>
+      </div>
+    </div>
+
+    <!-- BOTTOM ROW: Left Joystick | Center HP, Armor, Skills & Consumables | Right Combat Controls -->
+    <div class="flex items-end justify-between gap-2">
+      
+      <!-- Bottom-Left: Virtual Joystick -->
+      <div class="flex flex-col items-center gap-1 pointer-events-auto">
+        <div id="joystick-zone" class="w-28 h-28 sm:w-32 sm:h-32 rounded-full hud-glass border-2 border-slate-500/40 relative flex items-center justify-center cursor-pointer touch-none shadow-inner" title="Kéo chuột tại đây để di chuyển nhân vật">
+          <div class="text-[9px] uppercase tracking-wider text-slate-400 absolute top-2 pointer-events-none">Kéo Di Chuyển</div>
+          <div id="joystick-knob" class="w-11 h-11 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg border border-white/50 pointer-events-none transition-transform duration-75"></div>
+        </div>
+        <span class="text-[10px] text-slate-400 hidden sm:inline">WASD (A/D đi ngang) • Kéo màn hình xoay</span>
+      </div>
+
+      <!-- Bottom-Center: Active Skill [E], Passives, Medkit [3], Gloo Wall [4], Armor & HP Bar -->
+      <div class="flex-1 max-w-lg mx-auto flex flex-col gap-1.5 pointer-events-auto">
+        
+        <!-- Quick Item & Skill Bar -->
+        <div class="flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap">
+          <!-- Active Character Skill Button [Phím E] -->
+          <button id="btn-hud-skill" class="hud-glass px-3 py-1.5 rounded-xl flex items-center gap-2 border border-purple-400/60 hover:bg-purple-900/40 transition relative">
+            <span id="hud-skill-icon" class="text-base">🔥</span>
+            <div class="text-left">
+              <div class="text-[10px] text-purple-300 font-bold">[PHÍM E] <span id="hud-skill-name">ORION</span></div>
+              <div id="hud-skill-status" class="text-xs font-bold text-emerald-300">Sẵn sàng</div>
+            </div>
+          </button>
+
+          <!-- Medkit [3] -->
+          <button id="btn-use-medkit" class="hud-glass px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 hover:border-emerald-400/60 transition">
+            <span class="text-base">🩹</span>
+            <div class="text-left">
+              <div class="text-[10px] text-slate-400 font-bold">[PHÍM 3] BÌNH MÁU</div>
+              <div class="text-xs font-bold text-emerald-300">x<span id="hud-medkit-count">2</span> <span id="hud-medkit-time-label" class="text-[10px] text-slate-400">(3s +40HP)</span></div>
+            </div>
+          </button>
+
+          <!-- Gloo Wall [4] -->
+          <button id="btn-use-gloowall" class="hud-glass px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 hover:border-cyan-400/60 transition">
+            <span class="text-base">🧊</span>
+            <div class="text-left">
+              <div class="text-[10px] text-slate-400 font-bold">[PHÍM 4] BOM KEO</div>
+              <div class="text-xs font-bold text-cyan-300">x<span id="hud-gloowall-count">2</span> <span id="hud-gloowall-hp-label" class="text-[10px] text-slate-400">(500 HP)</span></div>
+            </div>
+          </button>
+        </div>
+
+        <!-- Passive Skills Strip -->
+        <div id="hud-passives-strip" class="flex items-center justify-center gap-1.5 text-[10px] text-slate-300">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Armor & HP Status Card -->
+        <div class="hud-glass p-2.5 rounded-2xl shadow-xl">
+          <!-- Armor Bar -->
+          <div class="mb-1.5">
+            <div class="flex items-center justify-between text-xs mb-0.5">
+              <span id="hud-armor-label" class="font-bold text-sky-300">🛡️ Chưa có Giáp (0% giảm ST)</span>
+              <span id="hud-armor-durability-text" class="font-display font-bold text-sky-200">0 / 0 viên</span>
+            </div>
+            <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden p-0.5 border border-slate-700/70">
+              <div id="hud-armor-bar" class="h-full bg-gradient-to-r from-sky-400 to-blue-500 rounded-full transition-all duration-150" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <!-- Health Bar (200 HP - turns RED when Orion is charged!) -->
+          <div>
+            <div class="flex items-center justify-between text-xs mb-0.5">
+              <span id="hud-hp-title" class="font-bold text-emerald-300">❤️ MÁU NHÂN VẬT (HP)</span>
+              <span class="font-display font-bold text-sm text-white"><span id="hud-hp-text">200</span> / 200</span>
+            </div>
+            <div class="w-full h-3.5 bg-slate-900 rounded-full overflow-hidden p-0.5 border border-slate-700/70">
+              <div id="hud-hp-bar" class="h-full bg-gradient-to-r from-emerald-500 to-lime-400 rounded-full transition-all duration-150" style="width: 100%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom-Right: Jump [Space], Vending [T], Pickup [F], Reload [Q], Fire [R] -->
+      <div class="flex flex-col items-end gap-1.5 pointer-events-auto">
+        <div class="flex items-center gap-1.5 flex-wrap justify-end">
+          <button id="btn-hud-jump" class="hud-glass px-3 py-1.5 rounded-xl font-display font-bold text-xs text-lime-300 border border-lime-400/40 hover:bg-lime-500/20 transition">
+            🦘 NHẢY [SPACE]
+          </button>
+          <button id="btn-hud-vending" class="hud-glass px-2.5 py-1.5 rounded-xl font-display font-bold text-xs text-amber-300 border border-amber-400/40 hover:bg-amber-500/20 transition">
+            🛒 MÁY BÁN HÀNG [T]
+          </button>
+          <button id="btn-hud-pickup" class="hud-glass px-2.5 py-1.5 rounded-xl font-display font-bold text-xs text-emerald-300 border border-emerald-400/40 hover:bg-emerald-500/20 transition">
+            ✋ NHẶT ĐỒ [F]
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="btn-hud-reload" class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl hud-glass border border-cyan-400/50 flex flex-col items-center justify-center hover:bg-cyan-500/20 active:scale-95 transition">
+            <span class="text-lg">🔄</span>
+            <span class="font-display font-bold text-[10px] text-cyan-300">NẠP [Q]</span>
+          </button>
+
+          <button id="btn-hud-fire" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-rose-500 to-orange-600 border-4 border-rose-300/60 shadow-xl shadow-rose-600/40 flex flex-col items-center justify-center active:scale-95 transition">
+            <span class="text-2xl">🎯</span>
+            <span class="font-display font-bold text-xs sm:text-sm text-white tracking-wider">BẮN [R]</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 1: VENDING MACHINE (MÁY BÁN HÀNG - PHÍM T) ==================== -->
+  <div id="modal-vending" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="lobby-glass w-full max-w-2xl rounded-3xl p-5 sm:p-6 border border-amber-400/40 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Trạm Tiếp Tế Khu Vực</span>
+          <h3 class="font-display font-bold text-xl sm:text-2xl text-white">🛒 MÁY BÁN HÀNG TỰ ĐỘNG</h3>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-400/40 font-display font-bold text-amber-300 text-sm">
+            🪙 Xu hiện có: <span id="vending-coins-amount">0</span>
+          </div>
+          <button id="btn-close-vending" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold">✕</button>
+        </div>
+      </div>
+
+      <p id="vending-status-msg" class="text-xs text-emerald-300 mt-2 min-h-[18px]">Chọn vật phẩm bạn muốn mua bằng Xu nhặt trên bản đồ:</p>
+
+      <div id="vending-items-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2 max-h-[60vh] overflow-y-auto custom-scrollbar pr-1"></div>
+
+      <div class="mt-4 flex justify-end">
+        <button id="btn-close-vending-bottom" class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200">
+          Đóng [Phím T / ESC]
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 2: EVENTS & SKIN MISSIONS (10 / 40 / 60 / 80 TRẬN) ==================== -->
+  <div id="modal-event" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm">
+    <div class="lobby-glass w-full max-w-3xl rounded-3xl p-5 sm:p-6 border border-amber-400/50 shadow-2xl max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-700 pb-3 shrink-0">
+        <div>
+          <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[11px] font-bold uppercase">Sự Kiện v1.1.0</span>
+          <h3 class="font-display font-bold text-xl sm:text-2xl text-white mt-1">🏆 CHUỖI NHIỆM VỤ SKIN SÚNG</h3>
+        </div>
+        <button id="btn-close-event" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold">✕</button>
+      </div>
+
+      <div class="mt-2 flex items-center justify-between text-xs text-slate-300 shrink-0">
+        <span>Tổng số trận đã hoàn thành: <strong id="event-modal-count" class="text-amber-300 font-display text-sm">0 trận</strong></span>
+        <span id="event-feedback-msg" class="font-semibold text-emerald-300"></span>
+      </div>
+      <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden mt-1.5 shrink-0">
+        <div id="event-modal-bar" class="h-full bg-gradient-to-r from-cyan-400 to-amber-400" style="width: 0%"></div>
+      </div>
+      <div class="mt-2 shrink-0">
+        <button id="btn-claim-event-skin" class="w-full py-2 px-4 rounded-xl btn-primary-glow font-display font-bold text-xs text-slate-950">
+          🎁 NHẬN SKIN UMP - PHONG CÁCH
+        </button>
+      </div>
+
+      <div id="event-skins-list" class="mt-3 space-y-3 overflow-y-auto custom-scrollbar pr-1 flex-1">
+        <!-- Populated dynamically via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 3: WEAPON ARMORY & SKINS (17 WEAPONS + 5 SKINS) ==================== -->
+  <div id="modal-armory" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm">
+    <div class="lobby-glass w-full max-w-6xl rounded-3xl p-5 sm:p-6 border border-slate-700 shadow-2xl max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-700 pb-3 shrink-0">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Hệ Thống Vũ Khí v1.1.0 (Đã +2 ST Toàn Bộ Súng & Thêm Độ Chính Xác)</span>
+          <h3 class="font-display font-bold text-xl sm:text-2xl text-white">🔫 KHO SÚNG (17 SÚNG) & TRANG BỊ 5 SKIN SÚNG</h3>
+        </div>
+        <button id="btn-close-armory" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold">✕</button>
+      </div>
+
+      <div class="mt-2 flex items-center justify-between text-xs bg-slate-900/80 px-3 py-1.5 rounded-xl border border-slate-700 shrink-0">
+        <span>Trạng thái Skin UMP: <span id="armory-skin-status-tag" class="px-2 py-0.5 rounded bg-slate-800 text-amber-300">Chưa mở khóa</span></span>
+        <button id="btn-armory-toggle-skin" class="px-3 py-1 rounded-lg bg-cyan-500 text-slate-950 font-bold text-xs">Trang bị Skin</button>
+      </div>
+      <!-- 5 Skins Strip -->
+      <div id="armory-skins-strip" class="mt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 shrink-0">
+        <!-- Populated dynamically -->
+      </div>
+
+      <!-- 17 Weapons Cards -->
+      <div class="mt-3 overflow-y-auto custom-scrollbar flex-1 pr-1">
+        <div id="armory-weapons-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 4: CHARACTER SKILLS (1 CHỦ ĐỘNG + 3 BỊ ĐỘNG) ==================== -->
+  <div id="modal-skills" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm">
+    <div class="lobby-glass w-full max-w-5xl rounded-3xl p-5 sm:p-6 border border-purple-400/50 shadow-2xl max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-700 pb-3 shrink-0">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-purple-300">Hệ Thống Nhân Vật v1.1.0 (Đã Mở Khóa Toàn Bộ 13 Kỹ Năng)</span>
+          <h3 class="font-display font-bold text-xl sm:text-2xl text-white">⚡ TRANG BỊ KỸ NĂNG (1 CHỦ ĐỘNG + 3 BỊ ĐỘNG)</h3>
+        </div>
+        <button id="btn-close-skills" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold">✕</button>
+      </div>
+
+      <div id="skills-feedback" class="mt-2 text-xs font-semibold text-amber-300 shrink-0">
+        Chọn 1 Kỹ năng Chủ động [Phím E] và tối đa 3 Kỹ năng Bị động mang vào trận:
+      </div>
+
+      <div class="mt-3 overflow-y-auto custom-scrollbar flex-1 pr-1 space-y-4">
+        <div>
+          <h4 class="font-display font-bold text-sm uppercase tracking-wider text-rose-300 mb-2">🔥 Kỹ Năng Chủ Động (Chọn 1 - Kích hoạt bằng Phím E)</h4>
+          <div id="skills-active-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5"></div>
+        </div>
+        <div>
+          <h4 class="font-display font-bold text-sm uppercase tracking-wider text-cyan-300 mb-2">🛡️ Kỹ Năng Bị Động (Chọn tối đa 3)</h4>
+          <div id="skills-passive-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 5: GIFTCODE INPUT ==================== -->
+  <div id="modal-giftcode" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm">
+    <div class="lobby-glass w-full max-w-md rounded-3xl p-6 border border-amber-400/50 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Trung Tâm Quà Tặng</span>
+          <h3 class="font-display font-bold text-xl text-white">🎟️ NHẬP GIFTCODE</h3>
+        </div>
+        <button id="btn-close-giftcode" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold">✕</button>
+      </div>
+
+      <div class="mt-4">
+        <label for="input-giftcode" class="block text-xs text-slate-300 mb-1.5">Nhập mã quà tặng của bạn:</label>
+        <input id="input-giftcode" type="text" placeholder="Nhập mã code tại đây..." class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-display font-bold text-sm uppercase focus:outline-none focus:border-amber-400" />
+        <div id="giftcode-feedback" class="text-xs font-semibold text-emerald-300 mt-2 min-h-[18px]"></div>
+        <button id="btn-submit-giftcode" class="w-full mt-3 py-2.5 rounded-xl btn-primary-glow font-display font-bold text-sm text-slate-950">
+          XÁC NHẬN NHẬN QUÀ
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 6: DIAMOND TOP-UP & PRIME LEVEL ==================== -->
+  <div id="modal-topup" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="lobby-glass w-full max-w-xl rounded-3xl p-6 border border-cyan-400/40 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-cyan-400">Cửa Hàng Kim Cương & Đặc Quyền</span>
+          <h3 class="font-display font-bold text-2xl text-white">💎 NẠP KIM CƯƠNG - TĂNG CẤP PRIME</h3>
+        </div>
+        <button id="btn-close-topup" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold">✕</button>
+      </div>
+
+      <div class="mt-4 p-4 rounded-2xl bg-gradient-to-r from-purple-950/80 to-indigo-950/80 border border-purple-400/40">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-xs text-purple-200">Cấp độ hiện tại:</div>
+            <div class="font-display font-bold text-2xl text-amber-300">👑 PRIME LEVEL <span id="topup-prime-level">1</span></div>
+          </div>
+          <div class="text-right">
+            <div class="text-xs text-purple-200">Điểm tích lũy Prime:</div>
+            <div class="font-display font-bold text-sm text-white"><span id="topup-prime-pts">0</span> / <span id="topup-prime-next">500</span> KC</div>
+          </div>
+        </div>
+        <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden mt-2 p-0.5">
+          <div id="topup-prime-bar" class="h-full bg-gradient-to-r from-purple-400 to-amber-400 rounded-full transition-all duration-300" style="width: 10%"></div>
+        </div>
+        <p class="text-[11px] text-purple-200 mt-2">Đặc quyền Prime: Tăng thưởng Vàng sau mỗi trận (+<span id="topup-prime-bonus">10</span>%) & Huy hiệu Hoàng Kim ở sảnh.</p>
+      </div>
+
+      <div id="topup-feedback" class="text-xs font-bold text-emerald-300 mt-3 min-h-[18px]"></div>
+
+      <div class="grid grid-cols-2 gap-3 mt-2">
+        <button data-pack="100" class="topup-pack-btn p-3.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-cyan-500/30 text-left transition">
+          <div class="text-xl">💎 100 KC</div>
+          <div class="text-xs text-slate-300 mt-0.5">+100 Điểm Prime • Tặng 500 Vàng</div>
+          <div class="mt-2 inline-block px-2.5 py-1 rounded bg-cyan-500/20 text-cyan-300 font-bold text-xs">Nạp Ngay</div>
+        </button>
+        <button data-pack="500" class="topup-pack-btn p-3.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-cyan-500/30 text-left transition">
+          <div class="text-xl">💎 500 KC</div>
+          <div class="text-xs text-slate-300 mt-0.5">+500 Điểm Prime • Tặng 2,500 Vàng</div>
+          <div class="mt-2 inline-block px-2.5 py-1 rounded bg-cyan-500/20 text-cyan-300 font-bold text-xs">Nạp Ngay</div>
+        </button>
+        <button data-pack="1000" class="topup-pack-btn p-3.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-amber-500/40 text-left transition">
+          <div class="text-xl">💎 1,000 KC</div>
+          <div class="text-xs text-slate-300 mt-0.5">+1,000 Điểm Prime • Tặng 6,000 Vàng</div>
+          <div class="mt-2 inline-block px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 font-bold text-xs">Nạp Ngay</div>
+        </button>
+        <button data-pack="5000" class="topup-pack-btn p-3.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-purple-500/40 text-left transition">
+          <div class="text-xl">💎 5,000 KC</div>
+          <div class="text-xs text-slate-300 mt-0.5">+5,000 Điểm Prime • Lên thẳng Prime Cao</div>
+          <div class="mt-2 inline-block px-2.5 py-1 rounded bg-purple-500/20 text-purple-300 font-bold text-xs">Nạp Ngay</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 7: GAME GUIDE & MECHANICS ==================== -->
+  <div id="modal-guide" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="lobby-glass w-full max-w-2xl rounded-3xl p-6 border border-slate-700 shadow-2xl max-h-[85vh] overflow-y-auto custom-scrollbar">
+      <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+        <h3 class="font-display font-bold text-xl text-white">🗺️ CHI TIẾT CẬP NHẬT v1.1.0</h3>
+        <button id="btn-close-guide" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold">✕</button>
+      </div>
+      <div class="mt-4 space-y-3 text-xs sm:text-sm text-slate-200 leading-relaxed">
+        <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-700">
+          <div class="font-bold text-purple-300 mb-1">1. Hệ thống 13 Kỹ năng Nhân vật (1 Chủ động [E] + 3 Bị động)</div>
+          <p><strong>Chủ động:</strong> Orion (Khi 200 HP tích thanh máu đỏ; bật trong 8s tăng 40% ST gây ra & nhận thêm 25% ST, hồi 50s), Iris (+50% tỉ lệ BK trong 3s, hồi 120s), Chrono (Vòng bảo vệ 360° 1800 HP trong 15s, bắn từ trong ra được, hồi 140s), Skyler (Tia phá hủy Bom keo + nổ 30 ST bán kính 5m quanh keo kể cả bản thân, hồi 75s), Mour (Tàng hình 20s cấm bắn, bấm E lần nữa hủy sớm, hồi 70s).</p>
+          <p class="mt-1"><strong>Bị động:</strong> Kelly (+20% tốc chạy), Beta (Di chuyển 3s liên tục hồi 5 HP), Rafaela (+20% độ dính đạn), Maxim (Cuốn máu 1.5s), Kapella (+40% HP hồi từ mọi nguồn), Nairi (+30% HP khiên & Bom keo tỏa vùng 3m hồi 5 HP/s trong 3s), Ama (+20% tốc bắn), Sophia (+50% tỉ lệ BK cho Shotgun).</p>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-700">
+          <div class="font-bold text-amber-300 mb-1">2. Bản đồ 6 Khu vực (Thêm Làng Tuyết) & Địa hình cao thấp [Space Nhảy]</div>
+          <p>Gồm <strong>Nhà Đá, Làng Thông, Đảo Dừa, Cổng Trời, Làng Mây, Làng Tuyết</strong>. Có đồi cao, bậc đá, tháp canh (bấm <strong>Space</strong> để nhảy). Phím <strong>A / D</strong> đi ngang trái/phải chuẩn xác không làm xoay màn hình.</p>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-700">
+          <div class="font-bold text-cyan-300 mb-1">3. Kho 17 Súng, Độ nở tâm & 5 Skin súng</div>
+          <p>Thêm <strong>Gatling, SCAR, Kar98, M590 (1 viên 130 ST), Súng Phá Bom Keo</strong>. Toàn bộ súng tăng +2 ST/viên (AWM 160 ST, giảm 30% độ ăn đạn; Súng tỉa độ nở tâm = 0). Có 5 Skin súng mở khóa qua mốc trận đấu (10 / 40 / 60 / 80 trận).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 8: END OF MATCH (VICTORY / DEFEAT) ==================== -->
+  <div id="modal-gameover" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
+    <div class="lobby-glass w-full max-w-md rounded-3xl p-6 border border-amber-400/50 text-center shadow-2xl">
+      <div id="gameover-icon" class="text-5xl mb-2">🏆</div>
+      <h2 id="gameover-title" class="font-display font-bold text-3xl text-amber-300 tracking-wider">CHIẾN THẮNG!</h2>
+      <p id="gameover-subtitle" class="text-xs text-slate-300 mt-1">Bạn đã tiêu diệt toàn bộ kẻ địch trên bản đồ!</p>
+
+      <div class="mt-4 p-4 rounded-2xl bg-slate-900/90 border border-slate-700 space-y-2 text-xs">
+        <div class="flex justify-between">
+          <span class="text-slate-400">Số mạng hạ gục:</span>
+          <span id="gameover-kills" class="font-bold text-white">0</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400">Thưởng Vàng trận đấu:</span>
+          <span id="gameover-gold" class="font-bold text-amber-300">+500 🪙</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400">Tổng số trận đã chơi:</span>
+          <span id="gameover-event-progress" class="font-bold text-cyan-300">1 trận</span>
+        </div>
+      </div>
+
+      <div class="mt-5 flex gap-3">
+        <button id="btn-gameover-lobby" class="flex-1 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 font-display font-bold text-sm text-white border border-slate-600 transition">
+          🏠 VỀ MÀN HÌNH CHÍNH
+        </button>
+        <button id="btn-gameover-replay" class="flex-1 py-3 rounded-xl btn-primary-glow font-display font-bold text-sm text-slate-950">
+          🔥 CHƠI TRẬN MỚI
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MAIN GAME LOGIC v1.1.0 ==================== -->
+  <script>
+    // =========================================================================
+    // 0. OFFLINE / NO-WEBGL FALLBACK SHIM FOR THREE.JS
+    // =========================================================================
+    if (typeof window.THREE === 'undefined') {
+      class Vec3 {
+        constructor(x = 0, y = 0, z = 0) { this.x = x; this.y = y; this.z = z; }
+        set(x, y, z) { this.x = x; this.y = y; this.z = z; return this; }
+        project(cam) {
+          const dx = this.x - cam.position.x;
+          const dy = this.y - cam.position.y;
+          const dz = this.z - cam.position.z;
+          const yaw = cam._yaw || 0;
+          const rx = dx * Math.cos(yaw) - dz * Math.sin(yaw);
+          const rz = -dx * Math.sin(yaw) - dz * Math.cos(yaw);
+          if (rz <= 0.2) { this.z = 2; return this; }
+          const f = 1.2 / rz;
+          this.x = rx * f;
+          this.y = (dy - 0.5) * f;
+          this.z = 0.5;
+          return this;
+        }
+      }
+      class Obj3D {
+        constructor() {
+          this.position = new Vec3();
+          this.rotation = new Vec3();
+          this.children = [];
+          this.visible = true;
+          this.userData = {};
+        }
+        add(...objs) { objs.forEach(o => { if (o) this.children.push(o); }); }
+        remove(o) { const i = this.children.indexOf(o); if (i >= 0) this.children.splice(i, 1); }
+      }
+      window.THREE = {
+        DoubleSide: 2,
+        PCFSoftShadowMap: 1,
+        Vector3: Vec3,
+        Color: class { constructor(c) { this.c = c; } setHex(h) { this.c = h; } },
+        FogExp2: class { constructor(c, d) {} },
+        Scene: class extends Obj3D {},
+        Group: class extends Obj3D {},
+        Mesh: class extends Obj3D {
+          constructor(geo, mat) { super(); this.geometry = geo; this.material = mat || { color: { setHex: () => {} }, opacity: 1 }; }
+        },
+        PerspectiveCamera: class extends Obj3D {
+          constructor(fov, aspect, near, far) { super(); this.aspect = aspect; this._yaw = 0; }
+          lookAt(x, y, z) { this._yaw = Math.atan2(-(x - this.position.x), -(z - this.position.z)); }
+          updateProjectionMatrix() {}
+        },
+        BoxGeometry: class { constructor(w, h, d) { this.w = w; this.h = h; this.d = d; } },
+        CylinderGeometry: class { constructor(rt, rb, h) { this.r = rb; this.h = h; } },
+        ConeGeometry: class { constructor(r, h) { this.r = r; this.h = h; } },
+        RingGeometry: class { constructor(ri, ro) { this.r = ro; } },
+        PlaneGeometry: class { constructor(w, h) { this.w = w; this.h = h; } },
+        SphereGeometry: class { constructor(r) { this.r = r; } },
+        OctahedronGeometry: class { constructor(r) { this.r = r; } },
+        GridHelper: class extends Obj3D {},
+        MeshLambertMaterial: class { constructor(opts = {}) { this.opacity = opts.opacity ?? 1; this.transparent = !!opts.transparent; this.color = { hex: opts.color || 0xffffff, setHex(h) { this.hex = h; } }; } },
+        MeshBasicMaterial: class { constructor(opts = {}) { this.opacity = opts.opacity ?? 1; this.transparent = !!opts.transparent; this.color = { hex: opts.color || 0xffffff, setHex(h) { this.hex = h; } }; } },
+        AmbientLight: class extends Obj3D {},
+        DirectionalLight: class extends Obj3D { constructor() { super(); this.shadow = { mapSize: {}, camera: {} }; } },
+        WebGLRenderer: class {
+          constructor() {
+            this.domElement = document.createElement('canvas');
+            this.ctx = this.domElement.getContext('2d');
+            this.shadowMap = { enabled: false };
+          }
+          setSize(w, h) { this.domElement.width = w; this.domElement.height = h; }
+          setPixelRatio() {}
+          render(scene, cam) {
+            const ctx = this.ctx;
+            if (!ctx) return;
+            const w = this.domElement.width;
+            const h = this.domElement.height;
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0, 0, w, h);
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(0, h * 0.5, w, h * 0.5);
+          }
+        }
+      };
+    }
+
+    // =========================================================================
+    // 1. CHARACTER SKILLS DATABASE (5 ACTIVE + 8 PASSIVE = 13 SKILLS)
+    // =========================================================================
+    const SKILLS_DB = {
+      // 5 ACTIVE SKILLS
+      orion: {
+        id: 'orion', name: 'Orion', type: 'active', icon: '🩸',
+        cooldown: 50, duration: 8,
+        desc: 'Khi có 200 HP, thanh HP chuyển đỏ (không mất tới khi bật hoặc chết). Bật chiêu (8s): +40% ST gây ra, +25% ST nhận vào. Hồi chiêu: 50s.'
+      },
+      iris: {
+        id: 'iris', name: 'Iris', type: 'active', icon: '🎯',
+        cooldown: 120, duration: 3,
+        desc: 'Khi bật kỹ năng Iris, tỉ lệ bạo kích cộng thẳng +50% trong 3 giây. Hồi chiêu: 120s.'
+      },
+      chrono: {
+        id: 'chrono', name: 'Chrono', type: 'active', icon: '🌐',
+        cooldown: 140, duration: 15, shieldHp: 1800,
+        desc: 'Tạo vòng tròn bảo vệ 360 độ (1800 HP) trong 15s. Đứng bên trong vẫn bắn ra ngoài được. Hồi chiêu: 140s.'
+      },
+      skyler: {
+        id: 'skyler', name: 'Skyler', type: 'active', icon: '💥',
+        cooldown: 75, duration: 0,
+        desc: 'Phóng tia sóng âm về phía trước phá vỡ toàn bộ Bom keo. Xung quanh Bom keo phạm vi 5m nổ 30 ST lên địch (kể cả bản thân). Hồi chiêu: 75s.'
+      },
+      mour: {
+        id: 'mour', name: 'Mour', type: 'active', icon: '👻',
+        cooldown: 70, duration: 20,
+        desc: 'Tàng hình trong 20s (cấm bắn khi đang tàng hình; bấm E lần nữa để hủy tàng hình sớm). Hồi chiêu: 70s.'
+      },
+
+      // 8 PASSIVE SKILLS
+      kelly: {
+        id: 'kelly', name: 'Kelly', type: 'passive', icon: '⚡',
+        desc: 'Tăng +20% tốc độ chạy.'
+      },
+      beta: {
+        id: 'beta', name: 'Beta', type: 'passive', icon: '💚',
+        desc: 'Mỗi 3 giây di chuyển liên tục hồi +5 HP.'
+      },
+      rafaela: {
+        id: 'rafaela', name: 'Rafaela', type: 'passive', icon: '🧲',
+        desc: 'Tăng thêm +20% khả năng dính đạn vào địch.'
+      },
+      maxim: {
+        id: 'maxim', name: 'Maxim', type: 'passive', icon: '⏱️',
+        desc: 'Thời gian cuốn Bình máu giảm chỉ còn 1.5 giây.'
+      },
+      kapella: {
+        id: 'kapella', name: 'Kapella', type: 'passive', icon: '✨',
+        desc: 'Tăng thêm +40% HP nhận vào từ mọi nguồn hồi máu.'
+      },
+      nairi: {
+        id: 'nairi', name: 'Nairi', type: 'passive', icon: '🧊',
+        desc: 'Tăng +30% HP cho các loại khiên (Bom keo, Chrono). Đặt Bom keo tạo vùng 3m giúp bản thân đứng trong đó hồi 5 HP/1s (tối đa 3s).'
+      },
+      ama: {
+        id: 'ama', name: 'Ama', type: 'passive', icon: '🔥',
+        desc: 'Tốc bắn của mọi loại súng tăng +20%.'
+      },
+      sophia: {
+        id: 'sophia', name: 'Sophia', type: 'passive', icon: '💥',
+        desc: 'Tăng +50% tỉ lệ bạo kích (cộng thẳng) khi dùng súng Shotgun.'
+      }
+    };
+    window.SKILLS_DB = SKILLS_DB;
+
+    // =========================================================================
+    // 2. WEAPON DATABASE (17 GUNS - v1.1.0 BUFFED +2 DMG & ACCURACY/BLOOM)
+    // =========================================================================
+    const WEAPONS_DB = {
+      MP40: {
+        id: 'MP40', name: 'MP40', category: 'Tiểu liên (SMG)',
+        fireRateScore: 20000, pellets: 1, damage: 14, // 8->12 + 2 = 14
+        critRate: 0.28, critBonus: 0.50, armorPen: 0.05,
+        accuracy: 0.78, bloomPerShot: 0.012, maxBloom: 0.12,
+        reloadScore: 10000, magSize: 28, moveSpeedMod: 0.00,
+        range: 62, spread: 0.022, color: 0x38bdf8, soundFreq: 420
+      },
+      UMP: {
+        id: 'UMP', name: 'UMP', category: 'Tiểu liên (SMG)',
+        fireRateScore: 16500, pellets: 1, damage: 11, // 9 + 2
+        critRate: 0.25, critBonus: 0.50, armorPen: 0.18,
+        accuracy: 0.80, bloomPerShot: 0.010, maxBloom: 0.10,
+        reloadScore: 14000, magSize: 30, moveSpeedMod: 0.03,
+        range: 68, spread: 0.020, color: 0x22d3ee, soundFreq: 390
+      },
+      MP5: {
+        id: 'MP5', name: 'MP5', category: 'Tiểu liên (SMG)',
+        fireRateScore: 17000, pellets: 1, damage: 10, // 8 + 2
+        critRate: 0.25, critBonus: 0.50, armorPen: 0.08,
+        accuracy: 0.82, bloomPerShot: 0.009, maxBloom: 0.09,
+        reloadScore: 15000, magSize: 30, moveSpeedMod: 0.02,
+        range: 66, spread: 0.018, color: 0x60a5fa, soundFreq: 410
+      },
+      SKORP: {
+        id: 'SKORP', name: 'SKORP', category: 'Tiểu liên (SMG)',
+        fireRateScore: 23000, pellets: 1, damage: 8, // 6 + 2, 22k -> 23k
+        critRate: 0.30, critBonus: 0.45, armorPen: 0.03,
+        accuracy: 0.72, bloomPerShot: 0.014, maxBloom: 0.14,
+        reloadScore: 16000, magSize: 35, moveSpeedMod: 0.05,
+        range: 56, spread: 0.028, color: 0xa78bfa, soundFreq: 480
+      },
+      AK47: {
+        id: 'AK47', name: 'AK47', category: 'Trường (AR)',
+        fireRateScore: 12500, pellets: 1, damage: 17, // 15 + 2
+        critRate: 0.20, critBonus: 0.65, armorPen: 0.12,
+        accuracy: 0.75, bloomPerShot: 0.013, maxBloom: 0.13,
+        reloadScore: 11000, magSize: 30, moveSpeedMod: -0.02,
+        range: 88, spread: 0.018, color: 0xf97316, soundFreq: 260
+      },
+      AN94: {
+        id: 'AN94', name: 'AN94', category: 'Trường (AR)',
+        fireRateScore: 13500, pellets: 1, damage: 16, // 14 + 2
+        critRate: 0.22, critBonus: 0.60, armorPen: 0.10,
+        accuracy: 0.80, bloomPerShot: 0.010, maxBloom: 0.10,
+        reloadScore: 13000, magSize: 30, moveSpeedMod: 0.00,
+        range: 86, spread: 0.016, color: 0xfb923c, soundFreq: 280
+      },
+      SCAR: {
+        id: 'SCAR', name: 'SCAR', category: 'Trường (AR)',
+        fireRateScore: 15000, pellets: 1, damage: 15, // 13 + 2
+        critRate: 0.24, critBonus: 0.55, armorPen: 0.10,
+        accuracy: 0.86, bloomPerShot: 0.008, maxBloom: 0.08,
+        reloadScore: 14500, magSize: 30, moveSpeedMod: 0.01,
+        range: 86, spread: 0.014, color: 0xfacc15, soundFreq: 300
+      },
+      MG90: {
+        id: 'MG90', name: 'MG90', category: 'Súng máy (LMG)',
+        fireRateScore: 16000, pellets: 1, damage: 14, // 12 + 2
+        critRate: 0.18, critBonus: 0.55, armorPen: 0.15,
+        accuracy: 0.72, bloomPerShot: 0.014, maxBloom: 0.15,
+        reloadScore: 7500, magSize: 60, moveSpeedMod: -0.08,
+        range: 84, spread: 0.024, color: 0xeab308, soundFreq: 230
+      },
+      GATLING: {
+        id: 'GATLING', name: 'Gatling', category: 'Đại liên (LMG)',
+        fireRateScore: 21000, pellets: 1, damage: 13, // 11 + 2
+        critRate: 0.15, critBonus: 0.50, armorPen: 0.18,
+        accuracy: 0.68, bloomPerShot: 0.015, maxBloom: 0.16,
+        reloadScore: 5500, magSize: 120, moveSpeedMod: -0.15,
+        range: 82, spread: 0.030, color: 0xf59e0b, soundFreq: 195
+      },
+      M1014: {
+        id: 'M1014', name: 'M1014', category: 'Shotgun', isShotgun: true,
+        fireRateScore: 7500, pellets: 6, damage: 8, // 6 + 2
+        critRate: 0.15, critBonus: 0.40, armorPen: 0.05,
+        accuracy: 0.68, bloomPerShot: 0.018, maxBloom: 0.12,
+        reloadScore: 8000, magSize: 6, moveSpeedMod: -0.02,
+        range: 42, spread: 0.080, color: 0xef4444, soundFreq: 150
+      },
+      M1887: {
+        id: 'M1887', name: 'M1887', category: 'Shotgun', isShotgun: true,
+        fireRateScore: 8500, pellets: 8, damage: 9, // 7 + 2
+        critRate: 0.20, critBonus: 0.45, armorPen: 0.25,
+        accuracy: 0.72, bloomPerShot: 0.015, maxBloom: 0.10,
+        reloadScore: 11000, magSize: 2, moveSpeedMod: 0.02,
+        range: 44, spread: 0.070, color: 0xf43f5e, soundFreq: 140
+      },
+      MAG7: {
+        id: 'MAG7', name: 'MAG-7', category: 'Shotgun', isShotgun: true,
+        fireRateScore: 11000, pellets: 5, damage: 7, // 5 + 2
+        critRate: 0.18, critBonus: 0.40, armorPen: 0.10,
+        accuracy: 0.74, bloomPerShot: 0.015, maxBloom: 0.10,
+        reloadScore: 13000, magSize: 8, moveSpeedMod: 0.00,
+        range: 45, spread: 0.065, color: 0xfb7185, soundFreq: 165
+      },
+      M1973: {
+        id: 'M1973', name: 'M1973', category: 'Shotgun phụ', isShotgun: true,
+        fireRateScore: 9500, pellets: 6, damage: 7, // 5 + 2
+        critRate: 0.15, critBonus: 0.40, armorPen: 0.00,
+        accuracy: 0.65, bloomPerShot: 0.018, maxBloom: 0.12,
+        reloadScore: 12000, magSize: 2, moveSpeedMod: 0.06,
+        range: 38, spread: 0.085, color: 0xd946ef, soundFreq: 175
+      },
+      M590: {
+        id: 'M590', name: 'M590', category: 'Shotgun (1 Đạn)', isShotgun: true,
+        fireRateScore: 9000, pellets: 1, damage: 130, // 130 + 2 (1 viên đạn / 1 lần bắn)
+        critRate: 0.25, critBonus: 0.60, armorPen: 0.20,
+        accuracy: 0.85, bloomPerShot: 0.010, maxBloom: 0.08,
+        reloadScore: 13500, magSize: 1, moveSpeedMod: 0.02,
+        range: 52, spread: 0.012, color: 0xe11d48, soundFreq: 130
+      },
+      AWM: {
+        id: 'AWM', name: 'AWM', category: 'Bắn tỉa (Sniper)', isSniper: true,
+        fireRateScore: 4500, pellets: 1, damage: 160, // 160 + 2
+        critRate: 0.40, critBonus: 1.00, armorPen: 0.35,
+        accuracy: 1.00, bloomPerShot: 0.00, maxBloom: 0.00, magnetismMult: 0.70, // Độ nở tâm = 0, Độ ăn đạn giảm 30%
+        reloadScore: 8000, magSize: 5, moveSpeedMod: -0.05,
+        range: 140, spread: 0.00, color: 0x10b981, soundFreq: 110
+      },
+      KAR98: {
+        id: 'KAR98', name: 'Kar98', category: 'Bắn tỉa (Sniper)', isSniper: true,
+        fireRateScore: 6000, pellets: 1, damage: 92, // 90 + 2
+        critRate: 0.35, critBonus: 0.85, armorPen: 0.28,
+        accuracy: 1.00, bloomPerShot: 0.00, maxBloom: 0.00, // Đối với súng tỉa, độ nở tâm = 0
+        reloadScore: 9500, magSize: 5, moveSpeedMod: -0.03,
+        range: 130, spread: 0.00, color: 0x34d399, soundFreq: 120
+      },
+      GLOO_BREAKER: {
+        id: 'GLOO_BREAKER', name: 'Súng Phá Bom Keo', category: 'Công phá Khiên',
+        fireRateScore: 11000, pellets: 1, damage: 20, // 18 + 2, x12 lên Bom keo/Khiên = 240 ST/viên!
+        shieldDamageMult: 12.0,
+        critRate: 0.20, critBonus: 0.45, armorPen: 0.30,
+        accuracy: 0.88, bloomPerShot: 0.006, maxBloom: 0.06,
+        reloadScore: 11500, magSize: 12, moveSpeedMod: -0.03,
+        range: 75, spread: 0.010, color: 0x06b6d4, soundFreq: 210
+      }
+    };
+    window.WEAPONS_DB = WEAPONS_DB;
+
+    // =========================================================================
+    // 3. WEAPON SKINS DATABASE (5 SKINS)
+    // =========================================================================
+    const SKINS_DB = {
+      UMP_PHONG_CACH: {
+        id: 'UMP_PHONG_CACH', weaponId: 'UMP', name: 'UMP - Phong Cách',
+        reqMatches: 10,
+        fireRateMod: 0.20, armorPenMod: 0.10, moveSpeedMod: -0.10,
+        damageMod: 0, accuracyMod: 0, magSizeMod: 0, critRateMod: 0, critBonusMod: 0,
+        desc: '+20% Tốc bắn, +10% Xuyên giáp, -10% Tốc chạy'
+      },
+      AK47_RONG_XANH: {
+        id: 'AK47_RONG_XANH', weaponId: 'AK47', name: 'AK47 - Rồng Xanh',
+        reqMatches: 40,
+        damageMod: 0.10, accuracyMod: 0.08, magSizeMod: -0.15,
+        fireRateMod: 0, armorPenMod: 0, moveSpeedMod: 0, critRateMod: 0, critBonusMod: 0,
+        desc: '+10% Sát thương, +8% Độ chính xác, -15% Băng đạn'
+      },
+      MP5_SIEU_SAO: {
+        id: 'MP5_SIEU_SAO', weaponId: 'MP5', name: 'MP5 - Siêu Sao',
+        reqMatches: 60,
+        fireRateMod: 0.25, damageMod: 0.08, accuracyMod: -0.09,
+        armorPenMod: 0, moveSpeedMod: 0, magSizeMod: 0, critRateMod: 0, critBonusMod: 0,
+        desc: '+25% Tốc bắn, +8% Sát thương, -9% Độ chính xác'
+      },
+      M590_MANH_ME: {
+        id: 'M590_MANH_ME', weaponId: 'M590', name: 'M590 - Mạnh Mẽ',
+        reqMatches: 80,
+        critRateMod: 0.08, critBonusMod: 0.20, damageMod: -0.11,
+        fireRateMod: 0, armorPenMod: 0, moveSpeedMod: 0, accuracyMod: 0, magSizeMod: 0,
+        desc: '+8% Tỉ lệ bạo kích, +20% ST bạo kích, -11% Sát thương'
+      },
+      M1887_QUY_LUA: {
+        id: 'M1887_QUY_LUA', weaponId: 'M1887', name: 'M1887 - Quỷ Lửa',
+        reqMatches: 50,
+        accuracyMod: 0.08, damageMod: 0.14, moveSpeedMod: -0.09,
+        fireRateMod: 0, armorPenMod: 0, magSizeMod: 0, critRateMod: 0, critBonusMod: 0,
+        desc: '+8% Độ chính xác, +14% Sát thương, -9% Tốc chạy'
+      }
+    };
+    window.SKINS_DB = SKINS_DB;
+
+    // Armor Levels (Lv1 - Lv4)
+    const ARMOR_DB = {
+      1: { level: 1, name: 'Giáp Lv1', reduction: 0.08, maxHits: 20, color: 0x94a3b8 },
+      2: { level: 2, name: 'Giáp Lv2', reduction: 0.10, maxHits: 45, color: 0x38bdf8 },
+      3: { level: 3, name: 'Giáp Lv3', reduction: 0.15, maxHits: 70, color: 0xa855f7 },
+      4: { level: 4, name: 'Giáp Lv4', reduction: 0.22, maxHits: 100, color: 0xf59e0b }
+    };
+    window.ARMOR_DB = ARMOR_DB;
+
+    // 6 Map Zones (Added Làng Tuyết + Elevation Hills)
+    const MAP_ZONES = [
+      { id: 'nha_da', name: 'Nhà Đá', x: -68, z: -62, radius: 34, baseHeight: 0.5, hillHeight: 3.2, color: '#64748b', groundHex: 0x334155, accentHex: 0x94a3b8 },
+      { id: 'lang_thong', name: 'Làng Thông', x: 68, z: -62, radius: 34, baseHeight: 0.4, hillHeight: 2.8, color: '#15803d', groundHex: 0x14532d, accentHex: 0x22c55e },
+      { id: 'dao_dua', name: 'Đảo Dừa', x: -68, z: 62, radius: 34, baseHeight: 0.2, hillHeight: 2.2, color: '#ca8a04', groundHex: 0x854d0e, accentHex: 0xfacc15 },
+      { id: 'cong_troi', name: 'Cổng Trời', x: 68, z: 62, radius: 34, baseHeight: 1.0, hillHeight: 4.2, color: '#7e22ce', groundHex: 0x3b0764, accentHex: 0xc084fc },
+      { id: 'lang_may', name: 'Làng Mây', x: 0, z: -18, radius: 35, baseHeight: 0.8, hillHeight: 3.6, color: '#0284c7', groundHex: 0x0c4a6e, accentHex: 0x38bdf8 },
+      { id: 'lang_tuyet', name: 'Làng Tuyết', x: 0, z: 68, radius: 35, baseHeight: 0.9, hillHeight: 4.0, color: '#e2e8f0', groundHex: 0x475569, accentHex: 0xf8fafc }
+    ];
+    window.MAP_ZONES = MAP_ZONES;
+
+    // Vending Machine Catalog
+    const VENDING_CATALOG = [
+      { id: 'mp40', name: 'Súng MP40', cost: 500, desc: 'Tiểu liên tốc bắn 20.000/30.000, ST 14, Băng 28 viên', icon: '🔫' },
+      { id: 'mg90', name: 'Súng MG90', cost: 800, desc: 'Súng máy hạng nặng 60 viên, ST 14, Xuyên giáp 15%', icon: '🔥' },
+      { id: 'gloo_breaker', name: 'Súng Phá Bom Keo', cost: 700, desc: 'Vũ khí khắc chế Bom keo & Khiên Chrono (240 ST lên khiên)', icon: '⚡' },
+      { id: 'gloowall', name: 'Bom Keo x1', cost: 100, desc: 'Tạo tường chắn đạn 500 HP trước mặt [Phím 4]', icon: '🧊' },
+      { id: 'armor3', name: 'Giáp Lv3 x1', cost: 400, desc: 'Giảm 15% ST từ súng, chịu đựng 70 viên đạn', icon: '🛡️' },
+      { id: 'armor4', name: 'Giáp Lv4 x1', cost: 600, desc: 'Giảm 22% ST từ súng, chịu đựng 100 viên đạn', icon: '⚜️' },
+      { id: 'chip99', name: 'Chip Lv Max 99', cost: 2000, desc: 'Tăng +20% tốc bắn và +15% xuyên giáp vĩnh viễn trong trận', icon: '💎' },
+      { id: 'medkit', name: 'Bình Máu x1', cost: 100, desc: 'Cuốn máu hồi +40 HP [Phím 3]', icon: '🩹' }
+    ];
+    window.VENDING_CATALOG = VENDING_CATALOG;
+
+    // =========================================================================
+    // 4. PERSISTENT ACCOUNT STATE (LOCALSTORAGE SAFE)
+    // =========================================================================
+    const AccountState = {
+      gold: 2500,
+      diamonds: 100,
+      primePoints: 100,
+      matchesPlayed: 0,
+      unlockedSkins: {
+        UMP_PHONG_CACH: false,
+        AK47_RONG_XANH: false,
+        MP5_SIEU_SAO: false,
+        M590_MANH_ME: false,
+        M1887_QUY_LUA: false
+      },
+      equippedSkins: {
+        UMP: null,
+        AK47: null,
+        MP5: null,
+        M590: null,
+        M1887: null
+      },
+      activeSkill: 'orion',
+      passiveSkills: ['kelly', 'maxim', 'nairi'],
+      soundEnabled: true,
+
+      load() {
+        try {
+          const raw = localStorage.getItem('skyfire_3d_v110_save');
+          if (raw) {
+            const data = JSON.parse(raw);
+            if (typeof data.gold === 'number') this.gold = data.gold;
+            if (typeof data.diamonds === 'number') this.diamonds = data.diamonds;
+            if (typeof data.primePoints === 'number') this.primePoints = data.primePoints;
+            if (typeof data.matchesPlayed === 'number') this.matchesPlayed = data.matchesPlayed;
+            if (data.unlockedSkins) this.unlockedSkins = { ...this.unlockedSkins, ...data.unlockedSkins };
+            if (data.equippedSkins) this.equippedSkins = { ...this.equippedSkins, ...data.equippedSkins };
+            if (data.activeSkill && SKILLS_DB[data.activeSkill]) this.activeSkill = data.activeSkill;
+            if (Array.isArray(data.passiveSkills)) this.passiveSkills = data.passiveSkills.slice(0, 3);
+            if (typeof data.soundEnabled === 'boolean') this.soundEnabled = data.soundEnabled;
+          }
+        } catch (e) {}
+      },
+
+      save() {
+        try {
+          localStorage.setItem('skyfire_3d_v110_save', JSON.stringify({
+            gold: this.gold,
+            diamonds: this.diamonds,
+            primePoints: this.primePoints,
+            matchesPlayed: this.matchesPlayed,
+            unlockedSkins: this.unlockedSkins,
+            equippedSkins: this.equippedSkins,
+            activeSkill: this.activeSkill,
+            passiveSkills: this.passiveSkills,
+            soundEnabled: this.soundEnabled
+          }));
+        } catch (e) {}
+      },
+
+      unlockAllSkinsViaCode() {
+        Object.keys(SKINS_DB).forEach((skinKey) => {
+          this.unlockedSkins[skinKey] = true;
+          const wId = SKINS_DB[skinKey].weaponId;
+          this.equippedSkins[wId] = skinKey;
+        });
+        this.save();
+      },
+
+      hasPassive(skillId) {
+        return this.passiveSkills.includes(skillId);
+      },
+
+      getPrimeLevel() {
+        if (this.primePoints >= 5000) return 8;
+        if (this.primePoints >= 3000) return 7;
+        if (this.primePoints >= 2000) return 6;
+        if (this.primePoints >= 1200) return 5;
+        if (this.primePoints >= 800) return 4;
+        if (this.primePoints >= 500) return 3;
+        if (this.primePoints >= 200) return 2;
+        return 1;
+      },
+
+      getNextPrimeThreshold() {
+        const thresholds = [200, 500, 800, 1200, 2000, 3000, 5000, 10000];
+        for (const t of thresholds) {
+          if (this.primePoints < t) return t;
+        }
+        return 10000;
+      }
+    };
+    AccountState.load();
+    window.AccountState = AccountState;
+
+    // =========================================================================
+    // 5. SYNTHESIZED SOUND ENGINE
+    // =========================================================================
+    const SoundFX = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume().catch(() => {});
+        }
+      },
+      playTone(freq, type, duration, gainVal = 0.12, slideFreq = null) {
+        if (!AccountState.soundEnabled) return;
+        try {
+          this.init();
+          if (!this.ctx) return;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          if (slideFreq) {
+            osc.frequency.exponentialRampToValueAtTime(slideFreq, this.ctx.currentTime + duration);
+          }
+          gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch (e) {}
+      },
+      shoot(weapon) {
+        const base = weapon ? weapon.soundFreq : 320;
+        this.playTone(base, 'sawtooth', 0.09, 0.14, Math.max(55, base * 0.35));
+      },
+      hit(isCrit) {
+        if (isCrit) {
+          this.playTone(980, 'triangle', 0.12, 0.16, 1420);
+        } else {
+          this.playTone(520, 'sine', 0.06, 0.10, 380);
+        }
+      },
+      pickup() {
+        this.playTone(580, 'sine', 0.12, 0.12, 880);
+      },
+      reload() {
+        this.playTone(300, 'square', 0.10, 0.08, 460);
+      },
+      glooWall() {
+        this.playTone(240, 'sine', 0.22, 0.15, 680);
+      },
+      skillActivate() {
+        this.playTone(360, 'triangle', 0.30, 0.16, 920);
+      },
+      healComplete() {
+        this.playTone(440, 'triangle', 0.25, 0.14, 880);
+      },
+      respawn() {
+        this.playTone(330, 'sawtooth', 0.35, 0.15, 660);
+      }
+    };
+
+    // =========================================================================
+    // 6. THREE.JS 3D SCENE & ELEVATION TERRAIN BUILDER
+    // =========================================================================
+    const container = document.getElementById('game-canvas-container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0f172a);
+    scene.fog = new THREE.FogExp2(0x0f172a, 0.005);
+
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 340);
+    let renderer = null;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      if (renderer.shadowMap) {
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      }
+      container.appendChild(renderer.domElement);
+    } catch (err) {
+      const fallbackCanvas = document.createElement('canvas');
+      fallbackCanvas.width = window.innerWidth;
+      fallbackCanvas.height = window.innerHeight;
+      container.appendChild(fallbackCanvas);
+      renderer = {
+        domElement: fallbackCanvas,
+        setSize: () => {},
+        render: () => {}
+      };
+    }
+
+    const ambientLight = new THREE.AmbientLight(0xdbeafe, 0.72);
+    scene.add(ambientLight);
+
+    const sunLight = new THREE.DirectionalLight(0xfef3c7, 0.95);
+    sunLight.position.set(65, 110, 45);
+    sunLight.castShadow = true;
+    scene.add(sunLight);
+
+    const worldGroup = new THREE.Group();
+    const lootGroup = new THREE.Group();
+    const botsGroup = new THREE.Group();
+    const bulletsGroup = new THREE.Group();
+    const glooWallsGroup = new THREE.Group();
+    const effectsGroup = new THREE.Group();
+    scene.add(worldGroup, lootGroup, botsGroup, bulletsGroup, glooWallsGroup, effectsGroup);
+
+    let staticColliders = [];
+    let terrainHills = []; // { x, z, r, height } for 3D high/low terrain elevation!
+    let vendingMachines = [];
+    let blueZoneBeaconMesh = null;
+
+    // Calculate terrain height (Y) at any (x, z) coordinate
+    function getTerrainHeight(x, z) {
+      let maxH = 0;
+      for (const hill of terrainHills) {
+        const d = Math.hypot(x - hill.x, z - hill.z);
+        if (d < hill.r) {
+          // Smooth cosine hill slope or plateau
+          const ratio = 1 - d / hill.r;
+          const h = hill.isPlateau
+            ? hill.height * Math.min(1, ratio * 2.5)
+            : hill.height * Math.cos((d / hill.r) * (Math.PI / 2));
+          if (h > maxH) maxH = h;
+        }
+      }
+      return maxH;
+    }
+    window.getTerrainHeight = getTerrainHeight;
+
+    function createCharacterMesh(bodyColor, isPlayer = false) {
+      const group = new THREE.Group();
+
+      const legGeo = new THREE.BoxGeometry(0.32, 0.75, 0.32);
+      const legMat = new THREE.MeshLambertMaterial({ color: 0x1e293b, transparent: true, opacity: 1 });
+      const leftLeg = new THREE.Mesh(legGeo, legMat);
+      leftLeg.position.set(-0.2, 0.375, 0);
+      const rightLeg = new THREE.Mesh(legGeo, legMat);
+      rightLeg.position.set(0.2, 0.375, 0);
+      group.add(leftLeg, rightLeg);
+
+      const torsoGeo = new THREE.BoxGeometry(0.82, 0.95, 0.48);
+      const torsoMat = new THREE.MeshLambertMaterial({ color: bodyColor, transparent: true, opacity: 1 });
+      const torso = new THREE.Mesh(torsoGeo, torsoMat);
+      torso.position.set(0, 1.22, 0);
+      group.add(torso);
+
+      const vestGeo = new THREE.BoxGeometry(0.88, 0.72, 0.54);
+      const vestMat = new THREE.MeshLambertMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.85 });
+      const vest = new THREE.Mesh(vestGeo, vestMat);
+      vest.position.set(0, 1.26, 0);
+      vest.visible = false;
+      group.add(vest);
+
+      const headGeo = new THREE.BoxGeometry(0.56, 0.56, 0.56);
+      const headMat = new THREE.MeshLambertMaterial({ color: 0xfde68a, transparent: true, opacity: 1 });
+      const head = new THREE.Mesh(headGeo, headMat);
+      head.position.set(0, 2.02, 0);
+      group.add(head);
+
+      const visorGeo = new THREE.BoxGeometry(0.6, 0.22, 0.6);
+      const visorMat = new THREE.MeshLambertMaterial({ color: isPlayer ? 0xf59e0b : 0xef4444 });
+      const visor = new THREE.Mesh(visorGeo, visorMat);
+      visor.position.set(0, 2.18, 0);
+      group.add(visor);
+
+      const gunGroup = new THREE.Group();
+      const barrelGeo = new THREE.BoxGeometry(0.16, 0.18, 0.95);
+      const barrelMat = new THREE.MeshLambertMaterial({ color: 0x38bdf8 });
+      const barrel = new THREE.Mesh(barrelGeo, barrelMat);
+      barrel.position.set(0, 0, -0.35);
+      gunGroup.add(barrel);
+      gunGroup.position.set(0.52, 1.32, -0.25);
+      group.add(gunGroup);
+
+      group.userData = { torso, torsoMat, headMat, legMat, vest, barrelMat, leftLeg, rightLeg, gunGroup };
+      return group;
+    }
+
+    const playerMesh = createCharacterMesh(0x0284c7, true);
+    scene.add(playerMesh);
+
+    function buildStaticWorld() {
+      while (worldGroup.children.length > 0) worldGroup.remove(worldGroup.children[0]);
+      staticColliders = [];
+      terrainHills = [];
+      vendingMachines = [];
+
+      const groundGeo = new THREE.PlaneGeometry(250, 250, 32, 32);
+      const groundMat = new THREE.MeshLambertMaterial({ color: 0x1e293b });
+      const ground = new THREE.Mesh(groundGeo, groundMat);
+      ground.rotation.x = -Math.PI / 2;
+      worldGroup.add(ground);
+
+      const grid = new THREE.GridHelper(250, 50, 0x334155, 0x1e293b);
+      grid.position.y = 0.02;
+      worldGroup.add(grid);
+
+      // Build 6 Zones + 3D Hills / High-Low Elevation Platforms
+      MAP_ZONES.forEach((zone) => {
+        const padGeo = new THREE.CylinderGeometry(zone.radius, zone.radius + 2, zone.baseHeight, 32);
+        const padMat = new THREE.MeshLambertMaterial({ color: zone.groundHex });
+        const pad = new THREE.Mesh(padGeo, padMat);
+        pad.position.set(zone.x, zone.baseHeight / 2, zone.z);
+        worldGroup.add(pad);
+
+        terrainHills.push({ x: zone.x, z: zone.z, r: zone.radius, height: zone.baseHeight, isPlateau: true });
+
+        // Elevated Hill / Ridge inside each zone for high-ground tactical combat
+        const hillX = zone.x - 10;
+        const hillZ = zone.z - 8;
+        const hillR = 13;
+        const hillH = zone.hillHeight;
+        const hillMesh = new THREE.Mesh(
+          new THREE.ConeGeometry(hillR, hillH, 16),
+          new THREE.MeshLambertMaterial({ color: zone.id === 'lang_tuyet' ? 0xe2e8f0 : zone.groundHex })
+        );
+        hillMesh.position.set(hillX, hillH / 2, hillZ);
+        worldGroup.add(hillMesh);
+        terrainHills.push({ x: hillX, z: hillZ, r: hillR, height: hillH, isPlateau: false });
+
+        // 1 Vending Machine per Zone
+        const vmX = zone.x + 6;
+        const vmZ = zone.z + 5;
+        const vmY = getTerrainHeight(vmX, vmZ);
+        const vmGroup = new THREE.Group();
+        const vmBody = new THREE.Mesh(
+          new THREE.BoxGeometry(2.2, 3.4, 1.6),
+          new THREE.MeshLambertMaterial({ color: 0xf59e0b })
+        );
+        vmBody.position.y = 1.7;
+        const vmScreen = new THREE.Mesh(
+          new THREE.BoxGeometry(1.6, 1.5, 1.68),
+          new THREE.MeshBasicMaterial({ color: 0x38bdf8 })
+        );
+        vmScreen.position.y = 2.1;
+        vmGroup.add(vmBody, vmScreen);
+        vmGroup.position.set(vmX, vmY, vmZ);
+        worldGroup.add(vmGroup);
+        vendingMachines.push({ zoneId: zone.id, zoneName: zone.name, x: vmX, z: vmZ, mesh: vmGroup });
+        staticColliders.push({ x: vmX, z: vmZ, r: 1.5, h: vmY + 3.5, type: 'vending' });
+
+        // Buildings & Crates
+        const buildingOffsets = [
+          { dx: -15, dz: 11, w: 7, d: 7, h: 4.5 },
+          { dx: 15, dz: -12, w: 8, d: 6, h: 3.8 }
+        ];
+        buildingOffsets.forEach((b, idx) => {
+          const bx = zone.x + b.dx;
+          const bz = zone.z + b.dz;
+          const by = getTerrainHeight(bx, bz);
+          const bMat = new THREE.MeshLambertMaterial({
+            color: zone.id === 'lang_tuyet' ? 0xcbd5e1 :
+                   zone.id === 'nha_da' ? 0x64748b :
+                   zone.id === 'lang_thong' ? 0x78350f :
+                   zone.id === 'dao_dua' ? 0xa16207 :
+                   zone.id === 'cong_troi' ? 0xe2e8f0 : 0x0ea5e9
+          });
+          const house = new THREE.Mesh(new THREE.BoxGeometry(b.w, b.h, b.d), bMat);
+          house.position.set(bx, by + b.h / 2, bz);
+          worldGroup.add(house);
+
+          const roof = new THREE.Mesh(
+            new THREE.ConeGeometry(Math.max(b.w, b.d) * 0.78, 2.4, 4),
+            new THREE.MeshLambertMaterial({ color: zone.accentHex })
+          );
+          roof.position.set(bx, by + b.h + 1.2, bz);
+          roof.rotation.y = Math.PI / 4;
+          worldGroup.add(roof);
+
+          staticColliders.push({ x: bx, z: bz, r: Math.max(b.w, b.d) * 0.52, h: by + b.h, type: 'building' });
+
+          const cx = bx + (idx % 2 === 0 ? 5.2 : -5.2);
+          const cz = bz + 3.5;
+          const cy = getTerrainHeight(cx, cz);
+          const crate = new THREE.Mesh(
+            new THREE.BoxGeometry(1.6, 1.6, 1.6),
+            new THREE.MeshLambertMaterial({ color: 0xd97706 })
+          );
+          crate.position.set(cx, cy + 0.8, cz);
+          worldGroup.add(crate);
+          staticColliders.push({ x: cx, z: cz, r: 1.1, h: cy + 1.6, type: 'crate' });
+        });
+      });
+
+      // Add extra central & inter-zone hills for terrain elevation variety
+      const extraHills = [
+        { x: -35, z: 0, r: 16, height: 3.8 },
+        { x: 35, z: 10, r: 16, height: 3.5 },
+        { x: 0, z: 25, r: 14, height: 3.0 }
+      ];
+      extraHills.forEach((eh) => {
+        const hill = new THREE.Mesh(
+          new THREE.ConeGeometry(eh.r, eh.height, 16),
+          new THREE.MeshLambertMaterial({ color: 0x334155 })
+        );
+        hill.position.set(eh.x, eh.height / 2, eh.z);
+        worldGroup.add(hill);
+        terrainHills.push({ x: eh.x, z: eh.z, r: eh.r, height: eh.height, isPlateau: false });
+      });
+    }
+    buildStaticWorld();
+
+    // =========================================================================
+    // 7. IN-GAME MATCH STATE & FULL v1.1.0 MECHANICS
+    // =========================================================================
+    const Match = {
+      active: false,
+      blueZone: null,
+      cameraFirstPerson: false,
+
+      player: {
+        x: 0,
+        y: 0,
+        z: 0,
+        vy: 0,
+        isGrounded: true,
+        yaw: 0,
+        hp: 200,
+        maxHp: 200,
+        coins: 300,
+        kills: 0,
+        respawnsLeft: 1,
+        armor: null,
+        hasMaxChip: false,
+        medkits: 2,
+        glooWalls: 2,
+        weapons: [null, null],
+        activeSlot: 0,
+        lastShotTime: 0,
+        recoilBloom: 0,
+        reloading: false,
+        reloadStart: 0,
+        reloadDuration: 0,
+        healing: false,
+        healStart: 0,
+        healDuration: 3000,
+
+        // Character Skill Runtime States
+        orionRedReady: true, // Starts at 200 HP -> red HP bar ready!
+        skillActiveUntil: 0,
+        skillCooldownUntil: 0,
+        invisibleUntil: 0,
+        continuousMoveTime: 0 // For Beta passive (every 3s continuous move -> +5 HP)
+      },
+
+      lootItems: [],
+      bots: [],
+      bullets: [],
+      glooWalls: [],    // { x, y, z, yaw, hp, maxHp, mesh, collider, nairiHealTicksLeft, nextNairiTick, ownerIsPlayer }
+      chronoDomes: [],  // { x, y, z, r, hp, maxHp, expiresAt, ownerId, mesh }
+
+      initMatch() {
+        while (lootGroup.children.length > 0) lootGroup.remove(lootGroup.children[0]);
+        while (botsGroup.children.length > 0) botsGroup.remove(botsGroup.children[0]);
+        while (bulletsGroup.children.length > 0) bulletsGroup.remove(bulletsGroup.children[0]);
+        while (glooWallsGroup.children.length > 0) glooWallsGroup.remove(glooWallsGroup.children[0]);
+        while (effectsGroup.children.length > 0) effectsGroup.remove(effectsGroup.children[0]);
+
+        this.lootItems = [];
+        this.bots = [];
+        this.bullets = [];
+        this.glooWalls = [];
+        this.chronoDomes = [];
+        staticColliders = staticColliders.filter(c => c.type !== 'gloowall');
+
+        // 1. Pick 1 of the 6 zones as VÙNG XANH
+        this.blueZone = MAP_ZONES[Math.floor(Math.random() * MAP_ZONES.length)];
+        this.createBlueZoneBeacon();
+
+        // 2. Initialize Player
+        this.player.x = 0;
+        this.player.z = -4;
+        this.player.y = getTerrainHeight(0, -4);
+        this.player.vy = 0;
+        this.player.isGrounded = true;
+        this.player.yaw = 0;
+        this.player.hp = 200;
+        this.player.maxHp = 200;
+        this.player.coins = 300;
+        this.player.kills = 0;
+        this.player.respawnsLeft = 1;
+        this.player.armor = { ...ARMOR_DB[1], hitsLeft: ARMOR_DB[1].maxHits };
+        playerMesh.userData.vest.visible = true;
+        playerMesh.userData.vest.material.color.setHex(ARMOR_DB[1].color);
+        this.player.hasMaxChip = false;
+        this.player.medkits = 2;
+        this.player.glooWalls = 2;
+        this.player.recoilBloom = 0;
+
+        // Apply MP40 starting weapon
+        const mp40Mag = this.getModifiedWeaponSpec('MP40').magSize;
+        this.player.weapons = [
+          { id: 'MP40', ammo: mp40Mag },
+          null
+        ];
+        this.player.activeSlot = 0;
+        this.player.reloading = false;
+        this.player.healing = false;
+
+        // Reset Skill States
+        this.player.orionRedReady = true; // 200 HP at start
+        this.player.skillActiveUntil = 0;
+        this.player.skillCooldownUntil = 0;
+        this.player.invisibleUntil = 0;
+        this.player.continuousMoveTime = 0;
+        this.setPlayerOpacity(1.0);
+
+        this.spawnAllMapLoot();
+        this.spawnInitialBots();
+
+        this.active = true;
+        this.updateAllHUD();
+        this.showBanner(`🔵 VÙNG XANH: ${this.blueZone.name.toUpperCase()} | Kỹ năng chủ động: ${SKILLS_DB[AccountState.activeSkill].name} [Phím E]`, 4500);
+      },
+
+      setPlayerOpacity(alpha) {
+        playerMesh.userData.torsoMat.opacity = alpha;
+        playerMesh.userData.headMat.opacity = alpha;
+        playerMesh.userData.legMat.opacity = alpha;
+      },
+
+      // ApplyKapella (+40% healing from all sources) and check Orion 200 HP Red Bar trigger
+      healPlayer(rawAmount, sourceLabel = '') {
+        if (!this.active || this.player.hp <= 0) return 0;
+        const mult = AccountState.hasPassive('kapella') ? 1.40 : 1.0;
+        const finalHeal = Math.round(rawAmount * mult * 10) / 10;
+        this.player.hp = Math.min(this.player.maxHp, Math.round((this.player.hp + finalHeal) * 10) / 10);
+        if (this.player.hp >= 200) {
+          this.player.orionRedReady = true;
+        }
+        this.updateHealthAndArmorHUD();
+        return finalHeal;
+      },
+
+      // Trigger Player Active Skill [Phím E]
+      triggerPlayerActiveSkill() {
+        if (!this.active) return;
+        const now = performance.now();
+        const skillId = AccountState.activeSkill;
+        const skill = SKILLS_DB[skillId];
+        if (!skill) return;
+
+        // Special check for Mour: pressing E while invisible cancels invisibility early!
+        if (skillId === 'mour' && now < this.player.invisibleUntil) {
+          this.player.invisibleUntil = 0;
+          this.player.skillActiveUntil = 0;
+          this.setPlayerOpacity(1.0);
+          this.showBanner('👻 Đã chủ động hủy Tàng hình Mour sớm — Bạn có thể nổ súng ngay!', 2200);
+          this.updateSkillHUD(now);
+          return;
+        }
+
+        if (now < this.player.skillCooldownUntil) {
+          const rem = Math.ceil((this.player.skillCooldownUntil - now) / 1000);
+          this.showBanner(`⏳ Kỹ năng ${skill.name} đang hồi chiêu (${rem}s)!`, 1600);
+          return;
+        }
+
+        if (skillId === 'orion') {
+          if (!this.player.orionRedReady) {
+            this.showBanner('⚠️ Orion cần từng đạt đầy 200 HP (Thanh máu Đỏ) mới có thể kích hoạt!', 2400);
+            return;
+          }
+          // Activate Orion: Red HP bar returns to normal! +40% dmg dealt, +25% dmg taken for 8s, CD 50s
+          this.player.orionRedReady = false;
+          this.player.skillActiveUntil = now + skill.duration * 1000;
+          this.player.skillCooldownUntil = now + skill.cooldown * 1000;
+          SoundFX.skillActivate();
+          this.updateHealthAndArmorHUD();
+          this.showBanner('🩸 ĐÃ BẬT ORION (8s): +40% Sát thương gây ra, +25% ST nhận vào, Thanh HP về bình thường!', 3200);
+        } else if (skillId === 'iris') {
+          this.player.skillActiveUntil = now + skill.duration * 1000;
+          this.player.skillCooldownUntil = now + skill.cooldown * 1000;
+          SoundFX.skillActivate();
+          this.showBanner('🎯 ĐÃ BẬT IRIS (3s): +50% Tỉ lệ Bạo kích!', 2800);
+        } else if (skillId === 'chrono') {
+          this.player.skillActiveUntil = now + skill.duration * 1000;
+          this.player.skillCooldownUntil = now + skill.cooldown * 1000;
+          SoundFX.skillActivate();
+          this.spawnChronoDome(this.player.x, this.player.y, this.player.z, 'player', AccountState.hasPassive('nairi'));
+          const domeHp = AccountState.hasPassive('nairi') ? Math.round(1800 * 1.3) : 1800;
+          this.showBanner(`🌐 ĐÃ BẬT CHRONO (15s): Vòng bảo vệ 360° (${domeHp} HP) - Bắn xuyên từ trong ra ngoài!`, 3200);
+        } else if (skillId === 'skyler') {
+          this.player.skillCooldownUntil = now + skill.cooldown * 1000;
+          SoundFX.skillActivate();
+          this.fireSkylerWave(this.player.x, this.player.z, this.player.yaw);
+        } else if (skillId === 'mour') {
+          this.player.invisibleUntil = now + skill.duration * 1000;
+          this.player.skillActiveUntil = this.player.invisibleUntil;
+          this.player.skillCooldownUntil = now + skill.cooldown * 1000;
+          this.setPlayerOpacity(0.22);
+          SoundFX.skillActivate();
+          this.showBanner('👻 ĐÃ BẬT MOUR (20s): Tàng hình hoàn toàn (Cấm bắn - Bấm E lần nữa để hủy sớm)!', 3200);
+        }
+
+        this.updateSkillHUD(now);
+      },
+
+      spawnChronoDome(x, y, z, ownerId, hasNairiBonus) {
+        const maxHp = Math.round(1800 * (hasNairiBonus ? 1.30 : 1.0));
+        const r = 4.2;
+        const geo = new THREE.SphereGeometry(r, 20, 16);
+        const mat = new THREE.MeshBasicMaterial({
+          color: ownerId === 'player' ? 0x38bdf8 : 0xf43f5e,
+          transparent: true,
+          opacity: 0.24,
+          side: THREE.DoubleSide
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(x, y + 1.5, z);
+        effectsGroup.add(mesh);
+
+        this.chronoDomes.push({
+          x, y, z, r,
+          hp: maxHp, maxHp,
+          expiresAt: performance.now() + 15000,
+          ownerId,
+          mesh
+        });
+      },
+
+      // Skyler Sonic Wave: Destroys all Gloo Walls in forward path & deals 30 AoE damage within 5m (including self!)
+      fireSkylerWave(originX, originZ, yaw) {
+        const dirX = -Math.sin(yaw);
+        const dirZ = -Math.cos(yaw);
+        let destroyedCount = 0;
+
+        // Visual Sonic Beam
+        const beamMesh = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.6, 0.6, 45, 8),
+          new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.65 })
+        );
+        beamMesh.rotation.x = Math.PI / 2;
+        beamMesh.rotation.z = -yaw;
+        beamMesh.position.set(originX + dirX * 22, this.player.y + 1.3, originZ + dirZ * 22);
+        effectsGroup.add(beamMesh);
+        setTimeout(() => effectsGroup.remove(beamMesh), 450);
+
+        for (let i = this.glooWalls.length - 1; i >= 0; i--) {
+          const gw = this.glooWalls[i];
+          const dx = gw.x - originX;
+          const dz = gw.z - originZ;
+          const forwardProj = dx * dirX + dz * dirZ;
+          const perpDist = Math.abs(dx * (-dirZ) + dz * dirX);
+
+          // Destroy Gloo Walls in front (or all Gloo Walls in beam range)
+          if ((forwardProj >= -2 && forwardProj <= 65 && perpDist <= 8.5) || Math.hypot(dx, dz) <= 45) {
+            destroyedCount++;
+            const gx = gw.x;
+            const gz = gw.z;
+
+            // Remove Gloo Wall
+            glooWallsGroup.remove(gw.mesh);
+            staticColliders = staticColliders.filter(c => c !== gw.collider);
+            this.glooWalls.splice(i, 1);
+
+            // 5m AoE Explosion around destroyed Gloo Wall: 30 Damage to Enemies AND Self!
+            for (const bot of this.bots) {
+              if (bot.hp <= 0) continue;
+              if (Math.hypot(bot.x - gx, bot.z - gz) <= 5.0) {
+                bot.hp = Math.max(0, bot.hp - 30);
+                this.spawnDamagePopup(bot.x, bot.y + 2.3, bot.z, 30, true, false);
+                if (bot.hp <= 0) this.handleBotEliminated(bot);
+              }
+            }
+            if (Math.hypot(this.player.x - gx, this.player.z - gz) <= 5.0) {
+              this.player.hp = Math.max(0, this.player.hp - 30);
+              this.updateHealthAndArmorHUD();
+              if (this.player.hp <= 0) this.handlePlayerEliminated();
+            }
+          }
+        }
+
+        this.showBanner(`💥 Tia Skyler đã phá hủy ${destroyedCount} Bom keo (Gây 30 ST nổ trong vùng 5m)!`, 2800);
+      },
+
+      jumpPlayer() {
+        if (!this.active) return;
+        if (this.player.isGrounded) {
+          this.player.vy = 10.5;
+          this.player.isGrounded = false;
+          SoundFX.playTone(280, 'sine', 0.12, 0.08, 480);
+        }
+      },
+
+      createBlueZoneBeacon() {
+        if (blueZoneBeaconMesh) {
+          worldGroup.remove(blueZoneBeaconMesh);
+          blueZoneBeaconMesh = null;
+        }
+        const bz = this.blueZone;
+        const ringGeo = new THREE.CylinderGeometry(bz.radius, bz.radius, 16, 36, 1, true);
+        const ringMat = new THREE.MeshBasicMaterial({
+          color: 0x06b6d4,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.16
+        });
+        blueZoneBeaconMesh = new THREE.Mesh(ringGeo, ringMat);
+        blueZoneBeaconMesh.position.set(bz.x, 8, bz.z);
+        worldGroup.add(blueZoneBeaconMesh);
+      },
+
+      spawnLootItem(type, subType, name, x, z, colorHex, amount = 1) {
+        const y = getTerrainHeight(x, z);
+        const meshGroup = new THREE.Group();
+        let geo;
+        if (type === 'coin') {
+          geo = new THREE.CylinderGeometry(0.65, 0.65, 0.25, 14);
+        } else if (type === 'weapon') {
+          geo = new THREE.BoxGeometry(1.3, 0.45, 0.55);
+        } else if (type === 'armor') {
+          geo = new THREE.OctahedronGeometry(0.65, 0);
+        } else if (type === 'chip99') {
+          geo = new THREE.OctahedronGeometry(0.75, 1);
+        } else {
+          geo = new THREE.BoxGeometry(0.75, 0.75, 0.75);
+        }
+        const mat = new THREE.MeshLambertMaterial({ color: colorHex });
+        const box = new THREE.Mesh(geo, mat);
+        box.position.y = 0.65;
+        meshGroup.add(box);
+
+        const baseRing = new THREE.Mesh(
+          new THREE.RingGeometry(0.65, 0.85, 16),
+          new THREE.MeshBasicMaterial({ color: colorHex, side: THREE.DoubleSide })
+        );
+        baseRing.rotation.x = -Math.PI / 2;
+        baseRing.position.y = 0.08;
+        meshGroup.add(baseRing);
+
+        meshGroup.position.set(x, y, z);
+        lootGroup.add(meshGroup);
+
+        this.lootItems.push({
+          id: 'loot_' + Math.random().toString(36).slice(2, 9),
+          type, subType, name, amount, x, y, z, mesh: meshGroup
+        });
+      },
+
+      spawnAllMapLoot() {
+        const allWeaponKeys = Object.keys(WEAPONS_DB);
+        const highTierWeapons = ['AWM', 'KAR98', 'M590', 'GATLING', 'SCAR', 'M1887', 'MG90', 'AK47', 'GLOO_BREAKER'];
+
+        MAP_ZONES.forEach((zone) => {
+          const isBlue = zone.id === this.blueZone.id;
+          const weaponCount = isBlue ? 9 : 5;
+          const coinStacksCount = isBlue ? 8 : 4;
+          const armorCount = isBlue ? 5 : 3;
+
+          if (isBlue) {
+            this.spawnLootItem('chip99', 'CHIP99', 'Chip Lv Max 99 (+20% Tốc bắn, +15% Xuyên giáp)', zone.x - 3, zone.z - 3, 0xc084fc, 1);
+          }
+
+          for (let i = 0; i < weaponCount; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const r = 6 + Math.random() * (zone.radius - 8);
+            const wx = zone.x + Math.cos(angle) * r;
+            const wz = zone.z + Math.sin(angle) * r;
+            const wKey = isBlue && Math.random() < 0.65
+              ? highTierWeapons[Math.floor(Math.random() * highTierWeapons.length)]
+              : allWeaponKeys[Math.floor(Math.random() * allWeaponKeys.length)];
+            const wData = WEAPONS_DB[wKey];
+            this.spawnLootItem('weapon', wKey, `Súng ${wData.name}`, wx, wz, wData.color, 1);
+          }
+
+          const coinOptions = isBlue ? [200, 500, 500, 1000] : [100, 100, 200, 500];
+          for (let i = 0; i < coinStacksCount; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const r = 4 + Math.random() * (zone.radius - 6);
+            const cx = zone.x + Math.cos(angle) * r;
+            const cz = zone.z + Math.sin(angle) * r;
+            const val = coinOptions[Math.floor(Math.random() * coinOptions.length)];
+            this.spawnLootItem('coin', val, `Cụm ${val} Xu`, cx, cz, 0xfacc15, val);
+          }
+
+          for (let i = 0; i < armorCount; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const r = 5 + Math.random() * (zone.radius - 7);
+            const ax = zone.x + Math.cos(angle) * r;
+            const az = zone.z + Math.sin(angle) * r;
+            const roll = Math.random();
+            const lv = isBlue
+              ? (roll < 0.50 ? 4 : (roll < 0.85 ? 3 : 2))
+              : (roll < 0.14 ? 4 : (roll < 0.40 ? 3 : (roll < 0.75 ? 2 : 1)));
+            const aData = ARMOR_DB[lv];
+            this.spawnLootItem('armor', lv, aData.name, ax, az, aData.color, 1);
+          }
+
+          for (let i = 0; i < 3; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const r = 5 + Math.random() * (zone.radius - 8);
+            this.spawnLootItem('medkit', 'MEDKIT', 'Bình Máu (+40 HP)', zone.x + Math.cos(angle) * r, zone.z + Math.sin(angle) * r, 0x22c55e, 1);
+            this.spawnLootItem('gloowall', 'GLOOWALL', 'Bom Keo (500 HP)', zone.x + Math.sin(angle) * r, zone.z + Math.cos(angle) * r, 0x38bdf8, 1);
+          }
+        });
+      },
+
+      spawnInitialBots() {
+        const botWeaponPool = ['MP40', 'UMP', 'MP5', 'AK47', 'AN94', 'SCAR', 'M1014', 'M1887', 'MAG7', 'M590', 'GATLING', 'KAR98'];
+        const botSkillPool = ['orion', 'chrono', 'iris', 'kelly', 'ama', 'nairi'];
+        let botIndex = 1;
+
+        MAP_ZONES.forEach((zone) => {
+          const countInZone = zone.id === this.blueZone.id ? 4 : 2;
+          for (let i = 0; i < countInZone; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const r = 12 + Math.random() * (zone.radius - 12);
+            const bx = zone.x + Math.cos(angle) * r;
+            const bz = zone.z + Math.sin(angle) * r;
+            if (Math.hypot(bx - this.player.x, bz - this.player.z) < 22) continue;
+
+            const wKey = botWeaponPool[Math.floor(Math.random() * botWeaponPool.length)];
+            const armorLv = zone.id === this.blueZone.id ? 3 : (Math.random() < 0.6 ? 2 : 1);
+            const botSkill = botSkillPool[Math.floor(Math.random() * botSkillPool.length)];
+            this.createBot(botIndex++, bx, bz, wKey, armorLv, 1, botSkill);
+          }
+        });
+      },
+
+      createBot(num, x, z, weaponKey, armorLv, respawnsLeft, skillId = 'kelly') {
+        const y = getTerrainHeight(x, z);
+        const mesh = createCharacterMesh(0xe11d48, false);
+        mesh.position.set(x, y, z);
+        if (armorLv && ARMOR_DB[armorLv]) {
+          mesh.userData.vest.visible = true;
+          mesh.userData.vest.material.color.setHex(ARMOR_DB[armorLv].color);
+        }
+        botsGroup.add(mesh);
+
+        this.bots.push({
+          id: 'bot_' + num + '_' + Math.random().toString(36).slice(2, 6),
+          name: `Bot #${num}`,
+          num,
+          x, y, z,
+          yaw: Math.random() * Math.PI * 2,
+          hp: 200,
+          maxHp: 200,
+          respawnsLeft,
+          skillId,
+          skillName: SKILLS_DB[skillId] ? SKILLS_DB[skillId].name : 'Kelly',
+          skillReady: true,
+          orionActiveUntil: 0,
+          glooReady: true,
+          strafeDir: Math.random() < 0.5 ? 1 : -1,
+          nextStrafeSwitch: performance.now() + 1500,
+          armor: armorLv ? { ...ARMOR_DB[armorLv], hitsLeft: ARMOR_DB[armorLv].maxHits } : null,
+          weapon: WEAPONS_DB[weaponKey] || WEAPONS_DB.UMP,
+          mesh,
+          lastShotTime: 0,
+          patrolTarget: { x: x + (Math.random() - 0.5) * 26, z: z + (Math.random() - 0.5) * 26 }
+        });
+      },
+
+      // Compute weapon spec including equipped Skin & Passive skills
+      getModifiedWeaponSpec(weaponId) {
+        const base = WEAPONS_DB[weaponId];
+        if (!base) return null;
+
+        let fireRateMod = 0;
+        let damageMod = 0;
+        let armorPenMod = 0;
+        let moveSpeedMod = base.moveSpeedMod;
+        let accuracyMod = 0;
+        let magSizeMod = 0;
+        let critRateMod = 0;
+        let critBonusMod = 0;
+        let equippedSkinObj = null;
+
+        // Check Equipped Skin for this weapon
+        const skinKey = AccountState.equippedSkins[weaponId];
+        if (skinKey && AccountState.unlockedSkins[skinKey] && SKINS_DB[skinKey]) {
+          const sk = SKINS_DB[skinKey];
+          equippedSkinObj = sk;
+          fireRateMod += sk.fireRateMod || 0;
+          damageMod += sk.damageMod || 0;
+          armorPenMod += sk.armorPenMod || 0;
+          moveSpeedMod += sk.moveSpeedMod || 0;
+          accuracyMod += sk.accuracyMod || 0;
+          magSizeMod += sk.magSizeMod || 0;
+          critRateMod += sk.critRateMod || 0;
+          critBonusMod += sk.critBonusMod || 0;
+        }
+
+        // Chip Lv Max 99: +20% fireRate, +15% armorPen
+        if (this.player && this.player.hasMaxChip) {
+          fireRateMod += 0.20;
+          armorPenMod += 0.15;
+        }
+
+        // Passive Ama: +20% fireRate for all weapons
+        if (AccountState.hasPassive('ama')) {
+          fireRateMod += 0.20;
+        }
+
+        // Passive Kelly: +20% move speed
+        if (AccountState.hasPassive('kelly')) {
+          moveSpeedMod += 0.20;
+        }
+
+        // Passive Sophia: +50% flat critRate for Shotguns
+        if (base.isShotgun && AccountState.hasPassive('sophia')) {
+          critRateMod += 0.50;
+        }
+
+        // Active Iris: +50% flat critRate during 3s window
+        const now = performance.now();
+        if (AccountState.activeSkill === 'iris' && this.player && now < this.player.skillActiveUntil) {
+          critRateMod += 0.50;
+        }
+
+        // Active Orion: +40% damage during 8s window
+        if (AccountState.activeSkill === 'orion' && this.player && now < this.player.skillActiveUntil) {
+          damageMod += 0.40;
+        }
+
+        const finalFireScore = Math.round(base.fireRateScore * (1 + fireRateMod));
+        const shotsPerSec = (finalFireScore / 30000) * 14.5;
+        const reloadSec = Math.max(0.75, 3.0 - (base.reloadScore / 30000) * 2.0);
+        const finalMagSize = Math.max(1, Math.round(base.magSize * (1 + magSizeMod)));
+        const finalDamage = Math.round(base.damage * (1 + damageMod) * 10) / 10;
+        const finalAccuracy = Math.max(0.25, Math.min(1.0, base.accuracy + accuracyMod));
+        const finalCritRate = Math.min(1.0, base.critRate + critRateMod);
+        const finalCritBonus = base.critBonus + critBonusMod;
+
+        return {
+          ...base,
+          equippedSkinObj,
+          finalFireScore,
+          shotsPerSec,
+          shotIntervalMs: 1000 / shotsPerSec,
+          reloadMs: reloadSec * 1000,
+          magSize: finalMagSize,
+          damage: finalDamage,
+          accuracy: finalAccuracy,
+          critRate: finalCritRate,
+          critBonus: finalCritBonus,
+          totalArmorPen: Math.min(0.95, base.armorPen + armorPenMod),
+          totalMoveSpeedMod: moveSpeedMod
+        };
+      },
+
+      getActiveWeaponObj() {
+        const slotData = this.player.weapons[this.player.activeSlot];
+        if (!slotData) return null;
+        return WEAPONS_DB[slotData.id] || null;
+      },
+
+      getEffectivePlayerWeaponStats() {
+        const slotData = this.player.weapons[this.player.activeSlot];
+        if (!slotData) return null;
+        return this.getModifiedWeaponSpec(slotData.id);
+      },
+
+      tryFirePlayerWeapon() {
+        if (!this.active || this.player.reloading) return;
+        const now = performance.now();
+
+        // Check Mour Invisibility: Cấm bắn khi đang tàng hình!
+        if (now < this.player.invisibleUntil) {
+          this.showBanner('👻 Đang Tàng hình (Mour) không thể bắn! Bấm [Phím E] nếu muốn hủy tàng hình sớm.', 1800);
+          return;
+        }
+
+        const slotData = this.player.weapons[this.player.activeSlot];
+        const stats = this.getEffectivePlayerWeaponStats();
+        if (!slotData || !stats) return;
+
+        if (now - this.player.lastShotTime < stats.shotIntervalMs) return;
+
+        if (slotData.ammo <= 0) {
+          this.startReload();
+          return;
+        }
+
+        this.player.lastShotTime = now;
+        slotData.ammo -= 1;
+        SoundFX.shoot(stats);
+
+        if (this.player.healing) {
+          this.player.healing = false;
+          document.getElementById('cast-bar-container').classList.add('hidden');
+        }
+
+        let aimDirX = -Math.sin(this.player.yaw);
+        let aimDirZ = -Math.cos(this.player.yaw);
+
+        // SOFT BULLET MAGNETISM ("Độ ăn đạn" + Rafaela +20%, AWM -30%)
+        let magFactor = stats.magnetismMult !== undefined ? stats.magnetismMult : 1.0;
+        if (AccountState.hasPassive('rafaela')) {
+          magFactor *= 1.20;
+        }
+
+        let bestBot = null;
+        let bestAngle = 0.22 * magFactor;
+        for (const bot of this.bots) {
+          if (bot.hp <= 0) continue;
+          const dx = bot.x - this.player.x;
+          const dz = bot.z - this.player.z;
+          const dist = Math.hypot(dx, dz);
+          if (dist > stats.range || dist < 0.5) continue;
+          const nx = dx / dist;
+          const nz = dz / dist;
+          const dot = Math.max(-1, Math.min(1, aimDirX * nx + aimDirZ * nz));
+          const angle = Math.acos(dot);
+          if (angle < bestAngle) {
+            bestAngle = angle;
+            bestBot = { nx, nz };
+          }
+        }
+
+        if (bestBot) {
+          const pullStrength = Math.min(0.92, 0.76 * magFactor);
+          aimDirX = aimDirX * (1 - pullStrength) + bestBot.nx * pullStrength;
+          aimDirZ = aimDirZ * (1 - pullStrength) + bestBot.nz * pullStrength;
+          const len = Math.hypot(aimDirX, aimDirZ) || 1;
+          aimDirX /= len;
+          aimDirZ /= len;
+        }
+
+        // Calculate Recoil Bloom + Base Spread (Snipers have bloom = 0!)
+        const effectiveSpread = stats.isSniper
+          ? 0
+          : Math.max(0.002, (1 - stats.accuracy) * 0.12 + this.player.recoilBloom);
+
+        for (let p = 0; p < stats.pellets; p++) {
+          const spreadAngle = (Math.random() - 0.5) * (stats.spread + effectiveSpread) * 2;
+          const cosS = Math.cos(spreadAngle);
+          const sinS = Math.sin(spreadAngle);
+          const vx = aimDirX * cosS - aimDirZ * sinS;
+          const vz = aimDirX * sinS + aimDirZ * cosS;
+
+          this.spawnBullet(
+            this.player.x + vx * 0.9,
+            this.player.y + 1.35,
+            this.player.z + vz * 0.9,
+            vx * 88,
+            vz * 88,
+            stats.range,
+            stats.damage,
+            stats.critRate,
+            stats.critBonus,
+            stats.totalArmorPen,
+            true,
+            stats.color,
+            stats.shieldDamageMult || 1.0
+          );
+        }
+
+        // Increase Recoil Bloom after shot (Snipers bloomPerShot = 0)
+        if (!stats.isSniper) {
+          this.player.recoilBloom = Math.min(stats.maxBloom || 0.14, this.player.recoilBloom + (stats.bloomPerShot || 0.01));
+        } else {
+          this.player.recoilBloom = 0;
+        }
+
+        this.updateWeaponHUD();
+        if (slotData.ammo <= 0) {
+          this.startReload();
+        }
+      },
+
+      spawnBullet(x, y, z, vx, vz, range, damage, critRate, critBonus, armorPen, isPlayer, colorHex, shieldDamageMult = 1.0) {
+        const geo = new THREE.SphereGeometry(isPlayer ? 0.14 : 0.12, 6, 6);
+        const mat = new THREE.MeshBasicMaterial({ color: colorHex });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(x, y, z);
+        bulletsGroup.add(mesh);
+
+        this.bullets.push({
+          x, y, z, vx, vz,
+          distLeft: range,
+          damage, critRate, critBonus, armorPen,
+          isPlayer, shieldDamageMult, mesh
+        });
+      },
+
+      startReload() {
+        if (!this.active || this.player.reloading) return;
+        const slotData = this.player.weapons[this.player.activeSlot];
+        const stats = this.getEffectivePlayerWeaponStats();
+        if (!slotData || !stats) return;
+        if (slotData.ammo >= stats.magSize) return;
+
+        this.player.healing = false;
+        this.player.reloading = true;
+        this.player.reloadStart = performance.now();
+        this.player.reloadDuration = stats.reloadMs;
+        SoundFX.reload();
+
+        const castBox = document.getElementById('cast-bar-container');
+        const castLabel = document.getElementById('cast-bar-label');
+        castBox.classList.remove('hidden');
+        castLabel.textContent = `Đang thay đạn ${stats.name}...`;
+      },
+
+      startMedkitHeal() {
+        if (!this.active || this.player.healing) return;
+        if (this.player.medkits <= 0) {
+          this.showBanner('⚠️ Bạn đã hết Bình máu! Hãy nhặt hoặc mua ở Máy bán hàng [T]', 2200);
+          return;
+        }
+        if (this.player.hp >= this.player.maxHp) {
+          this.showBanner('❤️ Máu của bạn đã đầy (200/200 HP)!', 1800);
+          return;
+        }
+        // Maxim Passive: Medkit time is 1.5s instead of 3.0s!
+        const healMs = AccountState.hasPassive('maxim') ? 1500 : 3000;
+        const healAmt = AccountState.hasPassive('kapella') ? 56 : 40;
+        this.player.reloading = false;
+        this.player.healing = true;
+        this.player.healStart = performance.now();
+        this.player.healDuration = healMs;
+
+        const castBox = document.getElementById('cast-bar-container');
+        const castLabel = document.getElementById('cast-bar-label');
+        castBox.classList.remove('hidden');
+        castLabel.textContent = `🩹 Đang cuốn Bình máu (${(healMs / 1000).toFixed(1)}s hồi +${healAmt} HP)...`;
+      },
+
+      deployGlooWall(isPlayer = true, customX = null, customZ = null, customYaw = null) {
+        if (!this.active) return;
+        if (isPlayer) {
+          if (this.player.glooWalls <= 0) {
+            this.showBanner('⚠️ Hết Bom Keo! Hãy nhặt trên bản đồ hoặc mua ở Máy bán hàng [T]', 2200);
+            return;
+          }
+          this.player.glooWalls -= 1;
+          SoundFX.glooWall();
+        }
+
+        const dist = 3.6;
+        const yaw = isPlayer ? this.player.yaw : customYaw;
+        const gx = isPlayer ? (this.player.x - Math.sin(yaw) * dist) : customX;
+        const gz = isPlayer ? (this.player.z - Math.cos(yaw) * dist) : customZ;
+        const gy = getTerrainHeight(gx, gz);
+
+        // Nairi Passive: +30% Shield HP (500 -> 650 HP) + 3m Healing Zone (5 HP/1s for 3s)
+        const hasNairi = isPlayer && AccountState.hasPassive('nairi');
+        const wallMaxHp = hasNairi ? Math.round(500 * 1.30) : 500;
+
+        const wallGroup = new THREE.Group();
+        const mainWall = new THREE.Mesh(
+          new THREE.BoxGeometry(3.8, 2.7, 0.45),
+          new THREE.MeshLambertMaterial({ color: isPlayer ? 0x06b6d4 : 0xf43f5e, transparent: true, opacity: 0.88 })
+        );
+        mainWall.position.y = 1.35;
+        wallGroup.add(mainWall);
+
+        if (hasNairi) {
+          // 3m Healing Ring visual around Gloo Wall
+          const healRing = new THREE.Mesh(
+            new THREE.RingGeometry(2.8, 3.0, 24),
+            new THREE.MeshBasicMaterial({ color: 0x22c55e, side: THREE.DoubleSide })
+          );
+          healRing.rotation.x = -Math.PI / 2;
+          healRing.position.y = 0.08;
+          wallGroup.add(healRing);
+        }
+
+        wallGroup.position.set(gx, gy, gz);
+        wallGroup.rotation.y = yaw;
+        glooWallsGroup.add(wallGroup);
+
+        const collider = { x: gx, z: gz, r: 1.85, h: gy + 2.7, type: 'gloowall' };
+        staticColliders.push(collider);
+
+        const now = performance.now();
+        this.glooWalls.push({
+          x: gx, y: gy, z: gz, yaw,
+          hp: wallMaxHp, maxHp: wallMaxHp,
+          mesh: wallGroup, collider,
+          ownerIsPlayer: isPlayer,
+          nairiHealTicksLeft: hasNairi ? 3 : 0,
+          nextNairiTick: now + 1000
+        });
+
+        if (isPlayer) {
+          this.updateAllHUD();
+          this.showBanner(`🧊 Đã đặt Bom Keo (${wallMaxHp} HP)${hasNairi ? ' + Vùng hồi máu Nairi 3m!' : '!'}`, 2000);
+        }
+      },
+
+      switchWeaponSlot(slotIdx) {
+        if (!this.active) return;
+        if (slotIdx !== 0 && slotIdx !== 1) return;
+        if (!this.player.weapons[slotIdx]) return;
+        this.player.activeSlot = slotIdx;
+        this.player.reloading = false;
+        this.player.recoilBloom = 0;
+        document.getElementById('cast-bar-container').classList.add('hidden');
+        const w = this.getActiveWeaponObj();
+        if (w) {
+          playerMesh.userData.barrelMat.color.setHex(w.color);
+        }
+        this.updateWeaponHUD();
+      },
+
+      equipWeaponFromLoot(weaponKey) {
+        const spec = this.getModifiedWeaponSpec(weaponKey);
+        if (!spec) return;
+
+        let targetSlot = this.player.activeSlot;
+        if (this.player.weapons[0] && this.player.weapons[0].id === weaponKey) targetSlot = 0;
+        else if (this.player.weapons[1] && this.player.weapons[1].id === weaponKey) targetSlot = 1;
+        else if (!this.player.weapons[0]) targetSlot = 0;
+        else if (!this.player.weapons[1]) targetSlot = 1;
+
+        const prev = this.player.weapons[targetSlot];
+        if (prev && prev.id !== weaponKey) {
+          const prevData = WEAPONS_DB[prev.id];
+          this.spawnLootItem('weapon', prev.id, `Súng ${prevData.name}`, this.player.x + 1.2, this.player.z + 1.2, prevData.color, 1);
+        }
+
+        this.player.weapons[targetSlot] = { id: weaponKey, ammo: spec.magSize };
+        this.player.activeSlot = targetSlot;
+        this.player.reloading = false;
+        this.player.recoilBloom = 0;
+        playerMesh.userData.barrelMat.color.setHex(spec.color);
+        this.updateWeaponHUD();
+      },
+
+      tryPickupNearestLoot() {
+        if (!this.active) return;
+        let nearestIdx = -1;
+        let nearestDist = 4.6;
+        for (let i = 0; i < this.lootItems.length; i++) {
+          const item = this.lootItems[i];
+          const d = Math.hypot(item.x - this.player.x, item.z - this.player.z);
+          if (d < nearestDist) {
+            nearestDist = d;
+            nearestIdx = i;
+          }
+        }
+        if (nearestIdx === -1) {
+          this.showBanner('Không có vật phẩm nào ở gần để nhặt!', 1500);
+          return;
+        }
+
+        const item = this.lootItems[nearestIdx];
+        SoundFX.pickup();
+
+        if (item.type === 'coin') {
+          this.player.coins += item.amount;
+          this.showBanner(`🪙 Đã nhặt +${item.amount} Xu!`, 1600);
+        } else if (item.type === 'weapon') {
+          this.equipWeaponFromLoot(item.subType);
+          this.showBanner(`🔫 Đã trang bị ${item.name}!`, 1800);
+        } else if (item.type === 'armor') {
+          const newArmor = ARMOR_DB[item.subType];
+          this.player.armor = { ...newArmor, hitsLeft: newArmor.maxHits };
+          playerMesh.userData.vest.visible = true;
+          playerMesh.userData.vest.material.color.setHex(newArmor.color);
+          this.showBanner(`🛡️ Đã mặc ${newArmor.name} (Giảm ${Math.round(newArmor.reduction * 100)}% ST, chịu ${newArmor.maxHits} viên)!`, 2200);
+        } else if (item.type === 'chip99') {
+          this.player.hasMaxChip = true;
+          this.showBanner('⚡ Đã gắn CHIP LV MAX 99 (+20% Tốc bắn & +15% Xuyên giáp)!', 2800);
+        } else if (item.type === 'medkit') {
+          this.player.medkits += 1;
+          this.showBanner('🩹 Đã nhặt Bình Máu (+1)!', 1500);
+        } else if (item.type === 'gloowall') {
+          this.player.glooWalls += 1;
+          this.showBanner('🧊 Đã nhặt Bom Keo (+1)!', 1500);
+        }
+
+        lootGroup.remove(item.mesh);
+        this.lootItems.splice(nearestIdx, 1);
+        this.updateAllHUD();
+      },
+
+      applyBulletHit(target, bullet, isTargetPlayer) {
+        const isCrit = Math.random() < bullet.critRate;
+        let dmg = bullet.damage * (isCrit ? (1 + bullet.critBonus) : 1);
+
+        // If target is Player and Orion active skill is currently active -> +25% incoming damage!
+        const now = performance.now();
+        if (isTargetPlayer && AccountState.activeSkill === 'orion' && now < this.player.skillActiveUntil) {
+          dmg *= 1.25;
+        }
+        // If target is Bot and Bot's Orion is active -> +25% incoming damage
+        if (!isTargetPlayer && target.orionActiveUntil && now < target.orionActiveUntil) {
+          dmg *= 1.25;
+        }
+
+        if (target.armor && target.armor.hitsLeft > 0) {
+          const effectiveReduction = Math.max(0, target.armor.reduction * (1 - bullet.armorPen));
+          dmg = dmg * (1 - effectiveReduction);
+          target.armor.hitsLeft -= 1;
+
+          if (target.armor.hitsLeft <= 0) {
+            target.armor = null;
+            if (isTargetPlayer) {
+              playerMesh.userData.vest.visible = false;
+              this.showBanner('💥 GIÁP CỦA BẠN ĐÃ BỂ HOÀN TOÀN!', 2200);
+            } else if (target.mesh) {
+              target.mesh.userData.vest.visible = false;
+            }
+          }
+        }
+
+        dmg = Math.max(1, Math.round(dmg * 10) / 10);
+        target.hp = Math.max(0, Math.round((target.hp - dmg) * 10) / 10);
+
+        if (!isTargetPlayer) {
+          SoundFX.hit(isCrit);
+          this.spawnDamagePopup(target.x, (target.y || 0) + 2.3, target.z, dmg, isCrit, target.armor != null);
+
+          // Bot AI defensive reaction: deploy Gloo Wall or activate Chrono/Orion when hurt!
+          if (target.hp > 0 && target.hp < 140) {
+            if (target.glooReady && Math.random() < 0.45) {
+              target.glooReady = false;
+              const angleToPlayer = Math.atan2(-(this.player.x - target.x), -(this.player.z - target.z));
+              this.deployGlooWall(false, target.x - Math.sin(angleToPlayer) * 3.0, target.z - Math.cos(angleToPlayer) * 3.0, angleToPlayer);
+            }
+            if (target.skillReady) {
+              target.skillReady = false;
+              if (target.skillId === 'chrono') {
+                this.spawnChronoDome(target.x, target.y || 0, target.z, target.id, false);
+              } else if (target.skillId === 'orion') {
+                target.orionActiveUntil = now + 8000;
+              }
+            }
+          }
+        }
+
+        if (target.hp <= 0) {
+          if (isTargetPlayer) {
+            this.handlePlayerEliminated();
+          } else {
+            this.handleBotEliminated(target);
+          }
+        }
+
+        if (isTargetPlayer) {
+          this.updateHealthAndArmorHUD();
+        }
+      },
+
+      handlePlayerEliminated() {
+        if (this.player.respawnsLeft > 0) {
+          this.player.respawnsLeft -= 1;
+          SoundFX.respawn();
+          const randZone = MAP_ZONES[Math.floor(Math.random() * MAP_ZONES.length)];
+          this.player.x = randZone.x + (Math.random() - 0.5) * 16;
+          this.player.z = randZone.z + (Math.random() - 0.5) * 16;
+          this.player.y = getTerrainHeight(this.player.x, this.player.z);
+          this.player.vy = 0;
+          this.player.hp = 200;
+          this.player.orionRedReady = true; // Respawned at 200 HP
+          this.player.skillActiveUntil = 0;
+          this.player.invisibleUntil = 0;
+          this.setPlayerOpacity(1.0);
+          this.player.armor = { ...ARMOR_DB[1], hitsLeft: ARMOR_DB[1].maxHits };
+          playerMesh.userData.vest.visible = true;
+          playerMesh.userData.vest.material.color.setHex(ARMOR_DB[1].color);
+
+          this.player.reloading = false;
+          this.player.healing = false;
+          document.getElementById('cast-bar-container').classList.add('hidden');
+          document.getElementById('modal-vending').classList.add('hidden');
+          document.getElementById('modal-vending').classList.remove('flex');
+          const umpSpec = this.getModifiedWeaponSpec('UMP');
+          this.player.weapons = [{ id: 'UMP', ammo: umpSpec.magSize }, null];
+          this.player.activeSlot = 0;
+          playerMesh.userData.barrelMat.color.setHex(WEAPONS_DB.UMP.color);
+
+          this.updateAllHUD();
+          this.showBanner(`🔄 BẠN ĐÃ HỒI SINH TẠI ${randZone.name.toUpperCase()} VỚI SÚNG UMP! (Còn 0 lượt hồi sinh)`, 4000);
+        } else {
+          this.endMatch(false);
+        }
+      },
+
+      handleBotEliminated(bot) {
+        this.player.kills += 1;
+        this.player.coins += 250;
+        this.spawnLootItem('coin', 200, 'Cụm 200 Xu', bot.x, bot.z, 0xfacc15, 200);
+
+        if (bot.respawnsLeft > 0) {
+          bot.respawnsLeft -= 1;
+          const randZone = MAP_ZONES[Math.floor(Math.random() * MAP_ZONES.length)];
+          bot.x = randZone.x + (Math.random() - 0.5) * 28;
+          bot.z = randZone.z + (Math.random() - 0.5) * 28;
+          bot.y = getTerrainHeight(bot.x, bot.z);
+          bot.hp = 200;
+          bot.weapon = WEAPONS_DB.UMP;
+          bot.glooReady = true;
+          bot.armor = { ...ARMOR_DB[2], hitsLeft: ARMOR_DB[2].maxHits };
+          bot.mesh.position.set(bot.x, bot.y, bot.z);
+          bot.mesh.userData.vest.visible = true;
+          bot.mesh.userData.vest.material.color.setHex(ARMOR_DB[2].color);
+          this.showBanner(`💀 Hạ gục ${bot.name} (+250 Xu)! Địch đã hồi sinh lại với súng UMP!`, 2600);
+        } else {
+          botsGroup.remove(bot.mesh);
+          this.bots = this.bots.filter(b => b.id !== bot.id);
+          this.showBanner(`🔥 TIÊU DIỆT HOÀN TOÀN ${bot.name} (+250 Xu)!`, 2600);
+        }
+
+        this.updateAllHUD();
+
+        if (this.bots.length === 0) {
+          this.endMatch(true);
+        }
+      },
+
+      endMatch(isVictory) {
+        this.active = false;
+        AccountState.matchesPlayed += 1;
+        const primeBonusMult = 1 + AccountState.getPrimeLevel() * 0.1;
+        const goldEarned = Math.round(((isVictory ? 600 : 200) + this.player.kills * 120) * primeBonusMult);
+        AccountState.gold += goldEarned;
+        AccountState.save();
+        updateLobbyUI();
+
+        const modal = document.getElementById('modal-gameover');
+        document.getElementById('gameover-icon').textContent = isVictory ? '🏆' : '💀';
+        const titleEl = document.getElementById('gameover-title');
+        titleEl.textContent = isVictory ? 'BOOYAH! CHIẾN THẮNG!' : 'BẠN ĐÃ BỊ HẠ GỤC';
+        titleEl.className = isVictory
+          ? 'font-display font-bold text-3xl text-amber-300 tracking-wider'
+          : 'font-display font-bold text-3xl text-rose-400 tracking-wider';
+        document.getElementById('gameover-subtitle').textContent = isVictory
+          ? 'Bạn đã quét sạch toàn bộ kẻ địch (cả lượt hồi sinh) trên chiến trường!'
+          : 'Bạn đã sử dụng hết cả lượt hồi sinh. Hãy thử lại nhé!';
+        document.getElementById('gameover-kills').textContent = this.player.kills;
+        document.getElementById('gameover-gold').textContent = `+${goldEarned.toLocaleString()} 🪙`;
+        document.getElementById('gameover-event-progress').textContent = `${AccountState.matchesPlayed} trận`;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      },
+
+      spawnDamagePopup(wx, wy, wz, dmg, isCrit, hitArmor) {
+        const vec = new THREE.Vector3(wx, wy, wz);
+        vec.project(camera);
+        if (vec.z > 1) return;
+        const sx = (vec.x * 0.5 + 0.5) * window.innerWidth;
+        const sy = (-(vec.y * 0.5) + 0.5) * window.innerHeight;
+
+        const el = document.createElement('div');
+        el.className = 'dmg-popup ' + (isCrit ? 'text-amber-300 text-lg' : 'text-white text-sm');
+        el.style.left = `${sx}px`;
+        el.style.top = `${sy}px`;
+        el.textContent = `${isCrit ? '💥 ' : ''}${dmg}${hitArmor ? ' 🛡️' : ''}`;
+        document.getElementById('damage-layer').appendChild(el);
+        setTimeout(() => el.remove(), 850);
+      },
+
+      showBanner(msg, duration = 2400) {
+        const banner = document.getElementById('hud-banner-msg');
+        banner.textContent = msg;
+        banner.style.opacity = '1';
+        clearTimeout(this._bannerTimer);
+        this._bannerTimer = setTimeout(() => {
+          banner.style.opacity = '0';
+        }, duration);
+      },
+
+      updateSkillHUD(now = performance.now()) {
+        const skill = SKILLS_DB[AccountState.activeSkill] || SKILLS_DB.orion;
+        document.getElementById('hud-skill-icon').textContent = skill.icon;
+        document.getElementById('hud-skill-name').textContent = skill.name.toUpperCase();
+        const statusEl = document.getElementById('hud-skill-status');
+
+        if (now < this.player.skillActiveUntil) {
+          const rem = ((this.player.skillActiveUntil - now) / 1000).toFixed(1);
+          statusEl.textContent = `Đang bật (${rem}s)`;
+          statusEl.className = 'text-xs font-bold text-amber-300';
+        } else if (now < this.player.skillCooldownUntil) {
+          const rem = Math.ceil((this.player.skillCooldownUntil - now) / 1000);
+          statusEl.textContent = `Hồi: ${rem}s`;
+          statusEl.className = 'text-xs font-bold text-slate-400';
+        } else if (skill.id === 'orion' && !this.player.orionRedReady) {
+          statusEl.textContent = 'Cần 200 HP';
+          statusEl.className = 'text-xs font-bold text-rose-400';
+        } else {
+          statusEl.textContent = 'Sẵn sàng';
+          statusEl.className = 'text-xs font-bold text-emerald-300';
+        }
+
+        // Render Passives Strip
+        const strip = document.getElementById('hud-passives-strip');
+        strip.innerHTML = AccountState.passiveSkills.map(pid => {
+          const p = SKILLS_DB[pid];
+          return p ? `<span class="px-2 py-0.5 rounded bg-slate-900/80 border border-slate-700">${p.icon} ${p.name}</span>` : '';
+        }).join('');
+      },
+
+      updateAllHUD() {
+        this.updateHealthAndArmorHUD();
+        this.updateWeaponHUD();
+        this.updateSkillHUD();
+        document.getElementById('hud-enemies-alive').textContent = this.bots.length;
+        document.getElementById('hud-kills').textContent = this.player.kills;
+        document.getElementById('hud-coins').textContent = this.player.coins;
+        document.getElementById('hud-respawns').textContent = this.player.respawnsLeft;
+        document.getElementById('hud-medkit-count').textContent = this.player.medkits;
+        document.getElementById('hud-gloowall-count').textContent = this.player.glooWalls;
+        document.getElementById('hud-medkit-time-label').textContent = AccountState.hasPassive('maxim') ? '(1.5s)' : '(3s)';
+        document.getElementById('hud-gloowall-hp-label').textContent = AccountState.hasPassive('nairi') ? '(650HP)' : '(500HP)';
+        document.getElementById('hud-bluezone-label').textContent = this.blueZone ? `🔵 Vùng Xanh: ${this.blueZone.name}` : '';
+
+        const chipBadge = document.getElementById('hud-chip-badge');
+        chipBadge.classList.toggle('hidden', !this.player.hasMaxChip);
+      },
+
+      updateHealthAndArmorHUD() {
+        if (this.player.hp >= 200) {
+          this.player.orionRedReady = true;
+        }
+        const hpPct = Math.max(0, Math.min(100, (this.player.hp / this.player.maxHp) * 100));
+        document.getElementById('hud-hp-text').textContent = Math.ceil(this.player.hp);
+        const hpBar = document.getElementById('hud-hp-bar');
+        const hpTitle = document.getElementById('hud-hp-title');
+        hpBar.style.width = `${hpPct}%`;
+
+        // Orion Red HP Bar mechanic: When Orion is equipped and orionRedReady is true, HP bar is RED until activated or dead!
+        if (AccountState.activeSkill === 'orion' && this.player.orionRedReady) {
+          hpBar.className = 'h-full bg-gradient-to-r from-rose-600 to-red-500 rounded-full transition-all duration-150';
+          hpTitle.textContent = '🩸 MÁU ĐỎ ORION (Sẵn sàng bật [E])';
+          hpTitle.className = 'font-bold text-rose-400';
+        } else {
+          hpBar.className = 'h-full bg-gradient-to-r from-emerald-500 to-lime-400 rounded-full transition-all duration-150';
+          hpTitle.textContent = '❤️ MÁU NHÂN VẬT (HP)';
+          hpTitle.className = 'font-bold text-emerald-300';
+        }
+
+        const armor = this.player.armor;
+        const armorLabel = document.getElementById('hud-armor-label');
+        const armorDurText = document.getElementById('hud-armor-durability-text');
+        const armorBar = document.getElementById('hud-armor-bar');
+
+        if (armor && armor.hitsLeft > 0) {
+          armorLabel.textContent = `🛡️ ${armor.name} (-${Math.round(armor.reduction * 100)}% ST)`;
+          armorDurText.textContent = `${armor.hitsLeft} / ${armor.maxHits} viên`;
+          armorBar.style.width = `${(armor.hitsLeft / armor.maxHits) * 100}%`;
+        } else {
+          armorLabel.textContent = '🛡️ Chưa có Giáp (0% giảm ST)';
+          armorDurText.textContent = '0 / 0 viên';
+          armorBar.style.width = '0%';
+        }
+      },
+
+      updateWeaponHUD() {
+        for (let i = 0; i < 2; i++) {
+          const slotBtn = document.getElementById(`weapon-slot-${i}`);
+          const typeEl = document.getElementById(`slot-${i}-type`);
+          const nameEl = document.getElementById(`slot-${i}-name`);
+          const ammoEl = document.getElementById(`slot-${i}-ammo`);
+          const skinBadge = document.getElementById(`slot-${i}-skin-badge`);
+          const wSlot = this.player.weapons[i];
+
+          if (i === this.player.activeSlot) {
+            slotBtn.classList.add('border-amber-400');
+            slotBtn.classList.remove('border-transparent');
+          } else {
+            slotBtn.classList.remove('border-amber-400');
+            slotBtn.classList.add('border-transparent');
+          }
+
+          if (wSlot && WEAPONS_DB[wSlot.id]) {
+            const spec = this.getModifiedWeaponSpec(wSlot.id);
+            typeEl.textContent = spec.category;
+            nameEl.textContent = spec.name;
+            nameEl.className = 'font-display font-bold text-sm sm:text-base text-white truncate mt-0.5';
+            ammoEl.textContent = `${wSlot.ammo} / ∞`;
+            ammoEl.className = 'font-display font-bold text-xs text-amber-300';
+            if (spec.equippedSkinObj) {
+              skinBadge.classList.remove('hidden');
+              skinBadge.textContent = spec.equippedSkinObj.name.split('-')[1]?.trim() || 'Skin';
+            } else {
+              skinBadge.classList.add('hidden');
+            }
+          } else {
+            typeEl.textContent = '--';
+            nameEl.textContent = 'Chưa có súng';
+            nameEl.className = 'font-display font-bold text-sm sm:text-base text-slate-400 truncate mt-0.5';
+            ammoEl.textContent = '-- / ∞';
+            ammoEl.className = 'font-display font-bold text-xs text-slate-400';
+            skinBadge.classList.add('hidden');
+          }
+        }
+
+        const activeSpec = this.getEffectivePlayerWeaponStats();
+        const skinHudBadge = document.getElementById('hud-skin-badge');
+        if (activeSpec && activeSpec.equippedSkinObj) {
+          skinHudBadge.classList.remove('hidden');
+          skinHudBadge.textContent = `🎨 ${activeSpec.equippedSkinObj.name}`;
+        } else {
+          skinHudBadge.classList.add('hidden');
+        }
+
+        if (activeSpec) {
+          document.getElementById('hud-accuracy-val').textContent = `${Math.round(activeSpec.accuracy * 100)}%`;
+          const bloomPct = activeSpec.isSniper ? 0 : Math.round((this.player.recoilBloom / (activeSpec.maxBloom || 0.14)) * 100);
+          document.getElementById('hud-bloom-val').textContent = `${bloomPct}%`;
+        }
+      }
+    };
+    window.Match = Match;
+
+    // =========================================================================
+    // 8. INPUT CONTROLS (A/D STRAFE ONLY WITHOUT ROTATING SCREEN, SPACE JUMP, E SKILL)
+    // =========================================================================
+    const InputState = {
+      keys: {},
+      joyActive: false,
+      joyDX: 0,
+      joyDZ: 0,
+      firingHeld: false,
+      lookDragging: false,
+      lastMouseX: 0
+    };
+
+    window.addEventListener('keydown', (e) => {
+      const code = e.code;
+      const key = e.key.toLowerCase();
+      InputState.keys[code] = true;
+      InputState.keys[key] = true;
+
+      if (!Match.active) return;
+
+      if (key === 'r') {
+        InputState.firingHeld = true;
+        Match.tryFirePlayerWeapon();
+      } else if (key === 'e') {
+        Match.triggerPlayerActiveSkill();
+      } else if (code === 'Space') {
+        e.preventDefault();
+        Match.jumpPlayer();
+      } else if (key === 'q') {
+        Match.startReload();
+      } else if (key === 'f') {
+        Match.tryPickupNearestLoot();
+      } else if (key === 't') {
+        toggleVendingModal();
+      } else if (key === '4') {
+        Match.deployGlooWall(true);
+      } else if (key === '3') {
+        Match.startMedkitHeal();
+      } else if (key === '1') {
+        Match.switchWeaponSlot(0);
+      } else if (key === '2') {
+        Match.switchWeaponSlot(1);
+      } else if (key === 'escape') {
+        document.getElementById('modal-vending').classList.add('hidden');
+        document.getElementById('modal-vending').classList.remove('flex');
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      const code = e.code;
+      const key = e.key.toLowerCase();
+      InputState.keys[code] = false;
+      InputState.keys[key] = false;
+      if (key === 'r') {
+        InputState.firingHeld = false;
+      }
+    });
+
+    const joyZone = document.getElementById('joystick-zone');
+    const joyKnob = document.getElementById('joystick-knob');
+
+    function updateJoystickFromPoint(clientX, clientY) {
+      const rect = joyZone.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const maxR = rect.width * 0.36;
+      let dx = clientX - cx;
+      let dy = clientY - cy;
+      const dist = Math.hypot(dx, dy);
+      if (dist > maxR) {
+        dx = (dx / dist) * maxR;
+        dy = (dy / dist) * maxR;
+      }
+      joyKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+      InputState.joyDX = dx / maxR;
+      InputState.joyDZ = dy / maxR;
+    }
+
+    function resetJoystick() {
+      InputState.joyActive = false;
+      InputState.joyDX = 0;
+      InputState.joyDZ = 0;
+      joyKnob.style.transform = 'translate(0px, 0px)';
+    }
+
+    joyZone.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      InputState.joyActive = true;
+      if (joyZone.setPointerCapture) {
+        try { joyZone.setPointerCapture(e.pointerId); } catch (err) {}
+      }
+      updateJoystickFromPoint(e.clientX, e.clientY);
+    });
+    joyZone.addEventListener('pointermove', (e) => {
+      if (!InputState.joyActive) return;
+      updateJoystickFromPoint(e.clientX, e.clientY);
+    });
+    joyZone.addEventListener('pointerup', resetJoystick);
+    joyZone.addEventListener('pointercancel', resetJoystick);
+
+    renderer.domElement.addEventListener('pointerdown', (e) => {
+      if (!Match.active) return;
+      InputState.lookDragging = true;
+      InputState.lastMouseX = e.clientX;
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (!Match.active || !InputState.lookDragging) return;
+      const deltaX = e.clientX - InputState.lastMouseX;
+      InputState.lastMouseX = e.clientX;
+      Match.player.yaw -= deltaX * 0.0065;
+    });
+    window.addEventListener('pointerup', () => {
+      InputState.lookDragging = false;
+    });
+
+    // =========================================================================
+    // 9. MINI-MAP RENDERER (6 ZONES) & 3D FLOATING WORLD TAGS
+    // =========================================================================
+    const minimapCanvas = document.getElementById('minimap-canvas');
+    const mmCtx = minimapCanvas.getContext('2d');
+    const worldLabelsLayer = document.getElementById('world-labels-layer');
+
+    function drawMiniMap() {
+      const w = minimapCanvas.width;
+      const h = minimapCanvas.height;
+      mmCtx.clearRect(0, 0, w, h);
+
+      mmCtx.fillStyle = '#090d16';
+      mmCtx.fillRect(0, 0, w, h);
+
+      const mapScale = w / 250;
+      const toMM = (wx, wz) => ({
+        x: (wx + 125) * mapScale,
+        y: (wz + 125) * mapScale
+      });
+
+      MAP_ZONES.forEach((z) => {
+        const p = toMM(z.x, z.z);
+        const r = z.radius * mapScale;
+        const isBlue = Match.blueZone && Match.blueZone.id === z.id;
+
+        mmCtx.beginPath();
+        mmCtx.arc(p.x, p.y, r, 0, Math.PI * 2);
+        mmCtx.fillStyle = isBlue ? 'rgba(6, 182, 212, 0.28)' : 'rgba(51, 65, 85, 0.35)';
+        mmCtx.fill();
+        mmCtx.lineWidth = isBlue ? 2 : 1;
+        mmCtx.strokeStyle = isBlue ? '#22d3ee' : z.color;
+        mmCtx.stroke();
+
+        mmCtx.fillStyle = isBlue ? '#67e8f9' : '#cbd5e1';
+        mmCtx.font = 'bold 8px Inter, sans-serif';
+        mmCtx.textAlign = 'center';
+        mmCtx.fillText(z.name, p.x, p.y - 2);
+      });
+
+      vendingMachines.forEach((vm) => {
+        const p = toMM(vm.x, vm.z);
+        mmCtx.fillStyle = '#facc15';
+        mmCtx.fillRect(p.x - 2.5, p.y - 2.5, 5, 5);
+      });
+
+      Match.bots.forEach((bot) => {
+        if (bot.hp <= 0) return;
+        const p = toMM(bot.x, bot.z);
+        mmCtx.beginPath();
+        mmCtx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+        mmCtx.fillStyle = '#f43f5e';
+        mmCtx.fill();
+      });
+
+      const pp = toMM(Match.player.x, Match.player.z);
+      mmCtx.save();
+      mmCtx.translate(pp.x, pp.y);
+      mmCtx.rotate(-Match.player.yaw);
+      mmCtx.beginPath();
+      mmCtx.moveTo(0, -6);
+      mmCtx.lineTo(4.5, 5);
+      mmCtx.lineTo(0, 2.5);
+      mmCtx.lineTo(-4.5, 5);
+      mmCtx.closePath();
+      mmCtx.fillStyle = '#fbbf24';
+      mmCtx.fill();
+      mmCtx.restore();
+    }
+
+    function renderWorldFloatingTags() {
+      if (!Match.active) {
+        worldLabelsLayer.innerHTML = '';
+        return;
+      }
+      let html = '';
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+
+      for (const bot of Match.bots) {
+        if (bot.hp <= 0) continue;
+        const dist = Math.hypot(bot.x - Match.player.x, bot.z - Match.player.z);
+        if (dist > 60) continue;
+        const v = new THREE.Vector3(bot.x, (bot.y || 0) + 2.8, bot.z);
+        v.project(camera);
+        if (v.z > 1 || v.x < -1 || v.x > 1 || v.y < -1 || v.y > 1) continue;
+        const sx = (v.x * 0.5 + 0.5) * w;
+        const sy = (-(v.y * 0.5) + 0.5) * h;
+        const hpPct = Math.max(0, Math.min(100, (bot.hp / bot.maxHp) * 100));
+        html += `
+          <div class="world-tag" style="left:${sx}px;top:${sy}px;">
+            <div class="px-1.5 py-0.5 rounded bg-slate-950/85 border border-rose-500/50 text-[10px] text-white font-bold shadow">
+              <span>${bot.name} [${bot.skillName}] (${bot.weapon.name})</span>
+              <div class="w-24 h-1.5 bg-slate-800 rounded-full overflow-hidden mt-0.5">
+                <div class="h-full bg-rose-500" style="width:${hpPct}%"></div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      for (const gw of Match.glooWalls) {
+        const dist = Math.hypot(gw.x - Match.player.x, gw.z - Match.player.z);
+        if (dist > 35) continue;
+        const v = new THREE.Vector3(gw.x, (gw.y || 0) + 3.1, gw.z);
+        v.project(camera);
+        if (v.z > 1) continue;
+        const sx = (v.x * 0.5 + 0.5) * w;
+        const sy = (-(v.y * 0.5) + 0.5) * h;
+        html += `
+          <div class="world-tag" style="left:${sx}px;top:${sy}px;">
+            <div class="px-2 py-0.5 rounded bg-cyan-950/90 border border-cyan-400/60 text-[10px] text-cyan-200 font-bold">
+              🧊 Bom Keo: ${Math.ceil(gw.hp)}/${gw.maxHp} HP
+            </div>
+          </div>
+        `;
+      }
+
+      for (const cd of Match.chronoDomes) {
+        const v = new THREE.Vector3(cd.x, (cd.y || 0) + 4.8, cd.z);
+        v.project(camera);
+        if (v.z > 1) continue;
+        const sx = (v.x * 0.5 + 0.5) * w;
+        const sy = (-(v.y * 0.5) + 0.5) * h;
+        html += `
+          <div class="world-tag" style="left:${sx}px;top:${sy}px;">
+            <div class="px-2 py-0.5 rounded bg-sky-950/90 border border-sky-400/60 text-[10px] text-sky-200 font-bold">
+              🌐 Khiên Chrono: ${Math.ceil(cd.hp)}/${cd.maxHp} HP
+            </div>
+          </div>
+        `;
+      }
+
+      worldLabelsLayer.innerHTML = html;
+    }
+
+    // =========================================================================
+    // 10. MAIN UPDATE LOOP (PHYSICS, ELEVATION, SKILLS, AI BOTS, BULLETS)
+    // =========================================================================
+    let lastFrameTime = performance.now();
+
+    function resolveCircleCollision(x, z, radius) {
+      let nx = x;
+      let nz = z;
+      for (const c of staticColliders) {
+        const dx = nx - c.x;
+        const dz = nz - c.z;
+        const dist = Math.hypot(dx, dz);
+        const minDist = radius + c.r;
+        if (dist < minDist && dist > 0.0001) {
+          const push = minDist - dist;
+          nx += (dx / dist) * push;
+          nz += (dz / dist) * push;
+        }
+      }
+      nx = Math.max(-118, Math.min(118, nx));
+      nz = Math.max(-118, Math.min(118, nz));
+      return { x: nx, z: nz };
+    }
+
+    function updateGame(dt, now) {
+      if (!Match.active) {
+        playerMesh.position.set(0, 0, 14);
+        playerMesh.rotation.y += dt * 0.6;
+        camera.position.set(0, 3.2, 20.5);
+        camera.lookAt(0, 1.4, 14);
+        return;
+      }
+
+      // 1. Update Active Skill Timers & Invisibility Expiration
+      if (Match.player.invisibleUntil > 0 && now >= Match.player.invisibleUntil) {
+        Match.player.invisibleUntil = 0;
+        Match.setPlayerOpacity(1.0);
+        Match.showBanner('👻 Hết thời gian Tàng hình Mour!', 1800);
+      }
+      Match.updateSkillHUD(now);
+
+      // 2. Decay Recoil Bloom when not firing
+      if (now - Match.player.lastShotTime > 160 && Match.player.recoilBloom > 0) {
+        Match.player.recoilBloom = Math.max(0, Match.player.recoilBloom - dt * 0.14);
+        Match.updateWeaponHUD();
+      }
+      const crosshairEl = document.getElementById('crosshair');
+      const bloomScale = 1 + Match.player.recoilBloom * 4.5;
+      crosshairEl.style.transform = `scale(${bloomScale.toFixed(2)})`;
+
+      // 3. Handle Reload & Medkit Cast Bars
+      if (Match.player.reloading) {
+        const elapsed = now - Match.player.reloadStart;
+        const pct = Math.min(100, (elapsed / Match.player.reloadDuration) * 100);
+        document.getElementById('cast-bar-fill').style.width = `${pct}%`;
+        if (elapsed >= Match.player.reloadDuration) {
+          Match.player.reloading = false;
+          const slotData = Match.player.weapons[Match.player.activeSlot];
+          const spec = Match.getEffectivePlayerWeaponStats();
+          if (slotData && spec) {
+            slotData.ammo = spec.magSize;
+          }
+          document.getElementById('cast-bar-container').classList.add('hidden');
+          Match.updateWeaponHUD();
+        }
+      } else if (Match.player.healing) {
+        const elapsed = now - Match.player.healStart;
+        const pct = Math.min(100, (elapsed / Match.player.healDuration) * 100);
+        document.getElementById('cast-bar-fill').style.width = `${pct}%`;
+        if (elapsed >= Match.player.healDuration) {
+          Match.player.healing = false;
+          Match.player.medkits = Math.max(0, Match.player.medkits - 1);
+          const healed = Match.healPlayer(40, 'Bình máu');
+          SoundFX.healComplete();
+          document.getElementById('cast-bar-container').classList.add('hidden');
+          Match.updateAllHUD();
+          Match.showBanner(`💚 Đã cuốn xong Bình máu (+${healed} HP)!`, 1800);
+        }
+      }
+
+      // 4. Nairi Gloo Wall 3m Healing Zone (5 HP/1s for max 3s)
+      for (const gw of Match.glooWalls) {
+        if (gw.ownerIsPlayer && gw.nairiHealTicksLeft > 0 && now >= gw.nextNairiTick) {
+          gw.nextNairiTick = now + 1000;
+          if (Math.hypot(Match.player.x - gw.x, Match.player.z - gw.z) <= 3.2) {
+            gw.nairiHealTicksLeft -= 1;
+            Match.healPlayer(5, 'Nairi');
+          }
+        }
+      }
+
+      // 5. Chrono Domes Expiration
+      for (let i = Match.chronoDomes.length - 1; i >= 0; i--) {
+        if (now >= Match.chronoDomes[i].expiresAt || Match.chronoDomes[i].hp <= 0) {
+          effectsGroup.remove(Match.chronoDomes[i].mesh);
+          Match.chronoDomes.splice(i, 1);
+        }
+      }
+
+      if (InputState.firingHeld) {
+        Match.tryFirePlayerWeapon();
+      }
+
+      // 6. Player Movement: A/D ONLY strafes left/right (NO camera yaw rotation on A/D!)
+      let moveForward = 0;
+      let moveRight = 0;
+
+      if (InputState.keys['KeyW'] || InputState.keys['ArrowUp']) moveForward += 1;
+      if (InputState.keys['KeyS'] || InputState.keys['ArrowDown']) moveForward -= 1;
+      if (InputState.keys['KeyA'] || InputState.keys['ArrowLeft']) moveRight -= 1;
+      if (InputState.keys['KeyD'] || InputState.keys['ArrowRight']) moveRight += 1;
+
+      const stats = Match.getEffectivePlayerWeaponStats();
+      const speedMod = stats ? stats.totalMoveSpeedMod : 0;
+      const baseSpeed = Math.max(5.5, 11.5 * (1 + speedMod));
+
+      let vx = 0;
+      let vz = 0;
+
+      if (InputState.joyActive && (Math.abs(InputState.joyDX) > 0.05 || Math.abs(InputState.joyDZ) > 0.05)) {
+        const forwardX = -Math.sin(Match.player.yaw);
+        const forwardZ = -Math.cos(Match.player.yaw);
+        const rightX = Math.cos(Match.player.yaw);
+        const rightZ = -Math.sin(Match.player.yaw);
+
+        const forwardInput = -InputState.joyDZ;
+        vx = (forwardX * forwardInput + rightX * InputState.joyDX) * baseSpeed;
+        vz = (forwardZ * forwardInput + rightZ * InputState.joyDX) * baseSpeed;
+      } else if (moveForward !== 0 || moveRight !== 0) {
+        // Strict strafe on A/D without rotating Match.player.yaw!
+        const len = Math.hypot(moveForward, moveRight) || 1;
+        const nf = moveForward / len;
+        const nr = moveRight / len;
+        const forwardX = -Math.sin(Match.player.yaw);
+        const forwardZ = -Math.cos(Match.player.yaw);
+        const rightX = Math.cos(Match.player.yaw);
+        const rightZ = -Math.sin(Match.player.yaw);
+
+        vx = (forwardX * nf + rightX * nr) * baseSpeed;
+        vz = (forwardZ * nf + rightZ * nr) * baseSpeed;
+      }
+
+      if (vx !== 0 || vz !== 0) {
+        const nextPos = resolveCircleCollision(
+          Match.player.x + vx * dt,
+          Match.player.z + vz * dt,
+          0.75
+        );
+        Match.player.x = nextPos.x;
+        Match.player.z = nextPos.z;
+
+        // Beta Passive: Every 3s of continuous movement heals +5 HP
+        if (AccountState.hasPassive('beta')) {
+          Match.player.continuousMoveTime += dt;
+          if (Match.player.continuousMoveTime >= 3.0) {
+            Match.player.continuousMoveTime -= 3.0;
+            Match.healPlayer(5, 'Beta');
+          }
+        }
+
+        const swing = Math.sin(now * 0.012) * 0.45;
+        playerMesh.userData.leftLeg.rotation.x = swing;
+        playerMesh.userData.rightLeg.rotation.x = -swing;
+      } else {
+        Match.player.continuousMoveTime = 0;
+        playerMesh.userData.leftLeg.rotation.x = 0;
+        playerMesh.userData.rightLeg.rotation.x = 0;
+      }
+
+      // 7. Vertical Physics (Jump & Terrain Height Elevation)
+      const groundY = getTerrainHeight(Match.player.x, Match.player.z);
+      if (!Match.player.isGrounded || Match.player.y > groundY) {
+        Match.player.vy -= 26.0 * dt; // Gravity
+        Match.player.y += Match.player.vy * dt;
+        if (Match.player.y <= groundY) {
+          Match.player.y = groundY;
+          Match.player.vy = 0;
+          Match.player.isGrounded = true;
+        }
+      } else {
+        Match.player.y = groundY;
+      }
+
+      playerMesh.position.set(Match.player.x, Match.player.y, Match.player.z);
+      playerMesh.rotation.y = Match.player.yaw;
+      playerMesh.visible = !Match.cameraFirstPerson;
+
+      const lookDirX = -Math.sin(Match.player.yaw);
+      const lookDirZ = -Math.cos(Match.player.yaw);
+      if (Match.cameraFirstPerson) {
+        camera.position.set(Match.player.x, Match.player.y + 2.05, Match.player.z);
+        camera.lookAt(Match.player.x + lookDirX * 20, Match.player.y + 1.9, Match.player.z + lookDirZ * 20);
+      } else {
+        camera.position.set(
+          Match.player.x - lookDirX * 7.4,
+          Match.player.y + 4.6,
+          Match.player.z - lookDirZ * 7.4
+        );
+        camera.lookAt(Match.player.x + lookDirX * 14, Match.player.y + 1.6, Match.player.z + lookDirZ * 14);
+      }
+
+      // 8. Current Zone & Prompts
+      let currentZoneName = 'Vùng Đồi Cao';
+      for (const z of MAP_ZONES) {
+        if (Math.hypot(Match.player.x - z.x, Match.player.z - z.z) <= z.radius) {
+          currentZoneName = z.name;
+          break;
+        }
+      }
+      document.getElementById('hud-current-zone').textContent = `📍 ${currentZoneName}`;
+
+      let closestLoot = null;
+      let closestLootDist = 4.6;
+      for (const item of Match.lootItems) {
+        item.mesh.rotation.y += dt * 1.8;
+        const d = Math.hypot(item.x - Match.player.x, item.z - Match.player.z);
+        if (d < closestLootDist) {
+          closestLootDist = d;
+          closestLoot = item;
+        }
+      }
+      const pickupPrompt = document.getElementById('prompt-pickup');
+      if (closestLoot) {
+        pickupPrompt.classList.remove('hidden');
+        document.getElementById('prompt-pickup-name').textContent = closestLoot.name;
+      } else {
+        pickupPrompt.classList.add('hidden');
+      }
+
+      let nearVending = false;
+      for (const vm of vendingMachines) {
+        if (Math.hypot(vm.x - Match.player.x, vm.z - Match.player.z) < 6.5) {
+          nearVending = true;
+          break;
+        }
+      }
+      document.getElementById('prompt-vending').classList.toggle('hidden', !nearVending);
+
+      // 9. Stronger AI Bots (Strafing, Skills, Elevation, Respects Player Mour Invisibility)
+      const playerInvisible = now < Match.player.invisibleUntil;
+
+      for (const bot of Match.bots) {
+        if (bot.hp <= 0) continue;
+        const dx = Match.player.x - bot.x;
+        const dz = Match.player.z - bot.z;
+        const distToPlayer = Math.hypot(dx, dz);
+
+        if (!playerInvisible && distToPlayer < 44) {
+          bot.yaw = Math.atan2(-dx, -dz);
+          if (now > bot.nextStrafeSwitch) {
+            bot.strafeDir *= -1;
+            bot.nextStrafeSwitch = now + 1200 + Math.random() * 1000;
+          }
+          const botSpeed = bot.skillId === 'kelly' ? 7.2 : 6.0;
+          const forwardX = dx / distToPlayer;
+          const forwardZ = dz / distToPlayer;
+          const rightX = -forwardZ * bot.strafeDir;
+          const rightZ = forwardX * bot.strafeDir;
+
+          const approachFactor = distToPlayer > 16 ? 0.75 : (distToPlayer < 9 ? -0.4 : 0.0);
+          const bvx = (forwardX * approachFactor + rightX * 0.65) * botSpeed;
+          const bvz = (forwardZ * approachFactor + rightZ * 0.65) * botSpeed;
+          const bNext = resolveCircleCollision(bot.x + bvx * dt, bot.z + bvz * dt, 0.75);
+          bot.x = bNext.x;
+          bot.z = bNext.z;
+
+          const fireDelay = bot.skillId === 'ama' ? 880 : 1050;
+          if (now - bot.lastShotTime > fireDelay) {
+            bot.lastShotTime = now;
+            const spread = (Math.random() - 0.5) * 0.11;
+            const dirX = forwardX * Math.cos(spread) - forwardZ * Math.sin(spread);
+            const dirZ = forwardX * Math.sin(spread) + forwardZ * Math.cos(spread);
+            const botDmgMult = (bot.orionActiveUntil && now < bot.orionActiveUntil) ? 1.40 : 1.0;
+            Match.spawnBullet(
+              bot.x + dirX * 0.9,
+              (bot.y || 0) + 1.35,
+              bot.z + dirZ * 0.9,
+              dirX * 64,
+              dirZ * 64,
+              bot.weapon.range,
+              bot.weapon.damage * botDmgMult,
+              bot.weapon.critRate,
+              bot.weapon.critBonus,
+              bot.weapon.armorPen,
+              false,
+              0xf43f5e,
+              1.0
+            );
+          }
+        } else {
+          const pdx = bot.patrolTarget.x - bot.x;
+          const pdz = bot.patrolTarget.z - bot.z;
+          const pDist = Math.hypot(pdx, pdz);
+          if (pDist < 2.0) {
+            bot.patrolTarget = {
+              x: Math.max(-108, Math.min(108, bot.x + (Math.random() - 0.5) * 34)),
+              z: Math.max(-108, Math.min(108, bot.z + (Math.random() - 0.5) * 34))
+            };
+          } else {
+            bot.yaw = Math.atan2(-pdx, -pdz);
+            const bNext = resolveCircleCollision(
+              bot.x + (pdx / pDist) * 4.5 * dt,
+              bot.z + (pdz / pDist) * 4.5 * dt,
+              0.75
+            );
+            bot.x = bNext.x;
+            bot.z = bNext.z;
+          }
+        }
+
+        bot.y = getTerrainHeight(bot.x, bot.z);
+        bot.mesh.position.set(bot.x, bot.y, bot.z);
+        bot.mesh.rotation.y = bot.yaw;
+      }
+
+      // 10. Update Bullets & Check Collisions (Chrono Domes, Gloo Walls, Obstacles, Bots, Player)
+      for (let i = Match.bullets.length - 1; i >= 0; i--) {
+        const b = Match.bullets[i];
+        const stepX = b.vx * dt;
+        const stepZ = b.vz * dt;
+        const stepDist = Math.hypot(stepX, stepZ);
+        b.x += stepX;
+        b.z += stepZ;
+        b.distLeft -= stepDist;
+        b.mesh.position.set(b.x, b.y, b.z);
+
+        let removeBullet = b.distLeft <= 0;
+
+        // Check Chrono Domes: Standing inside allows shooting outward; enemy shots from outside are blocked!
+        if (!removeBullet) {
+          for (let cIdx = Match.chronoDomes.length - 1; cIdx >= 0; cIdx--) {
+            const cd = Match.chronoDomes[cIdx];
+            const distToCenter = Math.hypot(b.x - cd.x, b.z - cd.z);
+            if (distToCenter <= cd.r) {
+              // If player owns dome and bullet is player's -> passes right through outward!
+              if (b.isPlayer && cd.ownerId === 'player') continue;
+              if (!b.isPlayer && cd.ownerId !== 'player') continue;
+
+              cd.hp -= b.damage * (b.shieldDamageMult || 1.0);
+              removeBullet = true;
+              if (cd.hp <= 0) {
+                effectsGroup.remove(cd.mesh);
+                Match.chronoDomes.splice(cIdx, 1);
+              }
+              break;
+            }
+          }
+        }
+
+        // Check Gloo Walls
+        if (!removeBullet) {
+          for (let gIdx = Match.glooWalls.length - 1; gIdx >= 0; gIdx--) {
+            const gw = Match.glooWalls[gIdx];
+            if (Math.hypot(b.x - gw.x, b.z - gw.z) < 1.95) {
+              gw.hp -= b.damage * (b.shieldDamageMult || 1.0);
+              removeBullet = true;
+              if (gw.hp <= 0) {
+                glooWallsGroup.remove(gw.mesh);
+                staticColliders = staticColliders.filter(c => c !== gw.collider);
+                Match.glooWalls.splice(gIdx, 1);
+              }
+              break;
+            }
+          }
+        }
+
+        // Check static obstacles
+        if (!removeBullet) {
+          for (const c of staticColliders) {
+            if (c.type === 'gloowall') continue;
+            if (Math.hypot(b.x - c.x, b.z - c.z) < c.r) {
+              removeBullet = true;
+              break;
+            }
+          }
+        }
+
+        // Check Target Hit
+        if (!removeBullet) {
+          if (b.isPlayer) {
+            for (const bot of Match.bots) {
+              if (bot.hp <= 0) continue;
+              if (Math.hypot(b.x - bot.x, b.z - bot.z) < 1.08) {
+                Match.applyBulletHit(bot, b, false);
+                removeBullet = true;
+                break;
+              }
+            }
+          } else {
+            if (Math.hypot(b.x - Match.player.x, b.z - Match.player.z) < 0.95) {
+              Match.applyBulletHit(Match.player, b, true);
+              removeBullet = true;
+            }
+          }
+        }
+
+        if (removeBullet) {
+          bulletsGroup.remove(b.mesh);
+          Match.bullets.splice(i, 1);
+        }
+      }
+
+      drawMiniMap();
+      renderWorldFloatingTags();
+    }
+    window.updateGame = updateGame;
+
+    function animate(now) {
+      requestAnimationFrame(animate);
+      const dt = Math.min(0.05, (now - lastFrameTime) / 1000);
+      lastFrameTime = now;
+      updateGame(dt, now);
+      renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // =========================================================================
+    // 11. UI BINDINGS (LOBBY, SKILLS, SKINS, GIFTCODE, ARMORY, VENDING)
+    // =========================================================================
+    function updateLobbyUI() {
+      document.getElementById('lobby-gold').textContent = AccountState.gold.toLocaleString();
+      document.getElementById('lobby-diamonds').textContent = AccountState.diamonds.toLocaleString();
+      document.getElementById('lobby-prime-level').textContent = AccountState.getPrimeLevel();
+      document.getElementById('lobby-matches-count').textContent = AccountState.matchesPlayed;
+
+      const evCount = Math.min(10, AccountState.matchesPlayed);
+      const evPct = (evCount / 10) * 100;
+      document.getElementById('lobby-event-progress-text').textContent = evCount;
+      document.getElementById('lobby-event-progress-bar').style.width = `${evPct}%`;
+
+      // Update Skills Summary in Lobby
+      const actSkill = SKILLS_DB[AccountState.activeSkill] || SKILLS_DB.orion;
+      const passNames = AccountState.passiveSkills.map(id => SKILLS_DB[id]?.name).filter(Boolean).join(', ');
+      document.getElementById('lobby-skills-summary').textContent = `Chủ động: ${actSkill.name} | Bị động: ${passNames || 'Trống'}`;
+
+      // Update Equipped Skins Summary in Lobby
+      const equippedList = Object.values(AccountState.equippedSkins)
+        .filter(Boolean)
+        .map(skKey => SKINS_DB[skKey]?.name)
+        .filter(Boolean);
+      const skinLabel = document.getElementById('lobby-equipped-skin-name');
+      skinLabel.textContent = equippedList.length > 0
+        ? `Đang lắp ${equippedList.length} Skin (${equippedList.join(', ')})`
+        : 'Chưa lắp Skin súng';
+
+      document.getElementById('btn-toggle-audio').textContent = AccountState.soundEnabled ? '🔊' : '🔇';
+    }
+
+    function renderEventModal() {
+      document.getElementById('event-modal-count').textContent = `${AccountState.matchesPlayed} trận`;
+      const evBar = document.getElementById('event-modal-bar');
+      if (evBar) evBar.style.width = `${Math.min(100, (AccountState.matchesPlayed / 80) * 100)}%`;
+      const containerEl = document.getElementById('event-skins-list');
+      containerEl.innerHTML = '';
+
+      Object.values(SKINS_DB).forEach((sk) => {
+        const unlocked = !!AccountState.unlockedSkins[sk.id];
+        const equipped = AccountState.equippedSkins[sk.weaponId] === sk.id;
+        const progress = Math.min(sk.reqMatches, AccountState.matchesPlayed);
+        const pct = Math.min(100, (progress / sk.reqMatches) * 100);
+
+        const card = document.createElement('div');
+        card.className = 'p-4 rounded-2xl bg-slate-900/90 border ' + (equipped ? 'border-cyan-400' : 'border-slate-700');
+        card.innerHTML = `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold uppercase">Mốc ${sk.reqMatches} Trận</span>
+              <h4 class="font-display font-bold text-lg text-white mt-0.5">${sk.name}</h4>
+              <p class="text-xs text-cyan-300 font-semibold">${sk.desc}</p>
+            </div>
+            <button data-event-skin="${sk.id}" class="event-skin-btn px-4 py-2 rounded-xl font-display font-bold text-xs shrink-0 transition ${
+              unlocked
+                ? (equipped ? 'bg-emerald-500 text-slate-950' : 'bg-cyan-500 hover:bg-cyan-400 text-slate-950')
+                : (AccountState.matchesPlayed >= sk.reqMatches ? 'btn-primary-glow text-slate-950' : 'bg-slate-800 text-slate-400')
+            }">
+              ${unlocked ? (equipped ? '✅ Đang Trang Bị (Bấm tháo)' : '⚡ Trang Bị Ngay') : (AccountState.matchesPlayed >= sk.reqMatches ? '🎁 Nhận Skin Ngay' : `Cần ${sk.reqMatches - AccountState.matchesPlayed} trận nữa`)}
+            </button>
+          </div>
+          <div class="mt-2.5">
+            <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+              <span>Tiến độ:</span>
+              <span>${progress} / ${sk.reqMatches} trận</span>
+            </div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-cyan-400 to-amber-400" style="width:${pct}%"></div>
+            </div>
+          </div>
+        `;
+        containerEl.appendChild(card);
+      });
+
+      containerEl.querySelectorAll('.event-skin-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const skinId = btn.getAttribute('data-event-skin');
+          const sk = SKINS_DB[skinId];
+          const fb = document.getElementById('event-feedback-msg');
+          if (!sk) return;
+
+          if (AccountState.unlockedSkins[skinId]) {
+            AccountState.equippedSkins[sk.weaponId] = AccountState.equippedSkins[sk.weaponId] === skinId ? null : skinId;
+            AccountState.save();
+            updateLobbyUI();
+            renderEventModal();
+            fb.textContent = AccountState.equippedSkins[sk.weaponId] ? `Đã trang bị ${sk.name}!` : `Đã tháo ${sk.name}.`;
+          } else if (AccountState.matchesPlayed >= sk.reqMatches) {
+            AccountState.unlockedSkins[skinId] = true;
+            AccountState.equippedSkins[sk.weaponId] = skinId;
+            AccountState.save();
+            SoundFX.pickup();
+            updateLobbyUI();
+            renderEventModal();
+            fb.textContent = `🎉 Đã mở khóa và trang bị ${sk.name}!`;
+          } else {
+            fb.textContent = `⚠️ Bạn cần chơi đủ ${sk.reqMatches} trận để nhận ${sk.name}!`;
+          }
+        });
+      });
+    }
+
+    function renderSkillsModal() {
+      const activeGrid = document.getElementById('skills-active-grid');
+      const passiveGrid = document.getElementById('skills-passive-grid');
+      activeGrid.innerHTML = '';
+      passiveGrid.innerHTML = '';
+
+      Object.values(SKILLS_DB).forEach((sk) => {
+        if (sk.type === 'active') {
+          const isSelected = AccountState.activeSkill === sk.id;
+          const card = document.createElement('div');
+          card.className = `p-3.5 rounded-2xl border cursor-pointer transition ${
+            isSelected ? 'bg-rose-950/50 border-rose-400 shadow-lg' : 'bg-slate-900/90 border-slate-700 hover:border-slate-500'
+          }`;
+          card.innerHTML = `
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-2xl">${sk.icon}</span>
+                <div>
+                  <div class="font-display font-bold text-base text-white">${sk.name}</div>
+                  <div class="text-[10px] text-rose-300 font-semibold">Hồi chiêu: ${sk.cooldown}s</div>
+                </div>
+              </div>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isSelected ? 'bg-rose-500 text-white' : 'bg-slate-800 text-slate-400'}">
+                ${isSelected ? 'ĐANG CHỌN' : 'Chọn'}
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-300 mt-2 leading-relaxed">${sk.desc}</p>
+          `;
+          card.addEventListener('click', () => {
+            AccountState.activeSkill = sk.id;
+            AccountState.save();
+            SoundFX.pickup();
+            updateLobbyUI();
+            renderSkillsModal();
+          });
+          activeGrid.appendChild(card);
+        } else {
+          const isSelected = AccountState.passiveSkills.includes(sk.id);
+          const card = document.createElement('div');
+          card.className = `p-3 rounded-2xl border cursor-pointer transition ${
+            isSelected ? 'bg-cyan-950/50 border-cyan-400 shadow-lg' : 'bg-slate-900/90 border-slate-700 hover:border-slate-500'
+          }`;
+          card.innerHTML = `
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">${sk.icon}</span>
+                <div class="font-display font-bold text-sm text-white">${sk.name}</div>
+              </div>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isSelected ? 'bg-cyan-500 text-slate-950' : 'bg-slate-800 text-slate-400'}">
+                ${isSelected ? 'ĐÃ LẮP' : 'Lắp'}
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-300 mt-1.5 leading-relaxed">${sk.desc}</p>
+          `;
+          card.addEventListener('click', () => {
+            const idx = AccountState.passiveSkills.indexOf(sk.id);
+            const fb = document.getElementById('skills-feedback');
+            if (idx >= 0) {
+              AccountState.passiveSkills.splice(idx, 1);
+            } else {
+              if (AccountState.passiveSkills.length >= 3) {
+                AccountState.passiveSkills.shift();
+              }
+              AccountState.passiveSkills.push(sk.id);
+            }
+            AccountState.save();
+            SoundFX.pickup();
+            updateLobbyUI();
+            renderSkillsModal();
+            fb.textContent = `✅ Tổ hợp hiện tại: Chủ động ${SKILLS_DB[AccountState.activeSkill].name} + Bị động (${AccountState.passiveSkills.length}/3): ${AccountState.passiveSkills.map(i => SKILLS_DB[i].name).join(', ')}`;
+          });
+          passiveGrid.appendChild(card);
+        }
+      });
+    }
+
+    function renderArmoryModal() {
+      const statusTag = document.getElementById('armory-skin-status-tag');
+      if (statusTag) {
+        statusTag.textContent = AccountState.unlockedSkins.UMP_PHONG_CACH
+          ? (AccountState.equippedSkins.UMP === 'UMP_PHONG_CACH' ? 'Đang trang bị' : 'Đã sở hữu')
+          : `Chưa mở khóa (${Math.min(10, AccountState.matchesPlayed)}/10 trận)`;
+      }
+      const strip = document.getElementById('armory-skins-strip');
+      strip.innerHTML = '';
+      Object.values(SKINS_DB).forEach((sk) => {
+        const unlocked = !!AccountState.unlockedSkins[sk.id];
+        const equipped = AccountState.equippedSkins[sk.weaponId] === sk.id;
+        const box = document.createElement('div');
+        box.className = 'p-2.5 rounded-xl bg-slate-900/95 border ' + (equipped ? 'border-cyan-400' : 'border-slate-700');
+        box.innerHTML = `
+          <div class="text-xs font-bold text-white truncate">${sk.name}</div>
+          <div class="text-[10px] text-slate-400 mt-0.5 line-clamp-2">${sk.desc}</div>
+          <button data-armory-skin="${sk.id}" class="armory-skin-btn mt-2 w-full py-1 rounded-lg font-bold text-[11px] transition ${
+            unlocked
+              ? (equipped ? 'bg-emerald-500 text-slate-950' : 'bg-cyan-500 text-slate-950')
+              : 'bg-slate-800 text-amber-300'
+          }">
+            ${unlocked ? (equipped ? 'Đang Lắp (Tháo)' : 'Trang Bị') : `Mốc ${sk.reqMatches} trận`}
+          </button>
+        `;
+        strip.appendChild(box);
+      });
+
+      strip.querySelectorAll('.armory-skin-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const skinId = btn.getAttribute('data-armory-skin');
+          const sk = SKINS_DB[skinId];
+          if (!sk) return;
+          if (!AccountState.unlockedSkins[skinId]) {
+            document.getElementById('modal-armory').classList.add('hidden');
+            document.getElementById('modal-armory').classList.remove('flex');
+            renderEventModal();
+            document.getElementById('modal-event').classList.remove('hidden');
+            document.getElementById('modal-event').classList.add('flex');
+          } else {
+            AccountState.equippedSkins[sk.weaponId] = AccountState.equippedSkins[sk.weaponId] === skinId ? null : skinId;
+            AccountState.save();
+            updateLobbyUI();
+            renderArmoryModal();
+          }
+        });
+      });
+
+      const grid = document.getElementById('armory-weapons-grid');
+      grid.innerHTML = '';
+      Object.values(WEAPONS_DB).forEach((w) => {
+        const spec = Match.getModifiedWeaponSpec(w.id);
+        const hasSkin = !!spec.equippedSkinObj;
+        const speedPct = Math.round(spec.totalMoveSpeedMod * 100);
+        const accPct = Math.round(spec.accuracy * 100);
+
+        const card = document.createElement('div');
+        card.className = 'p-3.5 rounded-2xl bg-slate-900/90 border ' + (hasSkin ? 'border-cyan-400' : 'border-slate-700/80');
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="text-[10px] font-bold uppercase text-amber-400">${w.category}</span>
+              <h4 class="font-display font-bold text-lg text-white">${w.name} ${hasSkin ? `<span class="text-xs text-cyan-300">(${spec.equippedSkinObj.name.split('-')[1].trim()})</span>` : ''}</h4>
+            </div>
+            <span class="px-2 py-1 rounded-lg bg-slate-800 font-display font-bold text-xs text-amber-300">Băng: ${spec.magSize} viên</span>
+          </div>
+          <div class="mt-2.5 space-y-1 text-xs text-slate-300 border-t border-slate-800 pt-2">
+            <div class="flex justify-between"><span>• Tốc bắn:</span><strong class="text-white">${spec.finalFireScore.toLocaleString()} / 30.000</strong></div>
+            <div class="flex justify-between"><span>• Số viên / 1 lần bắn:</span><strong class="text-white">${w.pellets} viên</strong></div>
+            <div class="flex justify-between"><span>• Sát thương 1 viên:</span><strong class="text-rose-300">${spec.damage} ST</strong></div>
+            <div class="flex justify-between"><span>• Tỉ lệ / ST Bạo kích:</span><strong class="text-amber-300">${Math.round(spec.critRate * 100)}% (+${Math.round(spec.critBonus * 100)}% ST)</strong></div>
+            <div class="flex justify-between"><span>• Độ chính xác (Độ nở tâm):</span><strong class="text-emerald-300">${accPct}% ${w.isSniper ? '(Nở tâm = 0)' : ''}</strong></div>
+            <div class="flex justify-between"><span>• Xuyên giáp:</span><strong class="text-cyan-300">${Math.round(spec.totalArmorPen * 100)}%</strong></div>
+            <div class="flex justify-between"><span>• Tốc độ di chuyển:</span><strong class="${speedPct >= 0 ? 'text-emerald-300' : 'text-rose-300'}">${speedPct >= 0 ? '+' : ''}${speedPct}%</strong></div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function renderVendingModal() {
+      document.getElementById('vending-coins-amount').textContent = Match.player.coins;
+      const grid = document.getElementById('vending-items-grid');
+      grid.innerHTML = '';
+
+      VENDING_CATALOG.forEach((item) => {
+        const canAfford = Match.player.coins >= item.cost;
+        const card = document.createElement('div');
+        card.className = 'p-3 rounded-2xl bg-slate-900/95 border border-slate-700 flex items-center justify-between gap-3';
+        card.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-xl bg-slate-800 flex items-center justify-center text-2xl shrink-0">${item.icon}</div>
+            <div>
+              <div class="font-display font-bold text-sm text-white">${item.name}</div>
+              <div class="text-[11px] text-slate-400 leading-tight">${item.desc}</div>
+            </div>
+          </div>
+          <button data-vending-id="${item.id}" class="vending-buy-btn px-3.5 py-2 rounded-xl font-display font-bold text-xs shrink-0 transition ${
+            canAfford
+              ? 'bg-amber-500 hover:bg-amber-400 text-slate-950'
+              : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+          }">
+            🪙 ${item.cost} Xu
+          </button>
+        `;
+        grid.appendChild(card);
+      });
+
+      grid.querySelectorAll('.vending-buy-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-vending-id');
+          buyFromVending(id);
+        });
+      });
+    }
+
+    function buyFromVending(itemId) {
+      const item = VENDING_CATALOG.find(i => i.id === itemId);
+      if (!item) return;
+      const msgEl = document.getElementById('vending-status-msg');
+
+      if (Match.player.coins < item.cost) {
+        msgEl.textContent = `⚠️ Không đủ Xu! Bạn cần ${item.cost} Xu để mua ${item.name}.`;
+        msgEl.className = 'text-xs text-rose-400 mt-2 min-h-[18px] font-semibold';
+        return;
+      }
+
+      Match.player.coins -= item.cost;
+      SoundFX.pickup();
+
+      if (itemId === 'mp40') {
+        Match.equipWeaponFromLoot('MP40');
+      } else if (itemId === 'mg90') {
+        Match.equipWeaponFromLoot('MG90');
+      } else if (itemId === 'gloo_breaker') {
+        Match.equipWeaponFromLoot('GLOO_BREAKER');
+      } else if (itemId === 'gloowall') {
+        Match.player.glooWalls += 1;
+      } else if (itemId === 'armor3') {
+        Match.player.armor = { ...ARMOR_DB[3], hitsLeft: ARMOR_DB[3].maxHits };
+        playerMesh.userData.vest.visible = true;
+        playerMesh.userData.vest.material.color.setHex(ARMOR_DB[3].color);
+      } else if (itemId === 'armor4') {
+        Match.player.armor = { ...ARMOR_DB[4], hitsLeft: ARMOR_DB[4].maxHits };
+        playerMesh.userData.vest.visible = true;
+        playerMesh.userData.vest.material.color.setHex(ARMOR_DB[4].color);
+      } else if (itemId === 'chip99') {
+        Match.player.hasMaxChip = true;
+      } else if (itemId === 'medkit') {
+        Match.player.medkits += 1;
+      }
+
+      msgEl.textContent = `✅ Đã mua thành công ${item.name}!`;
+      msgEl.className = 'text-xs text-emerald-300 mt-2 min-h-[18px] font-semibold';
+      Match.updateAllHUD();
+      renderVendingModal();
+    }
+    window.buyFromVending = buyFromVending;
+
+    function toggleVendingModal() {
+      if (!Match.active) return;
+      const modal = document.getElementById('modal-vending');
+      const isHidden = modal.classList.contains('hidden');
+      if (isHidden) {
+        renderVendingModal();
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function startMatchFromLobby() {
+      SoundFX.init();
+      document.getElementById('lobby-screen').classList.add('hidden');
+      document.getElementById('modal-gameover').classList.add('hidden');
+      document.getElementById('modal-gameover').classList.remove('flex');
+      const hud = document.getElementById('ingame-hud');
+      hud.classList.remove('hidden');
+      hud.classList.add('flex');
+      Match.initMatch();
+    }
+    window.startMatchFromLobby = startMatchFromLobby;
+
+    function returnToLobby() {
+      Match.active = false;
+      worldLabelsLayer.innerHTML = '';
+      document.getElementById('ingame-hud').classList.add('hidden');
+      document.getElementById('ingame-hud').classList.remove('flex');
+      document.getElementById('modal-vending').classList.add('hidden');
+      document.getElementById('modal-vending').classList.remove('flex');
+      document.getElementById('modal-gameover').classList.add('hidden');
+      document.getElementById('modal-gameover').classList.remove('flex');
+      document.getElementById('lobby-screen').classList.remove('hidden');
+      updateLobbyUI();
+    }
+
+    document.getElementById('btn-start-match').addEventListener('click', startMatchFromLobby);
+    document.getElementById('btn-leave-match').addEventListener('click', returnToLobby);
+    document.getElementById('btn-gameover-lobby').addEventListener('click', returnToLobby);
+    document.getElementById('btn-gameover-replay').addEventListener('click', startMatchFromLobby);
+
+    document.getElementById('btn-camera-mode').addEventListener('click', () => {
+      Match.cameraFirstPerson = !Match.cameraFirstPerson;
+      document.getElementById('btn-camera-mode').textContent = Match.cameraFirstPerson
+        ? '🎥 Góc nhìn: Thứ nhất (FPS)'
+        : '🎥 Góc nhìn: Sau lưng (3D)';
+    });
+
+    document.getElementById('btn-toggle-audio').addEventListener('click', () => {
+      AccountState.soundEnabled = !AccountState.soundEnabled;
+      AccountState.save();
+      updateLobbyUI();
+    });
+
+    // HUD Buttons
+    document.getElementById('weapon-slot-0').addEventListener('click', () => Match.switchWeaponSlot(0));
+    document.getElementById('weapon-slot-1').addEventListener('click', () => Match.switchWeaponSlot(1));
+    document.getElementById('btn-hud-skill').addEventListener('click', () => Match.triggerPlayerActiveSkill());
+    document.getElementById('btn-hud-jump').addEventListener('click', () => Match.jumpPlayer());
+    document.getElementById('btn-use-medkit').addEventListener('click', () => Match.startMedkitHeal());
+    document.getElementById('btn-use-gloowall').addEventListener('click', () => Match.deployGlooWall(true));
+    document.getElementById('btn-hud-reload').addEventListener('click', () => Match.startReload());
+    document.getElementById('btn-hud-pickup').addEventListener('click', () => Match.tryPickupNearestLoot());
+    document.getElementById('prompt-pickup').addEventListener('click', () => Match.tryPickupNearestLoot());
+    document.getElementById('btn-hud-vending').addEventListener('click', toggleVendingModal);
+    document.getElementById('prompt-vending').addEventListener('click', toggleVendingModal);
+    document.getElementById('btn-close-vending').addEventListener('click', toggleVendingModal);
+    document.getElementById('btn-close-vending-bottom').addEventListener('click', toggleVendingModal);
+
+    const fireBtn = document.getElementById('btn-hud-fire');
+    fireBtn.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      InputState.firingHeld = true;
+      Match.tryFirePlayerWeapon();
+    });
+    fireBtn.addEventListener('pointerup', () => { InputState.firingHeld = false; });
+    fireBtn.addEventListener('pointerleave', () => { InputState.firingHeld = false; });
+
+    // Event Modal
+    const eventModal = document.getElementById('modal-event');
+    document.getElementById('btn-open-event').addEventListener('click', () => {
+      renderEventModal();
+      eventModal.classList.remove('hidden');
+      eventModal.classList.add('flex');
+    });
+    document.getElementById('btn-close-event').addEventListener('click', () => {
+      eventModal.classList.add('hidden');
+      eventModal.classList.remove('flex');
+    });
+    document.getElementById('btn-claim-event-skin').addEventListener('click', () => {
+      const btn = document.querySelector('[data-event-skin="UMP_PHONG_CACH"]');
+      if (btn) btn.click();
+    });
+    document.getElementById('btn-armory-toggle-skin').addEventListener('click', () => {
+      const btn = document.querySelector('[data-armory-skin="UMP_PHONG_CACH"]');
+      if (btn) btn.click();
+    });
+
+    // Skills Modal
+    const skillsModal = document.getElementById('modal-skills');
+    function openSkillsModal() {
+      renderSkillsModal();
+      skillsModal.classList.remove('hidden');
+      skillsModal.classList.add('flex');
+    }
+    document.getElementById('btn-open-skills').addEventListener('click', openSkillsModal);
+    document.getElementById('btn-quick-skills').addEventListener('click', openSkillsModal);
+    document.getElementById('btn-close-skills').addEventListener('click', () => {
+      skillsModal.classList.add('hidden');
+      skillsModal.classList.remove('flex');
+    });
+
+    // Giftcode Modal (Hidden code verification without displaying the secret code in UI)
+    const giftcodeModal = document.getElementById('modal-giftcode');
+    document.getElementById('btn-open-giftcode').addEventListener('click', () => {
+      document.getElementById('input-giftcode').value = '';
+      document.getElementById('giftcode-feedback').textContent = '';
+      giftcodeModal.classList.remove('hidden');
+      giftcodeModal.classList.add('flex');
+    });
+    document.getElementById('btn-close-giftcode').addEventListener('click', () => {
+      giftcodeModal.classList.add('hidden');
+      giftcodeModal.classList.remove('flex');
+    });
+    document.getElementById('btn-submit-giftcode').addEventListener('click', () => {
+      const val = (document.getElementById('input-giftcode').value || '').trim().toUpperCase();
+      const fb = document.getElementById('giftcode-feedback');
+      // Compare via character codes so the secret string is not exposed in UI
+      const target = [84, 69, 83, 84, 71, 65, 77, 69, 48, 48, 49].map(c => String.fromCharCode(c)).join('');
+      if (val === target) {
+        AccountState.unlockAllSkinsViaCode();
+        SoundFX.pickup();
+        updateLobbyUI();
+        fb.textContent = '🎉 Nhập Giftcode thành công! Đã mở khóa & trang bị toàn bộ 5 Skin súng!';
+        fb.className = 'text-xs font-semibold text-emerald-300 mt-2 min-h-[18px]';
+      } else {
+        fb.textContent = '⚠️ Mã Giftcode không hợp lệ hoặc đã hết hạn!';
+        fb.className = 'text-xs font-semibold text-rose-400 mt-2 min-h-[18px]';
+      }
+    });
+
+    // Armory Modal
+    const armoryModal = document.getElementById('modal-armory');
+    function openArmoryModal() {
+      renderArmoryModal();
+      armoryModal.classList.remove('hidden');
+      armoryModal.classList.add('flex');
+    }
+    document.getElementById('btn-open-armory').addEventListener('click', openArmoryModal);
+    document.getElementById('btn-quick-skin-toggle').addEventListener('click', openArmoryModal);
+    document.getElementById('btn-close-armory').addEventListener('click', () => {
+      armoryModal.classList.add('hidden');
+      armoryModal.classList.remove('flex');
+    });
+
+    // Topup Modal
+    const topupModal = document.getElementById('modal-topup');
+    function openTopupModal() {
+      const lv = AccountState.getPrimeLevel();
+      const next = AccountState.getNextPrimeThreshold();
+      document.getElementById('topup-prime-level').textContent = lv;
+      document.getElementById('topup-prime-pts').textContent = AccountState.primePoints.toLocaleString();
+      document.getElementById('topup-prime-next').textContent = next.toLocaleString();
+      document.getElementById('topup-prime-bar').style.width = `${Math.min(100, (AccountState.primePoints / next) * 100)}%`;
+      document.getElementById('topup-prime-bonus').textContent = lv * 10;
+      topupModal.classList.remove('hidden');
+      topupModal.classList.add('flex');
+    }
+    document.getElementById('btn-open-topup').addEventListener('click', openTopupModal);
+    document.getElementById('btn-open-prime').addEventListener('click', openTopupModal);
+    document.getElementById('btn-close-topup').addEventListener('click', () => {
+      topupModal.classList.add('hidden');
+      topupModal.classList.remove('flex');
+    });
+    document.querySelectorAll('.topup-pack-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const amount = parseInt(btn.getAttribute('data-pack'), 10) || 100;
+        AccountState.diamonds += amount;
+        AccountState.primePoints += amount;
+        AccountState.gold += amount * 5;
+        AccountState.save();
+        SoundFX.pickup();
+        updateLobbyUI();
+        openTopupModal();
+        document.getElementById('topup-feedback').textContent = `💎 Đã nạp thành công +${amount.toLocaleString()} Kim Cương! Cấp Prime hiện tại: Lv.${AccountState.getPrimeLevel()}`;
+      });
+    });
+
+    // Guide Modal
+    const guideModal = document.getElementById('modal-guide');
+    document.getElementById('btn-open-guide').addEventListener('click', () => {
+      guideModal.classList.remove('hidden');
+      guideModal.classList.add('flex');
+    });
+    document.getElementById('btn-close-guide').addEventListener('click', () => {
+      guideModal.classList.add('hidden');
+      guideModal.classList.remove('flex');
+    });
+
+    window.onload = () => {
+      updateLobbyUI();
+      requestAnimationFrame(animate);
+    };
+  </script>
+</body>
+</html>
