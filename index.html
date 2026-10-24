@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>SKYFIRE 3D - Battle Royale v1.2.1 (Hợp Tác X Naruto Shippuden)</title>
+  <title>SKYFIRE 3D - Battle Royale v1.3.0 (Hệ Thống Rank, Laura, Balo 50 Ô, Hòm Thính & Vòng Bo)</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -126,13 +126,18 @@
         <div>
           <div class="flex items-center gap-2 flex-wrap">
             <h1 class="font-display font-bold text-xl sm:text-2xl tracking-wider text-white">SKYFIRE 3D</h1>
-            <span class="px-2 py-0.5 text-[11px] font-bold rounded bg-orange-500/20 text-orange-300 border border-orange-400/40">v1.2.1 X NARUTO SHIPPUDEN</span>
+            <span class="px-2 py-0.5 text-[11px] font-bold rounded bg-orange-500/20 text-orange-300 border border-orange-400/40">v1.3.0 RANK & SINH TỒN 400x400M</span>
           </div>
           <div class="flex items-center gap-2 mt-0.5 flex-wrap">
             <button id="btn-open-prime" class="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-xs font-semibold text-white shadow border border-purple-300/40 hover:brightness-110 transition">
               <span>👑 PRIME CẤP <span id="lobby-prime-level">1</span></span>
             </button>
-            <span class="text-xs text-slate-300">Đã chơi: <strong id="lobby-matches-count" class="text-amber-400">0</strong> trận</span>
+            <button id="btn-open-rank" class="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-xs font-bold text-slate-950 shadow border border-amber-300/60 hover:brightness-110 transition">
+              <span id="lobby-rank-icon">🥉</span>
+              <span id="lobby-rank-name">Đồng I</span>
+              <span id="lobby-rank-sub" class="text-[10px] bg-slate-950/30 px-1.5 rounded text-white">0/300</span>
+            </button>
+            <span class="text-xs text-slate-300">Đã chơi: <strong id="lobby-matches-count" class="text-amber-400">0</strong> trận (<span id="lobby-winstreak" class="text-emerald-300 font-bold">Chuỗi thắng: 0</span>)</span>
           </div>
         </div>
       </div>
@@ -216,24 +221,30 @@
           </div>
         </div>
 
-        <!-- Character Skills, Armory & Guide Buttons -->
-        <div class="grid grid-cols-3 gap-2">
-          <button id="btn-open-skills" class="lobby-glass p-3 rounded-2xl text-left hover:border-purple-400/60 transition group">
-            <div class="text-xl mb-0.5">⚡</div>
-            <div class="font-display font-bold text-xs sm:text-sm text-white group-hover:text-purple-300">KỸ NĂNG</div>
-            <div class="text-[10px] text-slate-400">17 KN + 4 Sharingan</div>
+        <!-- Character Skills, Rank, Armory & Guide Buttons -->
+        <div class="grid grid-cols-4 gap-2">
+          <button id="btn-open-skills" class="lobby-glass p-2.5 rounded-2xl text-left hover:border-purple-400/60 transition group">
+            <div class="text-lg mb-0.5">⚡</div>
+            <div class="font-display font-bold text-xs text-white group-hover:text-purple-300">KỸ NĂNG</div>
+            <div class="text-[10px] text-slate-400">18 KN (Mới: Laura)</div>
           </button>
 
-          <button id="btn-open-armory" class="lobby-glass p-3 rounded-2xl text-left hover:border-amber-400/60 transition group">
-            <div class="text-xl mb-0.5">🔫</div>
-            <div class="font-display font-bold text-xs sm:text-sm text-white group-hover:text-amber-300">KHO SÚNG</div>
+          <button id="btn-open-rank-card" class="lobby-glass p-2.5 rounded-2xl text-left hover:border-amber-400/60 transition group">
+            <div class="text-lg mb-0.5">🏆</div>
+            <div class="font-display font-bold text-xs text-white group-hover:text-amber-300">XẾP HẠNG</div>
+            <div id="lobby-rank-card-sub" class="text-[10px] text-amber-300 font-semibold">Đồng I</div>
+          </button>
+
+          <button id="btn-open-armory" class="lobby-glass p-2.5 rounded-2xl text-left hover:border-amber-400/60 transition group">
+            <div class="text-lg mb-0.5">🔫</div>
+            <div class="font-display font-bold text-xs text-white group-hover:text-amber-300">KHO SÚNG</div>
             <div class="text-[10px] text-slate-400">27 Súng & 11 Skin</div>
           </button>
 
-          <button id="btn-open-guide" class="lobby-glass p-3 rounded-2xl text-left hover:border-cyan-400/60 transition group">
-            <div class="text-xl mb-0.5">🗺️</div>
-            <div class="font-display font-bold text-xs sm:text-sm text-white group-hover:text-cyan-300">LUẬT CHƠI</div>
-            <div class="text-[10px] text-slate-400">8 Vùng & Ống ngắm</div>
+          <button id="btn-open-guide" class="lobby-glass p-2.5 rounded-2xl text-left hover:border-cyan-400/60 transition group">
+            <div class="text-lg mb-0.5">🗺️</div>
+            <div class="font-display font-bold text-xs text-white group-hover:text-cyan-300">CẬP NHẬT</div>
+            <div class="text-[10px] text-slate-400">v1.3.0 Chi tiết</div>
           </button>
         </div>
 
@@ -311,16 +322,16 @@
 
           <div class="space-y-1.5 text-xs text-slate-300 border-t border-slate-700/70 pt-2.5">
             <div class="flex justify-between">
-              <span>• 10 Súng mới v1.2.0:</span>
-              <span class="font-semibold text-amber-300">Groza, SVD, M4A1, XMB, Gõ Kiến, AC80, M249, VSS, MAC10, Trogon</span>
+              <span>• Nhân vật mới Laura & Balo:</span>
+              <span class="font-semibold text-emerald-300">Có sẵn Ngắm x2/x4/x8 (+50% CX) • Balo 50 Ô [Phím B]</span>
             </div>
             <div class="flex justify-between">
-              <span>• Cày Kim Cương & Prime:</span>
-              <span class="font-semibold text-cyan-300">+25 KC / 1 Bot hạ gục + Thưởng lớn khi Win</span>
+              <span>• Bản đồ 400x400m & Sinh tồn:</span>
+              <span class="font-semibold text-amber-300">Hòm Thính tiếp tế • Vòng Bo thu hẹp tối đa 10 phút</span>
             </div>
             <div class="flex justify-between">
-              <span>• Ống ngắm & Bình Oxy:</span>
-              <span class="font-semibold text-emerald-400">Ngắm x2/x4/x8 [Phím V] • Bình Oxy 0.8s [Phím 5]</span>
+              <span>• Hệ thống Rank Xếp Hạng:</span>
+              <span class="font-semibold text-cyan-300">Đồng I ➔ Huyền Thoại 15 Sao (Thưởng chuỗi 3 thắng)</span>
             </div>
           </div>
         </div>
@@ -336,6 +347,7 @@
         <span><kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-purple-300 font-bold border border-slate-600">E</kbd> Kỹ năng</span>
         <span><kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-orange-300 font-bold border border-slate-600">G</kbd> Naruto</span>
         <span><kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-bold border border-slate-600">V</kbd> Bật Ngắm</span>
+        <span><kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 font-bold border border-slate-600">B</kbd> Balo (50 Ô)</span>
         <span><kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-rose-400 font-bold border border-slate-600">R</kbd> Bắn</span>
         <span><kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-cyan-300 font-bold border border-slate-600">Q</kbd> Nạp (+40%)</span>
         <span><kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-bold border border-slate-600">F</kbd> Nhặt</span>
@@ -395,6 +407,15 @@
             <span class="text-cyan-400">🔄 HS:</span>
             <span id="hud-respawns" class="font-display font-bold text-cyan-300">1</span>
           </div>
+          <div class="h-4 w-px bg-slate-700"></div>
+          <div class="flex items-center gap-1" title="Thời gian trận đấu (Tối đa 10:00)">
+            <span class="text-emerald-400">⏱️</span>
+            <span id="hud-match-timer" class="font-display font-bold text-emerald-300">00:00 / 10:00</span>
+          </div>
+          <div class="h-4 w-px bg-slate-700"></div>
+          <div class="flex items-center gap-1" title="Trạng thái Vòng Bo">
+            <span id="hud-safezone-status" class="font-display font-bold text-xs text-sky-300">🌀 Bo: 260m</span>
+          </div>
         </div>
 
         <!-- Banner Notification -->
@@ -409,6 +430,9 @@
           </button>
           <button id="btn-hud-scope" class="hud-glass px-2.5 py-1 rounded-lg text-[11px] font-semibold text-emerald-300 border border-emerald-400/40 hover:bg-emerald-950/60 transition">
             🔭 Ngắm [Phím V]: Tắt
+          </button>
+          <button id="btn-hud-backpack" class="hud-glass px-2.5 py-1 rounded-lg text-[11px] font-semibold text-amber-300 border border-amber-400/40 hover:bg-amber-950/60 transition">
+            🎒 Balo [Phím B]: <span id="hud-backpack-count">5</span>/50
           </button>
           <button id="btn-leave-match" class="hud-glass px-2.5 py-1 rounded-lg text-[11px] font-semibold text-rose-300 hover:bg-rose-950/60 border-rose-500/30 transition">
             ✕ Thoát trận
@@ -897,23 +921,107 @@
   <div id="modal-guide" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
     <div class="lobby-glass w-full max-w-2xl rounded-3xl p-6 border border-slate-700 shadow-2xl max-h-[85vh] overflow-y-auto custom-scrollbar">
       <div class="flex items-center justify-between border-b border-slate-700 pb-3">
-        <h3 class="font-display font-bold text-xl text-white">🗺️ CHI TIẾT CẬP NHẬT v1.2.1 (X NARUTO SHIPPUDEN)</h3>
+        <h3 class="font-display font-bold text-xl text-white">🗺️ CHI TIẾT CẬP NHẬT v1.3.0 (RANK, LAURA, BALO 50 Ô, THÍNH & VÒNG BO)</h3>
         <button id="btn-close-guide" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold">✕</button>
       </div>
       <div class="mt-4 space-y-3 text-xs sm:text-sm text-slate-200 leading-relaxed">
-        <div class="p-3 rounded-xl bg-slate-900/80 border border-orange-500/40">
-          <div class="font-bold text-orange-300 mb-1">1. Hợp Tác Naruto Shippuden [Phím G] & Sự Kiện Vòng Quay</div>
-          <p><strong>4 Nhẫn thuật Hợp tác [Phím G]:</strong> <strong>Sharingan của Itachi</strong> (Phóng Hắc Hỏa Amaterasu; trúng Bom keo nổ ngay và lan lửa đen bán kính 10m trong 5s đốt 15 HP/1s, hồi 120s), <strong>Sharingan của Madara</strong> (Bọc Susanoo 25s giảm 30% ST súng; bấm G lần 2 phóng cầu năng lượng tự hút địch trong 5m nổ 50 HP, hồi 120s), <strong>Sharingan của Sasuke</strong> (Bị động: Bắn trúng bằng Shotgun đốt 2 HP/1s trong 5s), <strong>Rinnegan</strong> (Triệu hồi thiên thạch khổng lồ bán kính 30m gây -140 HP, hồi 110s).</p>
+        <div class="p-3 rounded-xl bg-slate-900/80 border border-emerald-500/40">
+          <div class="font-bold text-emerald-300 mb-1">1. Nhân Vật Mới Laura & Cân Bằng Sức Mạnh v1.3.0</div>
+          <p><strong>Laura (Bị động mới):</strong> Tăng <strong>+50% độ chính xác</strong> khi bật ống ngắm [Phím V]; mọi súng trang bị đều gắn sẵn ống ngắm cố định (<strong>x2</strong> cho Tiểu liên, <strong>x4</strong> cho Trường/DMR/LMG, <strong>x8</strong> cho Bắn tỉa). <strong>Rolk:</strong> +20% băng đạn & <strong>giảm 20% thời gian nạp đạn</strong>. <strong>Maxim:</strong> Giảm 40% thời gian dùng Bình máu (còn 1.8s). <strong>Beta:</strong> Mỗi <strong>20m di chuyển</strong> hồi +5 HP. <strong>Kimimaro:</strong> Giảm 35% hồi chiêu chủ động. <strong>Iris:</strong> Duy trì <strong>7s</strong>, hồi chiêu <strong>100s</strong>. <strong>Ignis:</strong> Sợi dây lửa duy trì kết nối liên tục vào mục tiêu suốt 8s.</p>
         </div>
-        <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-700">
-          <div class="font-bold text-purple-300 mb-1">2. Nhân Vật Mới & Tăng Sức Mạnh Nhân Vật [Phím E]</div>
-          <p><strong>Nhân vật mới:</strong> <strong>Kayne</strong> (Nhận 100 HP giáp ảo màu xanh trên thanh máu trong 8s, mỗi 2s giảm 10 HP, hồi 75s), <strong>Ignis</strong> (Nối dây lửa vào địch gần nhất trong 25m đốt 15 HP/2s trong 8s; quá 25m chiêu thất bại vẫn tốn hồi chiêu 50s), <strong>Kimimaro</strong> (Bị động: Giảm 45% hồi chiêu kỹ năng chủ động), <strong>Rolk</strong> (Bị động: +20% băng đạn mọi súng).</p>
-          <p class="mt-1"><strong>Buff nhân vật:</strong> <strong>Mour</strong> (Tàng hình 25s, hồi 73s), <strong>Skyler</strong> (Mỗi keo phá được hồi +20 HP, hồi 65s), <strong>Chrono</strong> (Đứng trong vòng bảo vệ hồi 1 HP/1s), <strong>Iris</strong> (Bắn xuyên Bom keo + cộng 50% tỉ lệ bạo kích trong 4.8s).</p>
+        <div class="p-3 rounded-xl bg-slate-900/80 border border-amber-500/40">
+          <div class="font-bold text-amber-300 mb-1">2. Hệ Thống Rank (Đồng I ➔ Huyền Thoại 15 Sao)</div>
+          <p><strong>21 Bậc Rank & Sao Huyền Thoại:</strong> Đồng (I-III), Bạc (I-III), Vàng (I-IV), Bạch Kim (I-IV), Kim Cương (I-V), Huyền Thoại (I-V) ➔ <strong>Huyền Thoại 1–15 Sao</strong>. Ở bậc Sao Huyền Thoại: <strong>&gt;8 Kills cộng 1 Sao</strong>, <strong>≤8 Kills trừ 1 Sao</strong> (tụt hết sao về lại <strong>Huyền Thoại V</strong>). Cứ 3 trận chơi nhận +150 EXP; <strong>mỗi 3 trận thắng liên tiếp</strong> nhận thêm +250 EXP (hoặc +1 Sao).</p>
         </div>
-        <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-700">
-          <div class="font-bold text-cyan-300 mb-1">3. 27 Súng (+40% Thay Đạn), Ống Ngắm [Phím V] & Bình Cấp Oxy [Phím 5]</div>
-          <p>Thêm 10 súng mới: <strong>Groza, SVD, M4A1, XMB, Chim Gõ Kiến, AC80, M249, VSS, MAC10, Trogon</strong>. Súng phá keo có 1 viên (2 ST lên người, 500 ST lên Bom keo). Nhặt <strong>Ống ngắm x2, x4, x8</strong> trên bản đồ và bấm <strong>Phím V</strong> để bật tâm ngắm thu phóng + tăng chính xác. <strong>Bình máu [Phím 3]</strong> hồi 80 HP; <strong>Bình cấp oxy [Phím 5]</strong> hồi 40 HP chỉ trong 0.8s.</p>
+        <div class="p-3 rounded-xl bg-slate-900/80 border border-cyan-500/40">
+          <div class="font-bold text-cyan-300 mb-1">3. Bản Đồ 400x400m, Balo 50 Ô [Phím B], Hòm Thính & Vòng Bo 10 Phút</div>
+          <p>Bản đồ mở rộng <strong>400x400m</strong> với các đảo rộng rãi hơn. <strong>Balo [Phím B]</strong> chứa tối đa 50 món (Bình máu, Bom keo, Bình oxy, Ống ngắm dự phòng). <strong>Hòm Thính</strong> rơi định kỳ chứa Giáp Lv4, Chip Max 99, 500 Xu và súng mạnh (AWM/Groza/M249). <strong>Vòng Bo</strong> thu hẹp dần giúp trận đấu kết thúc tối đa trong 10 phút.</p>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 7B: IN-MATCH BACKPACK (BALO 50 MÓN - PHÍM B) ==================== -->
+  <div id="modal-backpack" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="lobby-glass w-full max-w-xl rounded-3xl p-5 sm:p-6 border border-amber-400/50 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Quản Lý Hành Trang Chiến Đấu</span>
+          <h3 class="font-display font-bold text-xl sm:text-2xl text-white">🎒 BALO TRONG TRẬN (<span id="backpack-count-title">0</span> / 50 MÓN)</h3>
+        </div>
+        <button id="btn-close-backpack" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold">✕</button>
+      </div>
+      <div class="mt-3">
+        <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden p-0.5 border border-slate-700">
+          <div id="backpack-capacity-bar" class="h-full bg-gradient-to-r from-emerald-400 to-amber-400 rounded-full transition-all" style="width: 10%"></div>
+        </div>
+        <p id="backpack-feedback" class="text-xs text-slate-300 mt-1.5">Sức chứa tối đa 50 món (Bình máu, Bom keo, Bình oxy, Ống ngắm). Xu và Chip không tốn ô Balo.</p>
+      </div>
+      <div id="backpack-items-list" class="mt-3 space-y-2 max-h-[55vh] overflow-y-auto custom-scrollbar pr-1"></div>
+      <div class="mt-4 flex justify-end">
+        <button id="btn-close-backpack-bottom" class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200">
+          Đóng Balo [Phím B / ESC]
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 7C: RANK SYSTEM (ĐỒNG I -> HUYỀN THOẠI 15 SAO) ==================== -->
+  <div id="modal-rank" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm">
+    <div class="lobby-glass w-full max-w-3xl rounded-3xl p-5 sm:p-6 border border-amber-400/50 shadow-2xl max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-700 pb-3 shrink-0">
+        <div>
+          <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[11px] font-bold uppercase">Hệ Thống Xếp Hạng v1.3.0</span>
+          <h3 class="font-display font-bold text-xl sm:text-2xl text-white mt-0.5">🏆 BẢNG XẾP HẠNG RANK SINH TỒN</h3>
+        </div>
+        <button id="btn-close-rank" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold">✕</button>
+      </div>
+      <div class="mt-3 overflow-y-auto custom-scrollbar pr-1 space-y-4">
+        <div class="p-4 rounded-2xl bg-gradient-to-r from-amber-950/60 via-slate-900 to-orange-950/60 border border-amber-400/40 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-3.5">
+            <div id="rank-modal-icon" class="w-16 h-16 rounded-2xl bg-slate-900 border-2 border-amber-400 flex items-center justify-center text-4xl shadow-lg">🥉</div>
+            <div>
+              <div class="text-xs uppercase font-bold text-amber-300">Bậc Rank Hiện Tại</div>
+              <div id="rank-modal-title" class="font-display font-bold text-2xl text-white">Đồng I</div>
+              <div id="rank-modal-sub" class="text-xs text-cyan-300 font-semibold mt-0.5">EXP: 0 / 300</div>
+            </div>
+          </div>
+          <div class="w-full sm:w-64 space-y-1.5">
+            <div class="flex justify-between text-xs">
+              <span class="text-slate-300">Tiến trình lên bậc:</span>
+              <span id="rank-modal-pct" class="font-bold text-amber-300">0%</span>
+            </div>
+            <div class="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden p-0.5 border border-slate-700">
+              <div id="rank-modal-bar" class="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between text-[11px] text-slate-300 pt-1">
+              <span>🔥 Chuỗi thắng: <strong id="rank-modal-streak" class="text-emerald-300">0</strong></span>
+              <span>🎁 Mốc 3 trận: <strong id="rank-modal-3match" class="text-cyan-300">0/3</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+          <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-700 space-y-1">
+            <div class="font-bold text-amber-300">📈 Quy Tắc Tính EXP & Sao Mỗi Trận</div>
+            <p class="text-slate-300">• <strong>0 Kill + Thua nhanh:</strong> -200 đến -500 EXP</p>
+            <p class="text-slate-300">• <strong>1–2 Kills (&lt;3) + Thua:</strong> -100 đến -250 EXP</p>
+            <p class="text-slate-300">• <strong>3–6 Kills + Thua:</strong> -20 đến -100 EXP</p>
+            <p class="text-slate-300">• <strong>7–10 Kills (&gt;6) + Thua:</strong> +40 đến +150 EXP</p>
+            <p class="text-slate-300">• <strong>&gt;10 Kills + Thua:</strong> +100 đến +300 EXP</p>
+            <p class="text-emerald-300 font-semibold">• <strong>CHIẾN THẮNG (Quét sạch Bot):</strong> +500 đến +1000 EXP!</p>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-700 space-y-1">
+            <div class="font-bold text-cyan-300">👑 Cơ Chế Huyền Thoại Sao (1–15 Sao) & Thưởng</div>
+            <p class="text-slate-300">• Đạt đỉnh <strong>Huyền Thoại V</strong> sẽ bước vào <strong>Huyền Thoại Sao (1 ➔ 15 Sao)</strong>.</p>
+            <p class="text-slate-300">• Ở bậc Sao: <strong>&gt; 8 Kills nhận +1 Sao</strong>; <strong>≤ 8 Kills bị -1 Sao</strong>.</p>
+            <p class="text-rose-300">• Nếu tụt hết Sao (về 0 Sao) sẽ rớt xuống lại <strong>Huyền Thoại V</strong>.</p>
+            <p class="text-amber-300">• <strong>Thưởng chăm chỉ:</strong> Mỗi 3 trận hoàn thành tặng thêm <strong>+150 EXP</strong>.</p>
+            <p class="text-emerald-300">• <strong>Chuỗi 3 trận thắng liên tiếp:</strong> Tặng thêm <strong>+250 EXP (hoặc +1 Sao)</strong>!</p>
+          </div>
+        </div>
+
+        <div id="rank-tiers-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 text-xs"></div>
       </div>
     </div>
   </div>
@@ -929,6 +1037,18 @@
         <div class="flex justify-between">
           <span class="text-slate-400">Số mạng hạ gục:</span>
           <span id="gameover-kills" class="font-bold text-white">0</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400">Kết quả Rank Xếp Hạng:</span>
+          <span id="gameover-rank-delta" class="font-bold text-amber-300">+0 EXP</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400">Bậc Rank hiện tại:</span>
+          <span id="gameover-rank-current" class="font-bold text-cyan-300">Đồng I</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400">Thưởng mốc 3 trận / Chuỗi thắng:</span>
+          <span id="gameover-rank-bonus" class="font-bold text-emerald-300">Không</span>
         </div>
         <div class="flex justify-between">
           <span class="text-slate-400">Kim Cương nhận được (& Cộng Prime):</span>
@@ -987,6 +1107,7 @@
         constructor() {
           this.position = new Vec3();
           this.rotation = new Vec3();
+          this.scale = new Vec3(1, 1, 1);
           this.children = [];
           this.visible = true;
           this.userData = {};
@@ -1066,8 +1187,8 @@
       },
       iris: {
         id: 'iris', name: 'Iris', type: 'active', icon: '🎯',
-        cooldown: 120, duration: 4.8,
-        desc: 'Bật kỹ năng Iris trong 4.8s: Đạn bắn xuyên qua Bom keo và cộng thẳng +50% tỉ lệ bạo kích! Hồi chiêu: 120s.'
+        cooldown: 100, duration: 7.0,
+        desc: 'Bật kỹ năng Iris trong 7s: Đạn bắn xuyên qua Bom keo và cộng thẳng +50% tỉ lệ bạo kích! Hồi chiêu: 100s.'
       },
       chrono: {
         id: 'chrono', name: 'Chrono', type: 'active', icon: '🌐',
@@ -1085,14 +1206,18 @@
         desc: 'Tàng hình trong 25s (cấm bắn khi tàng hình; bấm E lần nữa để hủy sớm). Hồi chiêu: 73s.'
       },
 
-      // 10 PASSIVE SKILLS
+      // 11 PASSIVE SKILLS (Added Laura in v1.3.0)
+      laura: {
+        id: 'laura', name: 'Laura', type: 'passive', icon: '🔭',
+        desc: 'Tăng +50% độ chính xác khi bật ống ngắm [Phím V]. Đồng thời khi mang Laura, mỗi súng trang bị đều có sẵn ống ngắm cố định (x2 Tiểu liên, x4 Trường, x8 Tỉa).'
+      },
       kimimaro: {
         id: 'kimimaro', name: 'Kimimaro', type: 'passive', icon: '🦴',
-        desc: 'Giảm 45% thời gian hồi chiêu của kỹ năng chủ động.'
+        desc: 'Giảm 35% thời gian hồi chiêu của kỹ năng chủ động.'
       },
       rolk: {
         id: 'rolk', name: 'Rolk', type: 'passive', icon: '📦',
-        desc: 'Tăng +20% băng đạn cho tất cả các loại súng.'
+        desc: 'Tăng +20% băng đạn cho tất cả loại súng và giảm 20% thời gian nạp đạn.'
       },
       kelly: {
         id: 'kelly', name: 'Kelly', type: 'passive', icon: '⚡',
@@ -1100,7 +1225,7 @@
       },
       beta: {
         id: 'beta', name: 'Beta', type: 'passive', icon: '💚',
-        desc: 'Mỗi 3 giây di chuyển liên tục hồi +5 HP.'
+        desc: 'Mỗi 20m di chuyển trên bản đồ hồi +5 HP.'
       },
       rafaela: {
         id: 'rafaela', name: 'Rafaela', type: 'passive', icon: '🧲',
@@ -1108,7 +1233,7 @@
       },
       maxim: {
         id: 'maxim', name: 'Maxim', type: 'passive', icon: '⏱️',
-        desc: 'Thời gian cuốn Bình máu giảm chỉ còn 1.5 giây.'
+        desc: 'Giảm 40% thời gian sử dụng Bình máu (từ 3.0s xuống còn 1.8s).'
       },
       kapella: {
         id: 'kapella', name: 'Kapella', type: 'passive', icon: '✨',
@@ -1516,18 +1641,47 @@
     };
     window.ARMOR_DB = ARMOR_DB;
 
-    // 8 Map Zones (Added Làng Lá & Làng Cát alongside Làng Mây, Làng Tuyết, Nhà Đá, Làng Thông, Đảo Dừa, Cổng Trời)
+    // 8 Map Zones Expanded Across 400x400m Arena (Enlarged islands radius 46-48m)
     const MAP_ZONES = [
-      { id: 'lang_la', name: 'Làng Lá', x: -75, z: 0, radius: 32, baseHeight: 0.6, hillHeight: 3.5, color: '#16a34a', groundHex: 0x14532d, accentHex: 0x4ade80 },
-      { id: 'lang_cat', name: 'Làng Cát', x: 75, z: 0, radius: 32, baseHeight: 0.5, hillHeight: 3.4, color: '#d97706', groundHex: 0x78350f, accentHex: 0xfbbf24 },
-      { id: 'nha_da', name: 'Nhà Đá', x: -68, z: -68, radius: 32, baseHeight: 0.5, hillHeight: 3.2, color: '#64748b', groundHex: 0x334155, accentHex: 0x94a3b8 },
-      { id: 'lang_thong', name: 'Làng Thông', x: 68, z: -68, radius: 32, baseHeight: 0.4, hillHeight: 2.8, color: '#15803d', groundHex: 0x064e3b, accentHex: 0x22c55e },
-      { id: 'dao_dua', name: 'Đảo Dừa', x: -68, z: 68, radius: 32, baseHeight: 0.2, hillHeight: 2.2, color: '#ca8a04', groundHex: 0x854d0e, accentHex: 0xfacc15 },
-      { id: 'cong_troi', name: 'Cổng Trời', x: 68, z: 68, radius: 32, baseHeight: 1.0, hillHeight: 4.2, color: '#7e22ce', groundHex: 0x3b0764, accentHex: 0xc084fc },
-      { id: 'lang_may', name: 'Làng Mây', x: 0, z: -32, radius: 33, baseHeight: 0.8, hillHeight: 3.6, color: '#0284c7', groundHex: 0x0c4a6e, accentHex: 0x38bdf8 },
-      { id: 'lang_tuyet', name: 'Làng Tuyết', x: 0, z: 68, radius: 33, baseHeight: 0.9, hillHeight: 4.0, color: '#e2e8f0', groundHex: 0x475569, accentHex: 0xf8fafc }
+      { id: 'lang_la', name: 'Làng Lá', x: -120, z: 0, radius: 46, baseHeight: 0.6, hillHeight: 3.8, color: '#16a34a', groundHex: 0x14532d, accentHex: 0x4ade80 },
+      { id: 'lang_cat', name: 'Làng Cát', x: 120, z: 0, radius: 46, baseHeight: 0.5, hillHeight: 3.6, color: '#d97706', groundHex: 0x78350f, accentHex: 0xfbbf24 },
+      { id: 'nha_da', name: 'Nhà Đá', x: -110, z: -110, radius: 46, baseHeight: 0.5, hillHeight: 3.4, color: '#64748b', groundHex: 0x334155, accentHex: 0x94a3b8 },
+      { id: 'lang_thong', name: 'Làng Thông', x: 110, z: -110, radius: 46, baseHeight: 0.4, hillHeight: 3.0, color: '#15803d', groundHex: 0x064e3b, accentHex: 0x22c55e },
+      { id: 'dao_dua', name: 'Đảo Dừa', x: -110, z: 110, radius: 46, baseHeight: 0.2, hillHeight: 2.5, color: '#ca8a04', groundHex: 0x854d0e, accentHex: 0xfacc15 },
+      { id: 'cong_troi', name: 'Cổng Trời', x: 110, z: 110, radius: 46, baseHeight: 1.0, hillHeight: 4.5, color: '#7e22ce', groundHex: 0x3b0764, accentHex: 0xc084fc },
+      { id: 'lang_may', name: 'Làng Mây', x: 0, z: -55, radius: 48, baseHeight: 0.8, hillHeight: 3.8, color: '#0284c7', groundHex: 0x0c4a6e, accentHex: 0x38bdf8 },
+      { id: 'lang_tuyet', name: 'Làng Tuyết', x: 0, z: 110, radius: 48, baseHeight: 0.9, hillHeight: 4.2, color: '#e2e8f0', groundHex: 0x475569, accentHex: 0xf8fafc }
     ];
     window.MAP_ZONES = MAP_ZONES;
+
+    // 21 Rank Tiers (Đồng I -> Huyền Thoại V) + Legend Star Tier (1 -> 15 Sao)
+    const RANK_TIERS = [
+      { id: 'dong_1', name: 'Đồng I', group: 'Đồng', icon: '🥉', maxExp: 300 },
+      { id: 'dong_2', name: 'Đồng II', group: 'Đồng', icon: '🥉', maxExp: 300 },
+      { id: 'dong_3', name: 'Đồng III', group: 'Đồng', icon: '🥉', maxExp: 300 },
+      { id: 'bac_1', name: 'Bạc I', group: 'Bạc', icon: '🥈', maxExp: 400 },
+      { id: 'bac_2', name: 'Bạc II', group: 'Bạc', icon: '🥈', maxExp: 400 },
+      { id: 'bac_3', name: 'Bạc III', group: 'Bạc', icon: '🥈', maxExp: 400 },
+      { id: 'vang_1', name: 'Vàng I', group: 'Vàng', icon: '🥇', maxExp: 500 },
+      { id: 'vang_2', name: 'Vàng II', group: 'Vàng', icon: '🥇', maxExp: 500 },
+      { id: 'vang_3', name: 'Vàng III', group: 'Vàng', icon: '🥇', maxExp: 500 },
+      { id: 'vang_4', name: 'Vàng IV', group: 'Vàng', icon: '🥇', maxExp: 500 },
+      { id: 'bachkim_1', name: 'Bạch Kim I', group: 'Bạch Kim', icon: '💠', maxExp: 650 },
+      { id: 'bachkim_2', name: 'Bạch Kim II', group: 'Bạch Kim', icon: '💠', maxExp: 650 },
+      { id: 'bachkim_3', name: 'Bạch Kim III', group: 'Bạch Kim', icon: '💠', maxExp: 650 },
+      { id: 'bachkim_4', name: 'Bạch Kim IV', group: 'Bạch Kim', icon: '💠', maxExp: 650 },
+      { id: 'kimcuong_1', name: 'Kim Cương I', group: 'Kim Cương', icon: '💎', maxExp: 800 },
+      { id: 'kimcuong_2', name: 'Kim Cương II', group: 'Kim Cương', icon: '💎', maxExp: 800 },
+      { id: 'kimcuong_3', name: 'Kim Cương III', group: 'Kim Cương', icon: '💎', maxExp: 800 },
+      { id: 'kimcuong_4', name: 'Kim Cương IV', group: 'Kim Cương', icon: '💎', maxExp: 800 },
+      { id: 'kimcuong_5', name: 'Kim Cương V', group: 'Kim Cương', icon: '💎', maxExp: 800 },
+      { id: 'huyenthoai_1', name: 'Huyền Thoại I', group: 'Huyền Thoại', icon: '👑', maxExp: 1000 },
+      { id: 'huyenthoai_2', name: 'Huyền Thoại II', group: 'Huyền Thoại', icon: '👑', maxExp: 1000 },
+      { id: 'huyenthoai_3', name: 'Huyền Thoại III', group: 'Huyền Thoại', icon: '👑', maxExp: 1000 },
+      { id: 'huyenthoai_4', name: 'Huyền Thoại IV', group: 'Huyền Thoại', icon: '👑', maxExp: 1000 },
+      { id: 'huyenthoai_5', name: 'Huyền Thoại V', group: 'Huyền Thoại', icon: '👑', maxExp: 1000 }
+    ];
+    window.RANK_TIERS = RANK_TIERS;
 
     // Vending Machine Catalog
     const VENDING_CATALOG = [
@@ -1580,9 +1734,16 @@
         M1014: null
       },
       activeSkill: 'kayne',
-      passiveSkills: ['kimimaro', 'rolk', 'kelly'],
+      passiveSkills: ['laura', 'rolk', 'kelly'],
       collabSkill: 'itachi',
       soundEnabled: true,
+
+      // v1.3.0 Rank State
+      rankTierIndex: 0, // 0 = Đồng I .. 23 = Huyền Thoại V
+      rankExp: 0,
+      isLegendStarTier: false,
+      legendStars: 0, // 1 .. 15
+      winStreak: 0,
 
       load() {
         try {
@@ -1600,9 +1761,14 @@
             if (data.unlockedSkins) this.unlockedSkins = { ...this.unlockedSkins, ...data.unlockedSkins };
             if (data.equippedSkins) this.equippedSkins = { ...this.equippedSkins, ...data.equippedSkins };
             if (data.activeSkill && SKILLS_DB[data.activeSkill]) this.activeSkill = data.activeSkill;
-            if (Array.isArray(data.passiveSkills)) this.passiveSkills = data.passiveSkills.slice(0, 3);
+            if (Array.isArray(data.passiveSkills)) this.passiveSkills = data.passiveSkills.filter(k => SKILLS_DB[k]).slice(0, 3);
             if (data.collabSkill && COLLAB_SKILLS_DB[data.collabSkill]) this.collabSkill = data.collabSkill;
             if (typeof data.soundEnabled === 'boolean') this.soundEnabled = data.soundEnabled;
+            if (typeof data.rankTierIndex === 'number') this.rankTierIndex = Math.max(0, Math.min(RANK_TIERS.length - 1, data.rankTierIndex));
+            if (typeof data.rankExp === 'number') this.rankExp = Math.max(0, data.rankExp);
+            if (typeof data.isLegendStarTier === 'boolean') this.isLegendStarTier = data.isLegendStarTier;
+            if (typeof data.legendStars === 'number') this.legendStars = Math.max(0, Math.min(15, data.legendStars));
+            if (typeof data.winStreak === 'number') this.winStreak = Math.max(0, data.winStreak);
           }
         } catch (e) {}
       },
@@ -1623,9 +1789,151 @@
             activeSkill: this.activeSkill,
             passiveSkills: this.passiveSkills,
             collabSkill: this.collabSkill,
-            soundEnabled: this.soundEnabled
+            soundEnabled: this.soundEnabled,
+            rankTierIndex: this.rankTierIndex,
+            rankExp: this.rankExp,
+            isLegendStarTier: this.isLegendStarTier,
+            legendStars: this.legendStars,
+            winStreak: this.winStreak
           }));
         } catch (e) {}
+      },
+
+      getRankInfo() {
+        const tier = RANK_TIERS[Math.min(RANK_TIERS.length - 1, Math.max(0, this.rankTierIndex))] || RANK_TIERS[0];
+        if (this.isLegendStarTier) {
+          return {
+            icon: '🌟',
+            name: `Huyền Thoại ${this.legendStars} Sao`,
+            subText: `${this.legendStars} / 15 ⭐`,
+            pct: Math.min(100, Math.round((this.legendStars / 15) * 100))
+          };
+        }
+        return {
+          icon: tier.icon,
+          name: tier.name,
+          subText: `${this.rankExp} / ${tier.maxExp} EXP`,
+          pct: Math.min(100, Math.round((this.rankExp / tier.maxExp) * 100))
+        };
+      },
+
+      applyMatchRankResult(isVictory, kills, survivalSec = 120) {
+        if (isVictory) {
+          this.winStreak += 1;
+        } else {
+          this.winStreak = 0;
+        }
+
+        const is3MatchBonus = (this.matchesPlayed > 0 && this.matchesPlayed % 3 === 0);
+        const is3WinStreakBonus = (isVictory && this.winStreak > 0 && this.winStreak % 3 === 0);
+        const bonusMessages = [];
+
+        // Case 1: Already in Legend Star Tier (Huyền Thoại 1..15 Sao)
+        if (this.isLegendStarTier) {
+          let starDelta = kills > 8 ? 1 : -1;
+          if (is3WinStreakBonus) {
+            starDelta += 1;
+            bonusMessages.push('+1 Sao (Chuỗi 3 Thắng)');
+          }
+          if (is3MatchBonus) {
+            bonusMessages.push('+150 EXP Thưởng 3 trận');
+          }
+          this.legendStars += starDelta;
+          if (this.legendStars <= 0) {
+            // Demote back to Huyền Thoại V!
+            this.isLegendStarTier = false;
+            this.legendStars = 0;
+            this.rankTierIndex = RANK_TIERS.length - 1; // Huyền Thoại V
+            this.rankExp = 600;
+            this.save();
+            return {
+              deltaText: `${starDelta} ⭐ (Tụt về Huyền Thoại V)`,
+              bonusText: bonusMessages.join(' • ') || 'Không'
+            };
+          }
+          this.legendStars = Math.min(15, this.legendStars);
+          this.save();
+          return {
+            deltaText: `${starDelta >= 0 ? '+' : ''}${starDelta} ⭐ (Huyền Thoại ${this.legendStars} Sao)`,
+            bonusText: bonusMessages.join(' • ') || 'Không'
+          };
+        }
+
+        // Case 2: Standard EXP Tiers (Đồng I -> Huyền Thoại V)
+        let expDelta = 0;
+        if (isVictory) {
+          if (kills > 10) {
+            expDelta = Math.min(1000, 500 + (kills - 10) * 65);
+          } else {
+            expDelta = 500 + kills * 25;
+          }
+        } else {
+          if (kills === 0) {
+            // 0 kill + lose + short survival: -200 to -500 EXP
+            const timePenalty = Math.max(0, Math.min(300, Math.round((180 - Math.min(180, survivalSec)) * 1.65)));
+            expDelta = -(200 + timePenalty);
+          } else if (kills < 3) {
+            // 1-2 kills + lose: -100 to -250 EXP
+            expDelta = kills === 1 ? -220 : -130;
+          } else if (kills <= 6) {
+            // 3-6 kills + lose: -20 to -100 EXP
+            expDelta = -(100 - (kills - 3) * 25);
+          } else if (kills <= 10) {
+            // >6 kills (7-10) + lose: +40 to +150 EXP
+            expDelta = 40 + (kills - 7) * 35;
+          } else {
+            // >10 kills + lose: +100 to +300 EXP
+            expDelta = Math.min(300, 120 + (kills - 10) * 35);
+          }
+        }
+
+        if (is3MatchBonus) {
+          expDelta += 150;
+          bonusMessages.push('+150 EXP (Mốc 3 Trận)');
+        }
+        if (is3WinStreakBonus) {
+          expDelta += 250;
+          bonusMessages.push('+250 EXP (Chuỗi 3 Thắng)');
+        }
+
+        this.addRankExp(expDelta);
+        this.save();
+        return {
+          deltaText: `${expDelta >= 0 ? '+' : ''}${expDelta} EXP`,
+          bonusText: bonusMessages.join(' • ') || 'Không'
+        };
+      },
+
+      addRankExp(delta) {
+        let exp = this.rankExp + delta;
+        let idx = this.rankTierIndex;
+
+        while (exp >= RANK_TIERS[idx].maxExp) {
+          exp -= RANK_TIERS[idx].maxExp;
+          if (idx < RANK_TIERS.length - 1) {
+            idx += 1;
+          } else {
+            // Reached top of Huyền Thoại V -> Enter Legend Star Tier (1 Sao)!
+            this.rankTierIndex = RANK_TIERS.length - 1;
+            this.rankExp = RANK_TIERS[idx].maxExp;
+            this.isLegendStarTier = true;
+            this.legendStars = Math.max(1, Math.min(15, this.legendStars + 1));
+            return;
+          }
+        }
+
+        while (exp < 0) {
+          if (idx > 0) {
+            idx -= 1;
+            exp += RANK_TIERS[idx].maxExp;
+          } else {
+            exp = 0;
+            break;
+          }
+        }
+
+        this.rankTierIndex = idx;
+        this.rankExp = exp;
       },
 
       unlockAllSkinsViaCode() {
@@ -1815,9 +2123,9 @@
     const container = document.getElementById('game-canvas-container');
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0f172a);
-    scene.fog = new THREE.FogExp2(0x0f172a, 0.005);
+    scene.fog = new THREE.FogExp2(0x0f172a, 0.0026);
 
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 340);
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 520);
     let renderer = null;
     try {
       renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
@@ -1901,13 +2209,48 @@
       vest.visible = false;
       group.add(vest);
 
-      // Susanoo Aura Mesh (for Madara Collab Skill)
-      const susanooGeo = new THREE.CylinderGeometry(1.15, 1.35, 2.8, 12);
-      const susanooMat = new THREE.MeshBasicMaterial({ color: 0x6366f1, transparent: true, opacity: 0.32, side: THREE.DoubleSide });
-      const susanooAura = new THREE.Mesh(susanooGeo, susanooMat);
-      susanooAura.position.set(0, 1.4, 0);
+      // Upgraded v1.3.0 Multi-Layer Susanoo Ribcage & Horned Chakra Avatar (for Madara Collab Skill)
+      const susanooAura = new THREE.Group();
+      const susanooCore = new THREE.Mesh(
+        new THREE.CylinderGeometry(1.2, 1.45, 2.9, 16),
+        new THREE.MeshBasicMaterial({ color: 0x4f46e5, transparent: true, opacity: 0.30, side: THREE.DoubleSide })
+      );
+      susanooCore.position.set(0, 1.45, 0);
+      susanooAura.add(susanooCore);
+      for (let rIdx = 0; rIdx < 3; rIdx++) {
+        const rib = new THREE.Mesh(
+          new THREE.RingGeometry(1.22, 1.42, 18),
+          new THREE.MeshBasicMaterial({ color: 0x818cf8, side: THREE.DoubleSide, transparent: true, opacity: 0.78 })
+        );
+        rib.rotation.x = Math.PI / 2;
+        rib.position.set(0, 0.75 + rIdx * 0.55, 0);
+        susanooAura.add(rib);
+      }
+      const hornLeft = new THREE.Mesh(
+        new THREE.ConeGeometry(0.22, 0.9, 8),
+        new THREE.MeshBasicMaterial({ color: 0xa5b4fc })
+      );
+      hornLeft.position.set(-0.55, 2.85, 0);
+      hornLeft.rotation.z = 0.35;
+      const hornRight = new THREE.Mesh(
+        new THREE.ConeGeometry(0.22, 0.9, 8),
+        new THREE.MeshBasicMaterial({ color: 0xa5b4fc })
+      );
+      hornRight.position.set(0.55, 2.85, 0);
+      hornRight.rotation.z = -0.35;
+      susanooAura.add(hornLeft, hornRight);
       susanooAura.visible = false;
       group.add(susanooAura);
+
+      // Kayne / Orion / Iris Active Skill 3D Aura Ring
+      const activeSkillAura = new THREE.Mesh(
+        new THREE.RingGeometry(0.95, 1.32, 24),
+        new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.75 })
+      );
+      activeSkillAura.rotation.x = -Math.PI / 2;
+      activeSkillAura.position.set(0, 0.12, 0);
+      activeSkillAura.visible = false;
+      group.add(activeSkillAura);
 
       const headGeo = new THREE.BoxGeometry(0.56, 0.56, 0.56);
       const headMat = new THREE.MeshLambertMaterial({ color: 0xfde68a, transparent: true, opacity: 1 });
@@ -1930,7 +2273,7 @@
       gunGroup.position.set(0.52, 1.32, -0.25);
       group.add(gunGroup);
 
-      group.userData = { torso, torsoMat, headMat, legMat, vest, susanooAura, barrelMat, leftLeg, rightLeg, gunGroup };
+      group.userData = { torso, torsoMat, headMat, legMat, vest, susanooAura, activeSkillAura, barrelMat, leftLeg, rightLeg, gunGroup };
       return group;
     }
 
@@ -1943,13 +2286,13 @@
       terrainHills = [];
       vendingMachines = [];
 
-      const groundGeo = new THREE.PlaneGeometry(250, 250, 32, 32);
+      const groundGeo = new THREE.PlaneGeometry(400, 400, 48, 48);
       const groundMat = new THREE.MeshLambertMaterial({ color: 0x1e293b });
       const ground = new THREE.Mesh(groundGeo, groundMat);
       ground.rotation.x = -Math.PI / 2;
       worldGroup.add(ground);
 
-      const grid = new THREE.GridHelper(250, 50, 0x334155, 0x1e293b);
+      const grid = new THREE.GridHelper(400, 80, 0x334155, 0x1e293b);
       grid.position.y = 0.02;
       worldGroup.add(grid);
 
@@ -2084,9 +2427,12 @@
         respawnsLeft: 1,
         armor: null,
         hasMaxChip: false,
+        maxBackpackCapacity: 50,
         medkits: 2,
         glooWalls: 2,
         oxygenCanisters: 1,
+        spareScopes: [], // Spare scopes stored in backpack
+        distanceMovedAccum: 0, // Beta 20m heal tracker
         weapons: [null, null], // { id, ammo, scope: null | 'x2' | 'x4' | 'x8' }
         activeSlot: 0,
         lastShotTime: 0,
@@ -2119,6 +2465,20 @@
       chronoDomes: [],
       amaterasuZones: [], // { x, z, r: 10, expiresAt, nextTick, mesh, ownerIsPlayer }
       madaraOrbs: [],     // { x, y, z, vx, vz, distLeft, mesh, ownerIsPlayer }
+      ignisTether: null,  // { targetBot, expiresAt, mesh }
+      airdrops: [],       // { id, x, y, z, mesh, opened }
+      nextAirdropAt: 0,
+      matchStartTime: 0,
+      maxMatchDurationSec: 600, // 10 minutes max match duration
+      safeZone: {
+        x: 0,
+        z: 0,
+        startRadius: 260,
+        currentRadius: 260,
+        minRadius: 0,
+        nextStormTick: 0,
+        mesh: null
+      },
 
       initMatch() {
         while (lootGroup.children.length > 0) lootGroup.remove(lootGroup.children[0]);
@@ -2134,11 +2494,24 @@
         this.chronoDomes = [];
         this.amaterasuZones = [];
         this.madaraOrbs = [];
+        this.ignisTether = null;
+        this.airdrops = [];
         staticColliders = staticColliders.filter(c => c.type !== 'gloowall');
 
         // 1. Pick 1 of the 8 zones as VÙNG XANH
         this.blueZone = MAP_ZONES[Math.floor(Math.random() * MAP_ZONES.length)];
         this.createBlueZoneBeacon();
+
+        // 1B. Initialize Safe Zone (Vòng Bo 10 phút) & Airdrop Schedule
+        const now = performance.now();
+        this.matchStartTime = now;
+        this.nextAirdropAt = now + 15000; // First airdrop at 15s, then every 60s
+        this.safeZone.x = Math.round(this.blueZone.x * 0.35);
+        this.safeZone.z = Math.round(this.blueZone.z * 0.35);
+        this.safeZone.startRadius = 260;
+        this.safeZone.currentRadius = 260;
+        this.safeZone.nextStormTick = now + 1000;
+        this.createSafeZoneMesh();
 
         // 2. Initialize Player
         this.player.x = 0;
@@ -2160,17 +2533,21 @@
         playerMesh.userData.vest.visible = true;
         playerMesh.userData.vest.material.color.setHex(ARMOR_DB[1].color);
         playerMesh.userData.susanooAura.visible = false;
+        if (playerMesh.userData.activeSkillAura) playerMesh.userData.activeSkillAura.visible = false;
         this.player.hasMaxChip = false;
         this.player.medkits = 2;
         this.player.glooWalls = 2;
         this.player.oxygenCanisters = 1;
+        this.player.spareScopes = [];
+        this.player.distanceMovedAccum = 0;
         this.player.recoilBloom = 0;
         this.setScopeZoom(false);
 
-        // Apply MP40 starting weapon
+        // Apply MP40 starting weapon (with Laura auto-scope if equipped!)
         const mp40Mag = this.getModifiedWeaponSpec('MP40').magSize;
+        const startScope = this.getLauraDefaultScope('MP40');
         this.player.weapons = [
-          { id: 'MP40', ammo: mp40Mag, scope: null },
+          { id: 'MP40', ammo: mp40Mag, scope: startScope },
           null
         ];
         this.player.activeSlot = 0;
@@ -2190,6 +2567,7 @@
 
         this.spawnAllMapLoot();
         this.spawnInitialBots();
+        this.spawnAirdrop(); // Spawn 1 initial supply airdrop immediately on map!
 
         this.active = true;
         this.updateAllHUD();
@@ -2211,6 +2589,9 @@
         const wBase = slotData ? WEAPONS_DB[slotData.id] : null;
         if (!slotData || !wBase) return;
 
+        if (!slotData.scope && AccountState.hasPassive('laura')) {
+          slotData.scope = this.getLauraDefaultScope(slotData.id);
+        }
         if (!slotData.scope || !SCOPES_DB[slotData.scope]) {
           this.showBanner(`⚠️ Súng ${wBase.name} chưa lắp Ống ngắm! Hãy nhặt Ống ngắm (${(wBase.allowedScopes || []).join('/') || 'Không hỗ trợ'}) trên bản đồ.`, 2200);
           this.setScopeZoom(false);
@@ -2257,9 +2638,87 @@
         return finalHeal;
       },
 
-      // Calculate Active Skill Cooldown with Kimimaro (-45% cooldown)
+      // Laura Passive Helper: x2 for SMG, x4 for AR/DMR/LMG, x8 for Sniper
+      getLauraDefaultScope(weaponId) {
+        if (!AccountState.hasPassive('laura')) return null;
+        const w = WEAPONS_DB[weaponId];
+        if (!w || !w.allowedScopes || w.allowedScopes.length === 0) return null;
+        if (w.isSniper && w.allowedScopes.includes('x8')) return 'x8';
+        if (w.category.includes('Tiểu liên') && w.allowedScopes.includes('x2')) return 'x2';
+        if (w.allowedScopes.includes('x4')) return 'x4';
+        return w.allowedScopes[0] || null;
+      },
+
+      getBackpackCount() {
+        return (this.player.medkits || 0) +
+               (this.player.glooWalls || 0) +
+               (this.player.oxygenCanisters || 0) +
+               (this.player.spareScopes ? this.player.spareScopes.length : 0);
+      },
+
+      createSafeZoneMesh() {
+        if (this.safeZone.mesh) {
+          effectsGroup.remove(this.safeZone.mesh);
+          this.safeZone.mesh = null;
+        }
+        const geo = new THREE.CylinderGeometry(1, 1, 28, 48, 1, true);
+        const mat = new THREE.MeshBasicMaterial({
+          color: 0x38bdf8,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.14
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.scale.set(this.safeZone.currentRadius, 1, this.safeZone.currentRadius);
+        mesh.position.set(this.safeZone.x, 14, this.safeZone.z);
+        effectsGroup.add(mesh);
+        this.safeZone.mesh = mesh;
+      },
+
+      spawnAirdrop(customX = null, customZ = null) {
+        const angle = Math.random() * Math.PI * 2;
+        const maxR = Math.max(20, Math.min(140, this.safeZone.currentRadius * 0.65));
+        const r = Math.random() * maxR;
+        const ax = customX !== null ? customX : Math.round(this.safeZone.x + Math.cos(angle) * r);
+        const az = customZ !== null ? customZ : Math.round(this.safeZone.z + Math.sin(angle) * r);
+        const ay = getTerrainHeight(ax, az);
+
+        const group = new THREE.Group();
+        const box = new THREE.Mesh(
+          new THREE.BoxGeometry(2.1, 1.8, 2.1),
+          new THREE.MeshLambertMaterial({ color: 0xdc2626 })
+        );
+        box.position.y = 0.9;
+        const topCover = new THREE.Mesh(
+          new THREE.BoxGeometry(2.25, 0.45, 2.25),
+          new THREE.MeshLambertMaterial({ color: 0x1d4ed8 })
+        );
+        topCover.position.y = 1.75;
+        const beacon = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.35, 0.95, 26, 16, 1, true),
+          new THREE.MeshBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.28, side: THREE.DoubleSide })
+        );
+        beacon.position.y = 13;
+        group.add(box, topCover, beacon);
+        group.position.set(ax, ay, az);
+        lootGroup.add(group);
+
+        const dropWeapons = ['AWM', 'GROZA', 'M249'];
+        const wKey = dropWeapons[Math.floor(Math.random() * dropWeapons.length)];
+        this.airdrops.push({
+          id: 'airdrop_' + Math.random().toString(36).slice(2, 7),
+          x: ax, y: ay, z: az,
+          weaponId: wKey,
+          mesh: group
+        });
+        if (this.active) {
+          this.showBanner(`📦 HÒM THÍNH ĐÃ RƠI TẠI (${ax}m, ${az}m)! Chứa ${WEAPONS_DB[wKey].name}, Giáp Lv4, Chip Max 99 & 500 Xu!`, 3500);
+        }
+      },
+
+      // Calculate Active Skill Cooldown with Kimimaro (v1.3.0: -35% cooldown)
       getEffectiveSkillCooldownMs(baseSeconds) {
-        const mult = AccountState.hasPassive('kimimaro') ? 0.55 : 1.0;
+        const mult = AccountState.hasPassive('kimimaro') ? 0.65 : 1.0;
         return Math.round(baseSeconds * mult * 1000);
       },
 
@@ -2315,10 +2774,11 @@
           if (!nearestBot) {
             this.showBanner('⚠️ IGNIS THẤT BẠI: Không có kẻ địch nào trong phạm vi 25m (Vẫn tính thời gian hồi chiêu)!', 2800);
           } else {
+            this.player.skillActiveUntil = now + 8000;
             nearestBot.ignisTicksLeft = 4; // 8s total: every 2s burns 15 HP
             nearestBot.nextIgnisTick = now + 2000;
-            this.spawnTetherLine(this.player.x, this.player.y + 1.3, this.player.z, nearestBot.x, (nearestBot.y || 0) + 1.3, nearestBot.z, 0xf97316, 900);
-            this.showBanner(`🔥 IGNIS ĐÃ NỐI DÂY LỬA VÀO ${nearestBot.name} (${nearestDist.toFixed(1)}m): Đốt 15 HP / 2s trong 8s!`, 3200);
+            this.createPersistentIgnisTether(nearestBot, now + 8000);
+            this.showBanner(`🔥 IGNIS ĐÃ NỐI DÂY LỬA LIÊN TỤC VÀO ${nearestBot.name} (${nearestDist.toFixed(1)}m): Đốt 15 HP / 2s suốt 8s!`, 3200);
           }
         } else if (skillId === 'orion') {
           if (!this.player.orionRedReady) {
@@ -2335,7 +2795,7 @@
           this.player.skillActiveUntil = now + skill.duration * 1000;
           this.player.skillCooldownUntil = now + cdMs;
           SoundFX.skillActivate();
-          this.showBanner('🎯 ĐÃ BẬT IRIS (4.8s): Bắn xuyên Bom keo & +50% Tỉ lệ Bạo kích!', 3000);
+          this.showBanner('🎯 ĐÃ BẬT IRIS (7.0s): Bắn xuyên Bom keo & +50% Tỉ lệ Bạo kích!', 3000);
         } else if (skillId === 'chrono') {
           this.player.skillActiveUntil = now + skill.duration * 1000;
           this.player.skillCooldownUntil = now + cdMs;
@@ -2410,23 +2870,58 @@
         this.updateSkillHUD(now);
       },
 
-      spawnTetherLine(x1, y1, z1, x2, y2, z2, colorHex, durationMs = 700) {
-        const dx = x2 - x1;
-        const dz = z2 - z1;
-        const dist = Math.hypot(dx, dz) || 1;
-        const yaw = Math.atan2(-dx, -dz);
-        const beam = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.18, 0.18, dist, 8),
-          new THREE.MeshBasicMaterial({ color: colorHex, transparent: true, opacity: 0.85 })
+      createPersistentIgnisTether(targetBot, expiresAt) {
+        if (this.ignisTether && this.ignisTether.mesh) {
+          effectsGroup.remove(this.ignisTether.mesh);
+        }
+        const tetherGroup = new THREE.Group();
+        const innerCore = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.14, 0.14, 1, 10),
+          new THREE.MeshBasicMaterial({ color: 0xfef08a, transparent: true, opacity: 0.95 })
         );
-        beam.rotation.x = Math.PI / 2;
-        beam.rotation.z = -yaw;
-        beam.position.set((x1 + x2) / 2, (y1 + y2) / 2, (z1 + z2) / 2);
-        effectsGroup.add(beam);
-        setTimeout(() => effectsGroup.remove(beam), durationMs);
+        const outerFlame = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.32, 0.32, 1, 12),
+          new THREE.MeshBasicMaterial({ color: 0xf97316, transparent: true, opacity: 0.55 })
+        );
+        tetherGroup.add(innerCore, outerFlame);
+        effectsGroup.add(tetherGroup);
+        this.ignisTether = {
+          targetBot,
+          expiresAt,
+          mesh: tetherGroup
+        };
+        this.updateIgnisTetherMesh();
       },
 
-      // Itachi's Sharingan: Fires black flame forward; if it hits a Gloo Wall, destroys it & spawns 10m black fire zone for 5s (15 HP/1s)
+      updateIgnisTetherMesh() {
+        if (!this.ignisTether) return;
+        const tb = this.ignisTether.targetBot;
+        const now = performance.now();
+        if (!tb || tb.hp <= 0 || tb.ignisTicksLeft <= 0 || now >= this.ignisTether.expiresAt) {
+          effectsGroup.remove(this.ignisTether.mesh);
+          this.ignisTether = null;
+          return;
+        }
+        const x1 = this.player.x;
+        const y1 = this.player.y + 1.3;
+        const z1 = this.player.z;
+        const x2 = tb.x;
+        const y2 = (tb.y || 0) + 1.3;
+        const z2 = tb.z;
+        const dx = x2 - x1;
+        const dz = z2 - z1;
+        const dist = Math.hypot(dx, dz) || 0.5;
+        const yaw = Math.atan2(-dx, -dz);
+        const mesh = this.ignisTether.mesh;
+        mesh.position.set((x1 + x2) / 2, (y1 + y2) / 2, (z1 + z2) / 2);
+        mesh.rotation.x = Math.PI / 2;
+        mesh.rotation.z = -yaw;
+        mesh.children.forEach((c) => {
+          if (c.scale) c.scale.set(1, dist, 1);
+        });
+      },
+
+      // Itachi's Sharingan (Upgraded v1.3.0 3D Visuals): Crimson Sharingan + Black Flame Beam & 10m Pillar Zone
       fireItachiAmaterasu(originX, originZ, yaw, isPlayer = true) {
         const dirX = -Math.sin(yaw);
         const dirZ = -Math.cos(yaw);
@@ -2451,7 +2946,6 @@
           }
         }
 
-        // If no Gloo Wall hit, center on nearest enemy in front or 16m ahead
         if (!hitGloo && isPlayer) {
           for (const bot of this.bots) {
             if (bot.hp <= 0) continue;
@@ -2464,13 +2958,52 @@
           }
         }
 
-        const ringMesh = new THREE.Mesh(
-          new THREE.CylinderGeometry(10, 10, 0.6, 28),
-          new THREE.MeshBasicMaterial({ color: 0x1e1b4b, transparent: true, opacity: 0.72 })
-        );
         const hy = getTerrainHeight(hitX, hitZ);
-        ringMesh.position.set(hitX, hy + 0.3, hitZ);
-        effectsGroup.add(ringMesh);
+        // Cast Beam from caster to hit point
+        const beamDist = Math.hypot(hitX - originX, hitZ - originZ) || 1;
+        const beamYaw = Math.atan2(-(hitX - originX), -(hitZ - originZ));
+        const castBeam = new THREE.Group();
+        const blackCore = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.28, 0.28, beamDist, 10),
+          new THREE.MeshBasicMaterial({ color: 0x090d16, transparent: true, opacity: 0.95 })
+        );
+        const crimsonAura = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.55, 0.55, beamDist, 12),
+          new THREE.MeshBasicMaterial({ color: 0xdc2626, transparent: true, opacity: 0.55 })
+        );
+        castBeam.add(blackCore, crimsonAura);
+        castBeam.rotation.x = Math.PI / 2;
+        castBeam.rotation.z = -beamYaw;
+        castBeam.position.set((originX + hitX) / 2, hy + 1.3, (originZ + hitZ) / 2);
+        effectsGroup.add(castBeam);
+        setTimeout(() => effectsGroup.remove(castBeam), 650);
+
+        // 10m Amaterasu Black Flame Zone with 8 Flame Pillars & Sharingan Crimson Ring
+        const zoneGroup = new THREE.Group();
+        const baseDisc = new THREE.Mesh(
+          new THREE.CylinderGeometry(10, 10, 0.55, 32),
+          new THREE.MeshBasicMaterial({ color: 0x090d16, transparent: true, opacity: 0.82 })
+        );
+        const crimsonRing = new THREE.Mesh(
+          new THREE.RingGeometry(9.2, 10.2, 32),
+          new THREE.MeshBasicMaterial({ color: 0xdc2626, side: THREE.DoubleSide, transparent: true, opacity: 0.9 })
+        );
+        crimsonRing.rotation.x = -Math.PI / 2;
+        crimsonRing.position.y = 0.32;
+        zoneGroup.add(baseDisc, crimsonRing);
+
+        for (let p = 0; p < 8; p++) {
+          const ang = (p / 8) * Math.PI * 2;
+          const pr = 6.5;
+          const pillar = new THREE.Mesh(
+            new THREE.ConeGeometry(1.1, 3.8, 8),
+            new THREE.MeshBasicMaterial({ color: p % 2 === 0 ? 0x111827 : 0x991b1b, transparent: true, opacity: 0.85 })
+          );
+          pillar.position.set(Math.cos(ang) * pr, 1.9, Math.sin(ang) * pr);
+          zoneGroup.add(pillar);
+        }
+        zoneGroup.position.set(hitX, hy + 0.25, hitZ);
+        effectsGroup.add(zoneGroup);
 
         const now = performance.now();
         this.amaterasuZones.push({
@@ -2478,9 +3011,9 @@
           z: hitZ,
           r: 10.0,
           expiresAt: now + 5000,
-          nextTick: now + 200, // First tick almost immediate, then every 1000ms (5 ticks total)
+          nextTick: now + 200,
           ticksLeft: 5,
-          mesh: ringMesh,
+          mesh: zoneGroup,
           ownerIsPlayer: isPlayer
         });
 
@@ -2489,35 +3022,65 @@
         }
       },
 
-      // Madara Susanoo 2nd press: Fires energy orb that homes into enemies within 5m and explodes for 50 HP
+      // Madara Susanoo 2nd press (Upgraded Multi-Ring Chakra Orb)
       fireMadaraEnergyOrb(x, y, z, yaw, isPlayer = true) {
         const vx = -Math.sin(yaw) * 32;
         const vz = -Math.cos(yaw) * 32;
-        const orbMesh = new THREE.Mesh(
-          new THREE.SphereGeometry(0.75, 12, 12),
-          new THREE.MeshBasicMaterial({ color: 0x818cf8 })
+        const orbGroup = new THREE.Group();
+        const innerOrb = new THREE.Mesh(
+          new THREE.SphereGeometry(0.65, 14, 14),
+          new THREE.MeshBasicMaterial({ color: 0xe0e7ff })
         );
-        orbMesh.position.set(x, y, z);
-        effectsGroup.add(orbMesh);
+        const outerOrb = new THREE.Mesh(
+          new THREE.SphereGeometry(1.05, 14, 14),
+          new THREE.MeshBasicMaterial({ color: 0x6366f1, transparent: true, opacity: 0.55 })
+        );
+        const chakraRing = new THREE.Mesh(
+          new THREE.RingGeometry(1.15, 1.45, 20),
+          new THREE.MeshBasicMaterial({ color: 0xa855f7, side: THREE.DoubleSide })
+        );
+        chakraRing.rotation.x = Math.PI / 3;
+        orbGroup.add(innerOrb, outerOrb, chakraRing);
+        orbGroup.position.set(x, y, z);
+        effectsGroup.add(orbGroup);
 
         this.madaraOrbs.push({
           x, y, z, vx, vz,
           distLeft: 55,
-          mesh: orbMesh,
+          mesh: orbGroup,
           ownerIsPlayer: isPlayer
         });
       },
 
-      // Rinnegan: Summons giant meteor dealing -140 HP to all enemies within 30m radius!
+      // Rinnegan: Summons Chibaku Tensei Giant Meteor + 30m Rinnegan Seal Rings dealing -140 HP!
       castRinneganMeteor(centerX, centerZ, isPlayer = true) {
-        const meteorMesh = new THREE.Mesh(
-          new THREE.SphereGeometry(6.5, 16, 16),
+        const groundY = getTerrainHeight(centerX, centerZ);
+        const meteorGroup = new THREE.Group();
+        const rockCore = new THREE.Mesh(
+          new THREE.SphereGeometry(6.8, 18, 18),
           new THREE.MeshLambertMaterial({ color: 0x7c2d12 })
         );
-        const groundY = getTerrainHeight(centerX, centerZ);
-        meteorMesh.position.set(centerX, groundY + 4.5, centerZ);
-        effectsGroup.add(meteorMesh);
-        setTimeout(() => effectsGroup.remove(meteorMesh), 1200);
+        const magmaShell = new THREE.Mesh(
+          new THREE.SphereGeometry(7.6, 16, 16),
+          new THREE.MeshBasicMaterial({ color: 0xf97316, transparent: true, opacity: 0.42 })
+        );
+        rockCore.position.y = 5.5;
+        magmaShell.position.y = 5.5;
+        meteorGroup.add(rockCore, magmaShell);
+
+        // 30m Rinnegan Concentric Ground Seal Rings
+        for (const rVal of [10, 20, 30]) {
+          const sealRing = new THREE.Mesh(
+            new THREE.RingGeometry(rVal - 0.6, rVal, 36),
+            new THREE.MeshBasicMaterial({ color: 0xc084fc, side: THREE.DoubleSide, transparent: true, opacity: 0.75 })
+          );
+          sealRing.rotation.x = -Math.PI / 2;
+          sealRing.position.y = 0.25;
+          meteorGroup.add(sealRing);
+        }
+        meteorGroup.position.set(centerX, groundY, centerZ);
+        effectsGroup.add(meteorGroup);
+        setTimeout(() => effectsGroup.remove(meteorGroup), 1400);
 
         let hitCount = 0;
         if (isPlayer) {
@@ -2919,8 +3482,9 @@
           damageMod += 0.40;
         }
 
-        // Scope bonus when attached & zoomed
-        const scopeObj = attachedScopeId ? SCOPES_DB[attachedScopeId] : null;
+        // Ensure Laura default scope is recognized if Laura is equipped
+        const effectiveScopeId = attachedScopeId || this.getLauraDefaultScope(weaponId);
+        const scopeObj = effectiveScopeId ? SCOPES_DB[effectiveScopeId] : null;
         if (scopeObj) {
           accuracyMod += this.scopeZoomActive ? scopeObj.accuracyBonus : (scopeObj.accuracyBonus * 0.5);
         }
@@ -2928,10 +3492,19 @@
         const finalFireScore = Math.round(base.fireRateScore * (1 + fireRateMod));
         const shotsPerSec = (finalFireScore / 30000) * 14.5;
         const effectiveReloadScore = base.reloadScore * (1 + reloadSpeedMod);
-        const reloadSec = Math.max(0.55, 3.0 - (effectiveReloadScore / 30000) * 2.0);
+        let reloadSec = Math.max(0.55, 3.0 - (effectiveReloadScore / 30000) * 2.0);
+        // v1.3.0 Rolk Buff: -20% reload time!
+        if (AccountState.hasPassive('rolk')) {
+          reloadSec *= 0.80;
+        }
         const finalMagSize = Math.max(1, Math.round(base.magSize * (1 + magSizeMod)));
         const finalDamage = Math.round(base.damage * (1 + damageMod) * 10) / 10;
-        const finalAccuracy = Math.max(0.25, Math.min(1.0, base.accuracy + accuracyMod));
+        let rawAccuracy = base.accuracy + accuracyMod;
+        // v1.3.0 Laura Passive: +50% accuracy when scope is zoomed in!
+        if (this.scopeZoomActive && AccountState.hasPassive('laura')) {
+          rawAccuracy *= 1.50;
+        }
+        const finalAccuracy = Math.max(0.25, Math.min(1.0, rawAccuracy));
         const finalCritRate = Math.min(1.0, base.critRate + critRateMod);
         const finalCritBonus = base.critBonus + critBonusMod;
 
@@ -3121,7 +3694,7 @@
           this.showBanner('❤️ Máu của bạn đã đầy (200/200 HP)!', 1800);
           return;
         }
-        const healMs = AccountState.hasPassive('maxim') ? 1500 : 3000;
+        const healMs = AccountState.hasPassive('maxim') ? 1800 : 3000;
         const healAmt = AccountState.hasPassive('kapella') ? Math.round(80 * 1.4) : 80;
         this.player.reloading = false;
         this.player.healing = true;
@@ -3248,9 +3821,16 @@
         else if (!this.player.weapons[1]) targetSlot = 1;
 
         const prev = this.player.weapons[targetSlot];
-        let inheritedScope = null;
-        if (prev && prev.scope && (spec.allowedScopes || []).includes(prev.scope)) {
+        let inheritedScope = this.getLauraDefaultScope(weaponKey);
+        if (!inheritedScope && prev && prev.scope && (spec.allowedScopes || []).includes(prev.scope)) {
           inheritedScope = prev.scope;
+        }
+        // Also check if we have a compatible scope in spareScopes backpack
+        if (!inheritedScope && this.player.spareScopes && this.player.spareScopes.length > 0) {
+          const matchIdx = this.player.spareScopes.findIndex(s => (spec.allowedScopes || []).includes(s));
+          if (matchIdx >= 0) {
+            inheritedScope = this.player.spareScopes.splice(matchIdx, 1)[0];
+          }
         }
         if (prev && prev.id !== weaponKey) {
           const prevData = WEAPONS_DB[prev.id];
@@ -3269,25 +3849,55 @@
       equipScopeFromLoot(scopeId) {
         const sData = SCOPES_DB[scopeId];
         if (!sData) return false;
-        // Check active weapon first, then secondary weapon
+        // Check active weapon first, then secondary weapon (if no scope attached yet)
         const order = [this.player.activeSlot, this.player.activeSlot === 0 ? 1 : 0];
         for (const idx of order) {
           const wSlot = this.player.weapons[idx];
           if (!wSlot) continue;
           const wBase = WEAPONS_DB[wSlot.id];
-          if (wBase && (wBase.allowedScopes || []).includes(scopeId)) {
+          if (wBase && (wBase.allowedScopes || []).includes(scopeId) && !wSlot.scope) {
             wSlot.scope = scopeId;
             this.updateWeaponHUD();
             this.showBanner(`🔭 Đã gắn ${sData.name} vào súng ${wBase.name} (Bấm [Phím V] để bật tâm ngắm)!`, 2600);
             return true;
           }
         }
-        this.showBanner(`⚠️ Súng hiện tại không hỗ trợ ${sData.name} (x2: Tiểu liên/Trường, x4: Trường/Tầm xa, x8: Tỉa)!`, 2600);
-        return false;
+        // Otherwise store in Backpack (up to 50 items)
+        if (this.getBackpackCount() >= this.player.maxBackpackCapacity) {
+          this.showBanner(`🎒 Balo đã đầy (50/50 món)! Bấm [Phím B] mở Balo để vứt bớt đồ trước khi nhặt ${sData.name}.`, 2600);
+          return false;
+        }
+        this.player.spareScopes.push(scopeId);
+        this.updateAllHUD();
+        this.showBanner(`🎒 Đã cất ${sData.name} vào Balo (${this.getBackpackCount()}/50)! Bấm [Phím B] để lắp vào súng.`, 2400);
+        return true;
       },
 
       tryPickupNearestLoot() {
         if (!this.active) return;
+
+        // 1. Check nearby Airdrop Crate first!
+        for (let aIdx = 0; aIdx < this.airdrops.length; aIdx++) {
+          const ad = this.airdrops[aIdx];
+          if (Math.hypot(ad.x - this.player.x, ad.z - this.player.z) <= 5.2) {
+            SoundFX.pickup();
+            this.player.coins += 500;
+            this.player.hasMaxChip = true;
+            this.player.armor = { ...ARMOR_DB[4], hitsLeft: ARMOR_DB[4].maxHits };
+            playerMesh.userData.vest.visible = true;
+            playerMesh.userData.vest.material.color.setHex(ARMOR_DB[4].color);
+            if (this.getBackpackCount() < this.player.maxBackpackCapacity) {
+              this.player.oxygenCanisters += 1;
+            }
+            this.equipWeaponFromLoot(ad.weaponId);
+            lootGroup.remove(ad.mesh);
+            this.airdrops.splice(aIdx, 1);
+            this.updateAllHUD();
+            this.showBanner(`📦 ĐÃ NHẶT HÒM THÍNH: Súng ${WEAPONS_DB[ad.weaponId].name} + Giáp Lv4 + Chip Max 99 + 500 Xu + Bình Oxy!`, 4000);
+            return;
+          }
+        }
+
         let nearestIdx = -1;
         let nearestDist = 4.6;
 
@@ -3300,11 +3910,20 @@
           }
         }
         if (nearestIdx === -1) {
-          this.showBanner('Không có vật phẩm nào ở gần để nhặt!', 1500);
+          this.showBanner('Không có vật phẩm hay Hòm Thính nào ở gần để nhặt!', 1500);
           return;
         }
 
         const item = this.lootItems[nearestIdx];
+
+        // Check 50-item Backpack limit for consumables
+        if (item.type === 'medkit' || item.type === 'oxygen' || item.type === 'gloowall') {
+          if (this.getBackpackCount() >= this.player.maxBackpackCapacity) {
+            this.showBanner('🎒 Balo đã đầy (50/50 món)! Hãy bấm [Phím B] để vứt bớt đồ.', 2400);
+            return;
+          }
+        }
+
         SoundFX.pickup();
 
         if (item.type === 'coin') {
@@ -3327,13 +3946,13 @@
           this.showBanner('⚡ Đã gắn CHIP LV MAX 99 (+20% Tốc bắn & +15% Xuyên giáp)!', 2800);
         } else if (item.type === 'medkit') {
           this.player.medkits += 1;
-          this.showBanner('🩹 Đã nhặt Bình Máu (+80 HP)!', 1500);
+          this.showBanner(`🩹 Đã nhặt Bình Máu (+80 HP) [Balo: ${this.getBackpackCount()}/50]!`, 1500);
         } else if (item.type === 'oxygen') {
           this.player.oxygenCanisters += 1;
-          this.showBanner('🫧 Đã nhặt Bình Cấp Oxy (0.8s +40 HP)!', 1600);
+          this.showBanner(`🫧 Đã nhặt Bình Cấp Oxy (0.8s +40 HP) [Balo: ${this.getBackpackCount()}/50]!`, 1600);
         } else if (item.type === 'gloowall') {
           this.player.glooWalls += 1;
-          this.showBanner('🧊 Đã nhặt Bom Keo (+1)!', 1500);
+          this.showBanner(`🧊 Đã nhặt Bom Keo (+1) [Balo: ${this.getBackpackCount()}/50]!`, 1500);
         }
 
         lootGroup.remove(item.mesh);
@@ -3469,7 +4088,7 @@
           document.getElementById('modal-vending').classList.add('hidden');
           document.getElementById('modal-vending').classList.remove('flex');
           const umpSpec = this.getModifiedWeaponSpec('UMP');
-          this.player.weapons = [{ id: 'UMP', ammo: umpSpec.magSize, scope: null }, null];
+          this.player.weapons = [{ id: 'UMP', ammo: umpSpec.magSize, scope: this.getLauraDefaultScope('UMP') }, null];
           this.player.activeSlot = 0;
           playerMesh.userData.barrelMat.color.setHex(WEAPONS_DB.UMP.color);
 
@@ -3540,6 +4159,10 @@
         const narutoPtsEarned = this.player.kills >= 6 ? 50 : 0;
         AccountState.narutoPoints += narutoPtsEarned;
 
+        const survivalSec = Math.max(1, Math.round((performance.now() - (this.matchStartTime || performance.now())) / 1000));
+        const rankOutcome = AccountState.applyMatchRankResult(isVictory, this.player.kills, survivalSec);
+        const rankInfo = AccountState.getRankInfo();
+
         const primeBonusMult = 1 + AccountState.getPrimeLevel() * 0.1;
         const goldEarned = Math.round(((isVictory ? 600 : 200) + this.player.kills * 120) * primeBonusMult);
         AccountState.gold += goldEarned;
@@ -3557,6 +4180,9 @@
           ? `Quét sạch bản đồ! Thưởng thêm +${winBonusDiamonds} KC chiến thắng (Cộng thẳng vào Prime)!`
           : 'Bạn đã sử dụng hết lượt hồi sinh. Mọi KC hạ Bot đã được cộng vào Prime!';
         document.getElementById('gameover-kills').textContent = this.player.kills;
+        document.getElementById('gameover-rank-delta').textContent = rankOutcome.deltaText;
+        document.getElementById('gameover-rank-current').textContent = `${rankInfo.icon} ${rankInfo.name} (${rankInfo.subText})`;
+        document.getElementById('gameover-rank-bonus').textContent = rankOutcome.bonusText;
         document.getElementById('gameover-diamonds').textContent = `+${this.player.matchDiamondsEarned.toLocaleString()} 💎 (+Prime)`;
         document.getElementById('gameover-gold').textContent = `+${goldEarned.toLocaleString()} 🪙`;
         document.getElementById('gameover-naruto-pts').textContent = narutoPtsEarned > 0 ? `+${narutoPtsEarned} 🍥 (Đạt ≥6 Kills!)` : '0 🍥 (Cần ≥6 Kills)';
@@ -3655,7 +4281,9 @@
         document.getElementById('hud-medkit-count').textContent = this.player.medkits;
         document.getElementById('hud-gloowall-count').textContent = this.player.glooWalls;
         document.getElementById('hud-oxygen-count').textContent = this.player.oxygenCanisters;
-        document.getElementById('hud-medkit-time-label').textContent = AccountState.hasPassive('maxim') ? '(1.5s +80HP)' : '(3s +80HP)';
+        document.getElementById('hud-medkit-time-label').textContent = AccountState.hasPassive('maxim') ? '(1.8s +80HP)' : '(3s +80HP)';
+        const bpCountEl = document.getElementById('hud-backpack-count');
+        if (bpCountEl) bpCountEl.textContent = this.getBackpackCount();
         document.getElementById('hud-gloowall-hp-label').textContent = AccountState.hasPassive('nairi') ? '(650HP)' : '(500HP)';
         document.getElementById('hud-bluezone-label').textContent = this.blueZone ? `🔵 Vùng Xanh: ${this.blueZone.name}` : '';
 
@@ -3814,6 +4442,8 @@
         Match.tryPickupNearestLoot();
       } else if (key === 't') {
         toggleVendingModal();
+      } else if (key === 'b') {
+        toggleBackpackModal();
       } else if (key === '4') {
         Match.deployGlooWall(true);
       } else if (key === '3') {
@@ -3827,6 +4457,8 @@
       } else if (key === 'escape') {
         document.getElementById('modal-vending').classList.add('hidden');
         document.getElementById('modal-vending').classList.remove('flex');
+        document.getElementById('modal-backpack').classList.add('hidden');
+        document.getElementById('modal-backpack').classList.remove('flex');
       }
     });
 
@@ -3912,11 +4544,22 @@
       mmCtx.fillStyle = '#090d16';
       mmCtx.fillRect(0, 0, w, h);
 
-      const mapScale = w / 250;
+      const mapScale = w / 400;
       const toMM = (wx, wz) => ({
-        x: (wx + 125) * mapScale,
-        y: (wz + 125) * mapScale
+        x: (wx + 200) * mapScale,
+        y: (wz + 200) * mapScale
       });
+
+      // Draw Shrinking Safe Zone (Vòng Bo) on Minimap
+      if (Match.active && Match.safeZone) {
+        const szP = toMM(Match.safeZone.x, Match.safeZone.z);
+        const szR = Math.max(0, Match.safeZone.currentRadius * mapScale);
+        mmCtx.beginPath();
+        mmCtx.arc(szP.x, szP.y, szR, 0, Math.PI * 2);
+        mmCtx.strokeStyle = '#38bdf8';
+        mmCtx.lineWidth = 1.5;
+        mmCtx.stroke();
+      }
 
       MAP_ZONES.forEach((z) => {
         const p = toMM(z.x, z.z);
@@ -3940,7 +4583,17 @@
       vendingMachines.forEach((vm) => {
         const p = toMM(vm.x, vm.z);
         mmCtx.fillStyle = '#facc15';
-        mmCtx.fillRect(p.x - 2.5, p.y - 2.5, 5, 5);
+        mmCtx.fillRect(p.x - 2, p.y - 2, 4, 4);
+      });
+
+      // Draw Airdrops (Hòm Thính) on Minimap
+      (Match.airdrops || []).forEach((ad) => {
+        const p = toMM(ad.x, ad.z);
+        mmCtx.fillStyle = '#ef4444';
+        mmCtx.fillRect(p.x - 3.5, p.y - 3.5, 7, 7);
+        mmCtx.strokeStyle = '#fef08a';
+        mmCtx.lineWidth = 1;
+        mmCtx.strokeRect(p.x - 3.5, p.y - 3.5, 7, 7);
       });
 
       Match.bots.forEach((bot) => {
@@ -4030,6 +4683,23 @@
         `;
       }
 
+      for (const ad of (Match.airdrops || [])) {
+        const dist = Math.hypot(ad.x - Match.player.x, ad.z - Match.player.z);
+        if (dist > 130) continue;
+        const v = new THREE.Vector3(ad.x, (ad.y || 0) + 3.4, ad.z);
+        v.project(camera);
+        if (v.z > 1) continue;
+        const sx = (v.x * 0.5 + 0.5) * w;
+        const sy = (-(v.y * 0.5) + 0.5) * h;
+        html += `
+          <div class="world-tag" style="left:${sx}px;top:${sy}px;">
+            <div class="px-2 py-0.5 rounded bg-amber-950/90 border border-amber-400 text-[10px] text-amber-200 font-bold shadow">
+              📦 Hòm Thính (${Math.round(dist)}m) [${WEAPONS_DB[ad.weaponId]?.name || 'AWM'}]
+            </div>
+          </div>
+        `;
+      }
+
       worldLabelsLayer.innerHTML = html;
     }
 
@@ -4052,8 +4722,8 @@
           nz += (dz / dist) * push;
         }
       }
-      nx = Math.max(-118, Math.min(118, nx));
-      nz = Math.max(-118, Math.min(118, nz));
+      nx = Math.max(-192, Math.min(192, nx));
+      nz = Math.max(-192, Math.min(192, nz));
       return { x: nx, z: nz };
     }
 
@@ -4076,6 +4746,65 @@
       if (Match.player.susanooActiveUntil > 0 && now >= Match.player.susanooActiveUntil) {
         Match.player.susanooActiveUntil = 0;
         playerMesh.userData.susanooAura.visible = false;
+      }
+      if (playerMesh.userData.susanooAura.visible) {
+        playerMesh.userData.susanooAura.rotation.y += dt * 1.8;
+      }
+      if (playerMesh.userData.activeSkillAura) {
+        const isActOn = now < Match.player.skillActiveUntil || (Match.player.virtualShieldHp > 0 && now < Match.player.virtualShieldUntil);
+        playerMesh.userData.activeSkillAura.visible = isActOn;
+        if (isActOn) {
+          playerMesh.userData.activeSkillAura.rotation.z += dt * 2.5;
+        }
+      }
+
+      // 1B. Update Persistent Ignis Fire Tether
+      if (Match.ignisTether) {
+        Match.updateIgnisTetherMesh();
+      }
+
+      // 1C. Update Match Timer (Max 10:00 = 600s), Airdrop Spawns, and Safe Zone (Vòng Bo)
+      const elapsedSec = Math.max(0, (now - Match.matchStartTime) / 1000);
+      const mins = Math.floor(elapsedSec / 60);
+      const secs = Math.floor(elapsedSec % 60);
+      const timerEl = document.getElementById('hud-match-timer');
+      if (timerEl) {
+        timerEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')} / 10:00`;
+      }
+
+      if (now >= Match.nextAirdropAt && Match.airdrops.length < 6) {
+        Match.nextAirdropAt = now + 60000;
+        Match.spawnAirdrop();
+      }
+
+      // Safe Zone shrinks smoothly from 260m (at 45s) down to 0m (at 600s = 10 minutes)
+      if (elapsedSec <= 45) {
+        Match.safeZone.currentRadius = 260;
+      } else {
+        const shrinkProgress = Math.min(1, (elapsedSec - 45) / (Match.maxMatchDurationSec - 45));
+        Match.safeZone.currentRadius = Math.max(0, 260 * (1 - shrinkProgress));
+      }
+      if (Match.safeZone.mesh) {
+        const rScale = Math.max(0.5, Match.safeZone.currentRadius);
+        Match.safeZone.mesh.scale.set(rScale, 1, rScale);
+      }
+      const distFromSafeCenter = Math.hypot(Match.player.x - Match.safeZone.x, Match.player.z - Match.safeZone.z);
+      const outsideSafeZone = distFromSafeCenter > Match.safeZone.currentRadius;
+      const szStatusEl = document.getElementById('hud-safezone-status');
+      if (szStatusEl) {
+        if (outsideSafeZone) {
+          szStatusEl.textContent = `⚠️ NGOÀI BO (${Math.round(Match.safeZone.currentRadius)}m)`;
+          szStatusEl.className = 'font-display font-bold text-xs text-rose-400 animate-pulse';
+        } else {
+          szStatusEl.textContent = `🌀 Bo: ${Math.round(Match.safeZone.currentRadius)}m`;
+          szStatusEl.className = 'font-display font-bold text-xs text-sky-300';
+        }
+      }
+      if (outsideSafeZone && now >= Match.safeZone.nextStormTick) {
+        Match.safeZone.nextStormTick = now + 1000;
+        const stormDmg = elapsedSec > 360 ? 15 : (elapsedSec > 180 ? 8 : 3);
+        Match.applyDirectSkillDamageToPlayer(stormDmg);
+        Match.showBanner(`⚡ CẢNH BÁO: Bạn đang ở ngoài Vòng Bo (-${stormDmg} HP/s)! Hãy di chuyển vào trong Vòng Bo!`, 1400);
       }
 
       // Kayne Virtual Shield: lasts 8s, decays -10 HP every 2s!
@@ -4282,6 +5011,8 @@
       }
 
       if (vx !== 0 || vz !== 0) {
+        const prevX = Match.player.x;
+        const prevZ = Match.player.z;
         const nextPos = resolveCircleCollision(
           Match.player.x + vx * dt,
           Match.player.z + vz * dt,
@@ -4289,11 +5020,13 @@
         );
         Match.player.x = nextPos.x;
         Match.player.z = nextPos.z;
+        const movedDist = Math.hypot(Match.player.x - prevX, Match.player.z - prevZ);
 
-        if (AccountState.hasPassive('beta')) {
-          Match.player.continuousMoveTime += dt;
-          if (Match.player.continuousMoveTime >= 3.0) {
-            Match.player.continuousMoveTime -= 3.0;
+        // v1.3.0 Beta Passive: Every 20m moved heals +5 HP!
+        if (AccountState.hasPassive('beta') && movedDist > 0) {
+          Match.player.distanceMovedAccum = (Match.player.distanceMovedAccum || 0) + movedDist;
+          while (Match.player.distanceMovedAccum >= 20.0) {
+            Match.player.distanceMovedAccum -= 20.0;
             Match.healPlayer(5, 'Beta');
           }
         }
@@ -4350,11 +5083,18 @@
       document.getElementById('hud-current-zone').textContent = `📍 ${currentZoneName}`;
 
       let closestLoot = null;
-      let closestLootDist = 4.6;
+      let closestLootDist = 5.2;
+      for (const ad of Match.airdrops) {
+        const d = Math.hypot(ad.x - Match.player.x, ad.z - Match.player.z);
+        if (d < closestLootDist) {
+          closestLootDist = d;
+          closestLoot = { name: `📦 Hòm Thính (${WEAPONS_DB[ad.weaponId]?.name || 'AWM'} + Giáp Lv4 + Chip 99)` };
+        }
+      }
       for (const item of Match.lootItems) {
         item.mesh.rotation.y += dt * 1.8;
         const d = Math.hypot(item.x - Match.player.x, item.z - Match.player.z);
-        if (d < closestLootDist) {
+        if (d < 4.6 && d < closestLootDist) {
           closestLootDist = d;
           closestLoot = item;
         }
@@ -4456,13 +5196,21 @@
             );
           }
         } else {
+          // If bot is outside the shrinking Safe Zone, steer toward Safe Zone center!
+          const botDistToSafe = Math.hypot(bot.x - Match.safeZone.x, bot.z - Match.safeZone.z);
+          if (botDistToSafe > Match.safeZone.currentRadius * 0.88) {
+            bot.patrolTarget = {
+              x: Match.safeZone.x + (Math.random() - 0.5) * 18,
+              z: Match.safeZone.z + (Math.random() - 0.5) * 18
+            };
+          }
           const pdx = bot.patrolTarget.x - bot.x;
           const pdz = bot.patrolTarget.z - bot.z;
           const pDist = Math.hypot(pdx, pdz);
           if (pDist < 2.0) {
             bot.patrolTarget = {
-              x: Math.max(-108, Math.min(108, bot.x + (Math.random() - 0.5) * 34)),
-              z: Math.max(-108, Math.min(108, bot.z + (Math.random() - 0.5) * 34))
+              x: Math.max(-175, Math.min(175, bot.x + (Math.random() - 0.5) * 44)),
+              z: Math.max(-175, Math.min(175, bot.z + (Math.random() - 0.5) * 44))
             };
           } else {
             bot.yaw = Math.atan2(-pdx, -pdz);
@@ -4598,6 +5346,17 @@
       document.getElementById('lobby-naruto-shards').textContent = AccountState.narutoShards.toLocaleString();
       document.getElementById('lobby-prime-level').textContent = AccountState.getPrimeLevel();
       document.getElementById('lobby-matches-count').textContent = AccountState.matchesPlayed;
+      const rInfo = AccountState.getRankInfo();
+      const rIconEl = document.getElementById('lobby-rank-icon');
+      const rNameEl = document.getElementById('lobby-rank-name');
+      const rSubEl = document.getElementById('lobby-rank-sub');
+      const rCardSub = document.getElementById('lobby-rank-card-sub');
+      const wsEl = document.getElementById('lobby-winstreak');
+      if (rIconEl) rIconEl.textContent = rInfo.icon;
+      if (rNameEl) rNameEl.textContent = rInfo.name;
+      if (rSubEl) rSubEl.textContent = rInfo.subText;
+      if (rCardSub) rCardSub.textContent = `${rInfo.icon} ${rInfo.name}`;
+      if (wsEl) wsEl.textContent = `Chuỗi thắng: ${AccountState.winStreak}`;
 
       const evCount = Math.min(10, AccountState.matchesPlayed);
       const evPct = (evCount / 10) * 100;
@@ -5047,6 +5806,11 @@
         msgEl.className = 'text-xs text-rose-400 mt-2 min-h-[18px] font-semibold';
         return;
       }
+      if ((itemId === 'gloowall' || itemId === 'medkit') && Match.getBackpackCount() >= Match.player.maxBackpackCapacity) {
+        msgEl.textContent = '🎒 Balo đã đầy (50/50 món)! Hãy mở Balo [Phím B] để vứt bớt đồ.';
+        msgEl.className = 'text-xs text-rose-400 mt-2 min-h-[18px] font-semibold';
+        return;
+      }
 
       Match.player.coins -= item.cost;
       SoundFX.pickup();
@@ -5093,6 +5857,212 @@
         modal.classList.remove('flex');
       }
     }
+
+    function renderBackpackModal() {
+      const count = Match.getBackpackCount();
+      const maxCap = Match.player.maxBackpackCapacity || 50;
+      document.getElementById('backpack-count-title').textContent = count;
+      document.getElementById('backpack-capacity-bar').style.width = `${Math.min(100, (count / maxCap) * 100)}%`;
+      const listEl = document.getElementById('backpack-items-list');
+      listEl.innerHTML = '';
+
+      const rows = [
+        {
+          key: 'medkit',
+          icon: '🩹',
+          name: 'Bình Máu (+80 HP)',
+          count: Match.player.medkits,
+          desc: AccountState.hasPassive('maxim') ? 'Thời gian dùng: 1.8s (Maxim -40%)' : 'Thời gian dùng: 3.0s',
+          canUse: true,
+          useLabel: 'Dùng [Phím 3]'
+        },
+        {
+          key: 'gloowall',
+          icon: '🧊',
+          name: 'Bom Keo Chắn Đạn',
+          count: Match.player.glooWalls,
+          desc: AccountState.hasPassive('nairi') ? 'Độ bền: 650 HP (+Nairi)' : 'Độ bền: 500 HP',
+          canUse: true,
+          useLabel: 'Đặt [Phím 4]'
+        },
+        {
+          key: 'oxygen',
+          icon: '🫧',
+          name: 'Bình Cấp Oxy (0.8s +40 HP)',
+          count: Match.player.oxygenCanisters,
+          desc: 'Hồi cấp tốc 40 HP chỉ trong 0.8 giây',
+          canUse: true,
+          useLabel: 'Dùng [Phím 5]'
+        }
+      ];
+
+      // Group spare scopes by type
+      const scopeCounts = { x2: 0, x4: 0, x8: 0 };
+      (Match.player.spareScopes || []).forEach(s => {
+        if (scopeCounts[s] !== undefined) scopeCounts[s] += 1;
+      });
+      ['x2', 'x4', 'x8'].forEach(sk => {
+        if (scopeCounts[sk] > 0) {
+          rows.push({
+            key: `scope_${sk}`,
+            scopeId: sk,
+            icon: '🔭',
+            name: `${SCOPES_DB[sk].name} (Dự phòng)`,
+            count: scopeCounts[sk],
+            desc: `Tăng +${Math.round(SCOPES_DB[sk].accuracyBonus * 100)}% chính xác khi bật ngắm [Phím V]`,
+            canUse: true,
+            useLabel: 'Lắp vào súng'
+          });
+        }
+      });
+
+      rows.forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'p-3 rounded-2xl bg-slate-900/95 border border-slate-700 flex items-center justify-between gap-2';
+        div.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-xl">${r.icon}</div>
+            <div>
+              <div class="font-display font-bold text-sm text-white">${r.name} <span class="text-amber-300">x${r.count}</span></div>
+              <div class="text-[11px] text-slate-400">${r.desc}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button data-bp-use="${r.key}" class="bp-use-btn px-2.5 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-emerald-200 font-bold text-xs ${r.count <= 0 ? 'opacity-40 cursor-not-allowed' : ''}">
+              ${r.useLabel}
+            </button>
+            <button data-bp-drop="${r.key}" class="bp-drop-btn px-2.5 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-400/50 text-rose-200 font-bold text-xs ${r.count <= 0 ? 'opacity-40 cursor-not-allowed' : ''}">
+              Vứt bớt 1
+            </button>
+          </div>
+        `;
+        listEl.appendChild(div);
+      });
+
+      listEl.querySelectorAll('.bp-use-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const key = btn.getAttribute('data-bp-use');
+          if (key === 'medkit' && Match.player.medkits > 0) {
+            toggleBackpackModal();
+            Match.startMedkitHeal();
+          } else if (key === 'gloowall' && Match.player.glooWalls > 0) {
+            toggleBackpackModal();
+            Match.deployGlooWall(true);
+          } else if (key === 'oxygen' && Match.player.oxygenCanisters > 0) {
+            toggleBackpackModal();
+            Match.startOxygenHeal();
+          } else if (key.startsWith('scope_')) {
+            const sk = key.replace('scope_', '');
+            const wSlot = Match.player.weapons[Match.player.activeSlot];
+            const wBase = wSlot ? WEAPONS_DB[wSlot.id] : null;
+            const fb = document.getElementById('backpack-feedback');
+            if (!wSlot || !wBase || !(wBase.allowedScopes || []).includes(sk)) {
+              fb.textContent = `⚠️ Súng đang cầm (${wBase ? wBase.name : 'Trống'}) không hỗ trợ ${SCOPES_DB[sk].name}!`;
+              fb.className = 'text-xs text-rose-400 mt-1.5 font-semibold';
+              return;
+            }
+            const idx = Match.player.spareScopes.indexOf(sk);
+            if (idx >= 0) {
+              Match.player.spareScopes.splice(idx, 1);
+              if (wSlot.scope) Match.player.spareScopes.push(wSlot.scope);
+              wSlot.scope = sk;
+              Match.updateAllHUD();
+              renderBackpackModal();
+              fb.textContent = `✅ Đã lắp ${SCOPES_DB[sk].name} vào súng ${wBase.name}!`;
+              fb.className = 'text-xs text-emerald-300 mt-1.5 font-semibold';
+            }
+          }
+        });
+      });
+
+      listEl.querySelectorAll('.bp-drop-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const key = btn.getAttribute('data-bp-drop');
+          const dx = Match.player.x + (Math.random() - 0.5) * 2.2;
+          const dz = Match.player.z + (Math.random() - 0.5) * 2.2;
+          if (key === 'medkit' && Match.player.medkits > 0) {
+            Match.player.medkits -= 1;
+            Match.spawnLootItem('medkit', 'MEDKIT', 'Bình Máu (+80 HP)', dx, dz, 0x22c55e, 1);
+          } else if (key === 'gloowall' && Match.player.glooWalls > 0) {
+            Match.player.glooWalls -= 1;
+            Match.spawnLootItem('gloowall', 'GLOOWALL', 'Bom Keo (500 HP)', dx, dz, 0x38bdf8, 1);
+          } else if (key === 'oxygen' && Match.player.oxygenCanisters > 0) {
+            Match.player.oxygenCanisters -= 1;
+            Match.spawnLootItem('oxygen', 'OXYGEN', 'Bình Cấp Oxy (0.8s +40 HP)', dx, dz, 0x0ea5e9, 1);
+          } else if (key.startsWith('scope_')) {
+            const sk = key.replace('scope_', '');
+            const idx = Match.player.spareScopes.indexOf(sk);
+            if (idx >= 0) {
+              Match.player.spareScopes.splice(idx, 1);
+              Match.spawnLootItem('scope', sk, SCOPES_DB[sk].name, dx, dz, SCOPES_DB[sk].color, 1);
+            }
+          }
+          Match.updateAllHUD();
+          renderBackpackModal();
+        });
+      });
+    }
+    window.renderBackpackModal = renderBackpackModal;
+
+    function toggleBackpackModal() {
+      if (!Match.active) return;
+      const modal = document.getElementById('modal-backpack');
+      const isHidden = modal.classList.contains('hidden');
+      if (isHidden) {
+        renderBackpackModal();
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+    window.toggleBackpackModal = toggleBackpackModal;
+
+    function renderRankModal() {
+      const rInfo = AccountState.getRankInfo();
+      document.getElementById('rank-modal-icon').textContent = rInfo.icon;
+      document.getElementById('rank-modal-title').textContent = rInfo.name;
+      document.getElementById('rank-modal-sub').textContent = rInfo.subText;
+      document.getElementById('rank-modal-pct').textContent = `${rInfo.pct}%`;
+      document.getElementById('rank-modal-bar').style.width = `${rInfo.pct}%`;
+      document.getElementById('rank-modal-streak').textContent = `${AccountState.winStreak} trận thắng liên tiếp`;
+      document.getElementById('rank-modal-3match').textContent = `${AccountState.matchesPlayed % 3} / 3 trận`;
+
+      const grid = document.getElementById('rank-tiers-grid');
+      grid.innerHTML = '';
+      RANK_TIERS.forEach((t, idx) => {
+        const isCurrent = !AccountState.isLegendStarTier && AccountState.rankTierIndex === idx;
+        const isPassed = AccountState.isLegendStarTier || AccountState.rankTierIndex > idx;
+        const card = document.createElement('div');
+        card.className = `p-2.5 rounded-xl border ${
+          isCurrent ? 'bg-amber-950/60 border-amber-400 shadow' : (isPassed ? 'bg-slate-900/90 border-emerald-500/40' : 'bg-slate-900/60 border-slate-800 opacity-75')
+        }`;
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="font-display font-bold text-white">${t.icon} ${t.name}</span>
+            <span class="text-[10px] font-bold ${isCurrent ? 'text-amber-300' : (isPassed ? 'text-emerald-300' : 'text-slate-500')}">
+              ${isCurrent ? 'HIỆN TẠI' : (isPassed ? 'ĐÃ QUA' : `${t.maxExp} EXP`)}
+            </span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      // Add Legend Star 1-15 Card at the end
+      const starCard = document.createElement('div');
+      starCard.className = `p-2.5 rounded-xl border col-span-2 ${
+        AccountState.isLegendStarTier ? 'bg-amber-950/70 border-amber-400 shadow' : 'bg-slate-900/80 border-amber-500/40'
+      }`;
+      starCard.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span class="font-display font-bold text-amber-300">🌟 Huyền Thoại 1 Sao ➔ 15 Sao</span>
+          <span class="text-[10px] font-bold text-cyan-300">${AccountState.isLegendStarTier ? `Đang có ${AccountState.legendStars}/15 Sao` : 'Đỉnh Cao Xếp Hạng'}</span>
+        </div>
+      `;
+      grid.appendChild(starCard);
+    }
+    window.renderRankModal = renderRankModal;
 
     function startMatchFromLobby() {
       SoundFX.init();
@@ -5264,6 +6234,25 @@
     document.getElementById('btn-close-topup').addEventListener('click', () => {
       topupModal.classList.add('hidden');
       topupModal.classList.remove('flex');
+    });
+
+    // Backpack Modal Bindings
+    document.getElementById('btn-hud-backpack').addEventListener('click', toggleBackpackModal);
+    document.getElementById('btn-close-backpack').addEventListener('click', toggleBackpackModal);
+    document.getElementById('btn-close-backpack-bottom').addEventListener('click', toggleBackpackModal);
+
+    // Rank Modal Bindings
+    const rankModal = document.getElementById('modal-rank');
+    function openRankModal() {
+      renderRankModal();
+      rankModal.classList.remove('hidden');
+      rankModal.classList.add('flex');
+    }
+    document.getElementById('btn-open-rank').addEventListener('click', openRankModal);
+    document.getElementById('btn-open-rank-card').addEventListener('click', openRankModal);
+    document.getElementById('btn-close-rank').addEventListener('click', () => {
+      rankModal.classList.add('hidden');
+      rankModal.classList.remove('flex');
     });
 
     // Guide Modal
