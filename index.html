@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>SKYFIRE 3D - Battle Royale v1.3.0 (Hệ Thống Rank, Laura, Balo 50 Ô, Hòm Thính & Vòng Bo)</title>
+  <title>SKYFIRE 3D - Battle Royale v1.4.0 (3 Bản Đồ, Máy Bay Nhảy Dù, 23 Kỹ Năng, 32 Súng, 17 Skin & 6 Combo)</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -126,7 +126,7 @@
         <div>
           <div class="flex items-center gap-2 flex-wrap">
             <h1 class="font-display font-bold text-xl sm:text-2xl tracking-wider text-white">SKYFIRE 3D</h1>
-            <span class="px-2 py-0.5 text-[11px] font-bold rounded bg-orange-500/20 text-orange-300 border border-orange-400/40">v1.3.0 RANK & SINH TỒN 400x400M</span>
+            <span class="px-2 py-0.5 text-[11px] font-bold rounded bg-orange-500/20 text-orange-300 border border-orange-400/40">v1.4.0 3 BẢN ĐỒ • MÁY BAY NHẢY DÙ • 6 COMBO</span>
           </div>
           <div class="flex items-center gap-2 mt-0.5 flex-wrap">
             <button id="btn-open-prime" class="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-xs font-semibold text-white shadow border border-purple-300/40 hover:brightness-110 transition">
@@ -226,7 +226,7 @@
           <button id="btn-open-skills" class="lobby-glass p-2.5 rounded-2xl text-left hover:border-purple-400/60 transition group">
             <div class="text-lg mb-0.5">⚡</div>
             <div class="font-display font-bold text-xs text-white group-hover:text-purple-300">KỸ NĂNG</div>
-            <div class="text-[10px] text-slate-400">18 KN (Mới: Laura)</div>
+            <div class="text-[10px] text-slate-400">23 KN & 6 Combo</div>
           </button>
 
           <button id="btn-open-rank-card" class="lobby-glass p-2.5 rounded-2xl text-left hover:border-amber-400/60 transition group">
@@ -238,13 +238,13 @@
           <button id="btn-open-armory" class="lobby-glass p-2.5 rounded-2xl text-left hover:border-amber-400/60 transition group">
             <div class="text-lg mb-0.5">🔫</div>
             <div class="font-display font-bold text-xs text-white group-hover:text-amber-300">KHO SÚNG</div>
-            <div class="text-[10px] text-slate-400">27 Súng & 11 Skin</div>
+            <div class="text-[10px] text-slate-400">32 Súng & 17 Skin</div>
           </button>
 
           <button id="btn-open-guide" class="lobby-glass p-2.5 rounded-2xl text-left hover:border-cyan-400/60 transition group">
             <div class="text-lg mb-0.5">🗺️</div>
             <div class="font-display font-bold text-xs text-white group-hover:text-cyan-300">CẬP NHẬT</div>
-            <div class="text-[10px] text-slate-400">v1.3.0 Chi tiết</div>
+            <div class="text-[10px] text-slate-400">v1.4.0 Chi tiết</div>
           </button>
         </div>
 
@@ -278,60 +278,46 @@
         </div>
       </div>
 
-      <!-- Right Column: 8 Map Zones & Match Config Summary -->
+      <!-- Right Column: 3 Selectable Maps (8 Zones Each) & Match Config Summary -->
       <div class="lg:col-span-4 flex flex-col gap-3">
         <div class="lobby-glass rounded-2xl p-4">
           <div class="flex items-center justify-between mb-2">
-            <h3 class="font-display font-bold text-sm uppercase tracking-wider text-amber-300">Bản Đồ 8 Khu Vực (Thêm Làng Lá & Làng Cát)</h3>
-            <span class="text-[11px] px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">Ngẫu nhiên 1 Vùng Xanh</span>
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-300">Chọn Chiến Trường Sinh Tồn (400x400m)</span>
+              <h3 id="lobby-map-title" class="font-display font-bold text-sm uppercase tracking-wider text-amber-300">🗺️ ĐẢO THIÊN ĐƯỜNG (8 KHU VỰC)</h3>
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">✈️ Nhảy Dù Máy Bay</span>
           </div>
-          <div class="grid grid-cols-4 gap-1.5 text-center text-[10px] mb-3">
-            <div class="p-1.5 rounded-lg bg-emerald-950/90 border border-emerald-400/50">
-              <div class="text-sm">🍃</div>
-              <div class="font-semibold text-emerald-200 mt-0.5">Làng Lá</div>
-            </div>
-            <div class="p-1.5 rounded-lg bg-amber-950/90 border border-amber-400/50">
-              <div class="text-sm">🏜️</div>
-              <div class="font-semibold text-amber-200 mt-0.5">Làng Cát</div>
-            </div>
-            <div class="p-1.5 rounded-lg bg-slate-800/90 border border-slate-700">
-              <div class="text-sm">☁️</div>
-              <div class="font-semibold text-slate-200 mt-0.5">Làng Mây</div>
-            </div>
-            <div class="p-1.5 rounded-lg bg-sky-950/90 border border-sky-400/50">
-              <div class="text-sm">❄️</div>
-              <div class="font-semibold text-sky-200 mt-0.5">Làng Tuyết</div>
-            </div>
-            <div class="p-1.5 rounded-lg bg-slate-800/90 border border-slate-700">
-              <div class="text-sm">🪨</div>
-              <div class="font-semibold text-slate-200 mt-0.5">Nhà Đá</div>
-            </div>
-            <div class="p-1.5 rounded-lg bg-slate-800/90 border border-slate-700">
-              <div class="text-sm">🌲</div>
-              <div class="font-semibold text-slate-200 mt-0.5">Làng Thông</div>
-            </div>
-            <div class="p-1.5 rounded-lg bg-slate-800/90 border border-slate-700">
-              <div class="text-sm">🌴</div>
-              <div class="font-semibold text-slate-200 mt-0.5">Đảo Dừa</div>
-            </div>
-            <div class="p-1.5 rounded-lg bg-slate-800/90 border border-slate-700">
-              <div class="text-sm">⛩️</div>
-              <div class="font-semibold text-slate-200 mt-0.5">Cổng Trời</div>
-            </div>
+
+          <!-- 3 Map Selection Buttons -->
+          <div id="map-select-buttons" class="grid grid-cols-3 gap-1.5 mb-2.5 text-xs">
+            <button data-map-id="dao_thien_duong" class="map-select-btn py-1.5 px-2 rounded-xl font-display font-bold border border-amber-400 bg-amber-500/20 text-amber-200 transition truncate">
+              🏝️ Đảo Thiên Đường
+            </button>
+            <button data-map-id="sa_mac_hoa_long" class="map-select-btn py-1.5 px-2 rounded-xl font-display font-bold border border-slate-700 bg-slate-900/80 text-slate-300 hover:border-orange-400/60 transition truncate">
+              🌋 Sa Mạc Hỏa Long
+            </button>
+            <button data-map-id="thanh_pho_cyber" class="map-select-btn py-1.5 px-2 rounded-xl font-display font-bold border border-slate-700 bg-slate-900/80 text-slate-300 hover:border-cyan-400/60 transition truncate">
+              🌆 Thành Phố Cyber
+            </button>
+          </div>
+
+          <div id="lobby-zones-grid" class="grid grid-cols-4 gap-1.5 text-center text-[10px] mb-3">
+            <!-- Populated dynamically from selected map -->
           </div>
 
           <div class="space-y-1.5 text-xs text-slate-300 border-t border-slate-700/70 pt-2.5">
             <div class="flex justify-between">
-              <span>• Nhân vật mới Laura & Balo:</span>
-              <span class="font-semibold text-emerald-300">Có sẵn Ngắm x2/x4/x8 (+50% CX) • Balo 50 Ô [Phím B]</span>
+              <span>• Máy Bay & Cơ Chế Mới v1.4.0:</span>
+              <span class="font-semibold text-amber-300">Nhảy dù chọn đảo • Bệ phóng • Trạm sửa giáp</span>
             </div>
             <div class="flex justify-between">
-              <span>• Bản đồ 400x400m & Sinh tồn:</span>
-              <span class="font-semibold text-amber-300">Hòm Thính tiếp tế • Vòng Bo thu hẹp tối đa 10 phút</span>
+              <span>• 5 Nhân Vật Mới & 6 Combo:</span>
+              <span class="font-semibold text-emerald-300">Tatsuya, Alok, Moco, Jota, Hayato</span>
             </div>
             <div class="flex justify-between">
-              <span>• Hệ thống Rank Xếp Hạng:</span>
-              <span class="font-semibold text-cyan-300">Đồng I ➔ Huyền Thoại 15 Sao (Thưởng chuỗi 3 thắng)</span>
+              <span>• 5 Súng Mới & 6 Skin Mới:</span>
+              <span class="font-semibold text-cyan-300">P90, FAMAS, SPAS12, Barrett, Bizon + Thưởng Rank</span>
             </div>
           </div>
         </div>
@@ -509,10 +495,19 @@
         </div>
       </div>
 
-      <!-- Nearby Loot / Vending Prompt -->
+      <!-- Airplane Jump / Parachute Dive / Nearby Loot / Vending / Launchpad / Repair Station Prompts -->
       <div class="mt-4 flex flex-col items-center gap-1.5 pointer-events-auto">
+        <button id="btn-jump-plane" class="hidden px-6 py-2.5 rounded-2xl btn-primary-glow text-slate-950 font-display font-bold text-sm sm:text-base shadow-2xl border-2 border-amber-200 animate-bounce">
+          🪂 [PHÍM F / SPACE] NHẢY DÙ XUỐNG ĐẢO NGAY!
+        </button>
         <button id="prompt-pickup" class="hidden px-4 py-1.5 rounded-xl bg-emerald-600/90 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg border border-emerald-300/50 animate-bounce">
           [Phím F] Nhặt: <span id="prompt-pickup-name">Vật phẩm</span>
+        </button>
+        <button id="prompt-launchpad" class="hidden px-4 py-1.5 rounded-xl bg-purple-600/95 hover:bg-purple-500 text-white font-bold text-xs shadow-lg border border-purple-300/60">
+          🚀 [Phím F] Bệ Phóng Bay Chuyển Đảo
+        </button>
+        <button id="prompt-repair" class="hidden px-4 py-1.5 rounded-xl bg-cyan-600/95 hover:bg-cyan-500 text-white font-bold text-xs shadow-lg border border-cyan-300/60">
+          🔧 [Phím F] Trạm Sửa Giáp (100% Độ Bền + 25 HP)
         </button>
         <button id="prompt-vending" class="hidden px-4 py-1.5 rounded-xl bg-amber-500/95 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-lg border border-amber-200">
           🛒 [Phím T] Mở Máy Bán Hàng Khu Vực
@@ -834,6 +829,13 @@
       </div>
 
       <div class="mt-3 overflow-y-auto custom-scrollbar flex-1 pr-1 space-y-4">
+        <div class="p-3.5 rounded-2xl bg-gradient-to-r from-purple-950/60 via-slate-900/90 to-indigo-950/60 border border-purple-400/40">
+          <div class="flex items-center justify-between mb-2 flex-wrap gap-1">
+            <h4 class="font-display font-bold text-sm uppercase tracking-wider text-amber-300">⚡ Hệ Thống Chọn Nhanh Combo Nhân Vật Chuẩn (1 Chạm)</h4>
+            <span class="text-[11px] text-purple-200">Bấm vào 1 Combo để tự động trang bị bộ kỹ năng tối ưu</span>
+          </div>
+          <div id="skills-combos-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2"></div>
+        </div>
         <div>
           <h4 class="font-display font-bold text-sm uppercase tracking-wider text-orange-300 mb-2">🍥 Kỹ Năng Hợp Tác Naruto Shippuden (Chọn 1 - Kích hoạt bằng Phím G)</h4>
           <div id="skills-collab-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5"></div>
@@ -921,7 +923,7 @@
   <div id="modal-guide" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
     <div class="lobby-glass w-full max-w-2xl rounded-3xl p-6 border border-slate-700 shadow-2xl max-h-[85vh] overflow-y-auto custom-scrollbar">
       <div class="flex items-center justify-between border-b border-slate-700 pb-3">
-        <h3 class="font-display font-bold text-xl text-white">🗺️ CHI TIẾT CẬP NHẬT v1.3.0 (RANK, LAURA, BALO 50 Ô, THÍNH & VÒNG BO)</h3>
+        <h3 class="font-display font-bold text-xl text-white">🗺️ CHI TIẾT CẬP NHẬT v1.4.0 (3 BẢN ĐỒ, MÁY BAY, 23 KỸ NĂNG, 32 SÚNG & 6 COMBO)</h3>
         <button id="btn-close-guide" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold">✕</button>
       </div>
       <div class="mt-4 space-y-3 text-xs sm:text-sm text-slate-200 leading-relaxed">
@@ -1169,7 +1171,17 @@
     // 1. CHARACTER SKILLS DATABASE (7 ACTIVE + 10 PASSIVE = 17 SKILLS)
     // =========================================================================
     const SKILLS_DB = {
-      // 7 ACTIVE SKILLS (E)
+      // 9 ACTIVE SKILLS (E) - Added Tatsuya & Alok in v1.4.0
+      tatsuya: {
+        id: 'tatsuya', name: 'Tatsuya', type: 'active', icon: '⚡',
+        cooldown: 45, duration: 3, maxCharges: 2,
+        desc: 'Lướt Tốc Độ: Phóng nhanh về phía trước 12m ngay lập tức và tăng +30% tốc chạy trong 3s. Tích trữ tối đa 2 lần lướt, hồi mỗi lần: 45s.'
+      },
+      alok: {
+        id: 'alok', name: 'Alok', type: 'active', icon: '🎵',
+        cooldown: 60, duration: 10,
+        desc: 'Vòng Tròn Âm Nhạc: Tạo hào quang 5m quanh bản thân trong 10s, tăng +15% tốc độ di chuyển và hồi +5 HP / 1s (tổng 50 HP). Hồi chiêu: 60s.'
+      },
       kayne: {
         id: 'kayne', name: 'Kayne', type: 'active', icon: '💠',
         cooldown: 75, duration: 8,
@@ -1206,7 +1218,19 @@
         desc: 'Tàng hình trong 25s (cấm bắn khi tàng hình; bấm E lần nữa để hủy sớm). Hồi chiêu: 73s.'
       },
 
-      // 11 PASSIVE SKILLS (Added Laura in v1.3.0)
+      // 14 PASSIVE SKILLS (Added Moco, Jota, Hayato in v1.4.0)
+      moco: {
+        id: 'moco', name: 'Moco', type: 'passive', icon: '👁️‍🗨️',
+        desc: 'Mắt Hacker: Bắn trúng kẻ địch sẽ đánh dấu vị trí mục tiêu trong 5s trên màn hình 3D & Mini-map, đồng thời tăng +12% sát thương lên mục tiêu bị đánh dấu.'
+      },
+      jota: {
+        id: 'jota', name: 'Jota', type: 'passive', icon: '🧛',
+        desc: 'Hút Máu Giao Tranh: Mỗi viên đạn bắn trúng kẻ địch hồi ngay +2 HP; khi hạ gục 1 Bot hồi lập tức +40 HP.'
+      },
+      hayato: {
+        id: 'hayato', name: 'Hayato', type: 'passive', icon: '⚔️',
+        desc: 'Ý Chí Samurai: Cứ mỗi 10% máu (HP) mất đi, nhân vật được cộng thêm +5% Xuyên giáp và +4% Sát thương súng.'
+      },
       laura: {
         id: 'laura', name: 'Laura', type: 'passive', icon: '🔭',
         desc: 'Tăng +50% độ chính xác khi bật ống ngắm [Phím V]. Đồng thời khi mang Laura, mỗi súng trang bị đều có sẵn ống ngắm cố định (x2 Tiểu liên, x4 Trường, x8 Tỉa).'
@@ -1253,6 +1277,59 @@
       }
     };
     window.SKILLS_DB = SKILLS_DB;
+
+    // 6 Preset Character Combos (v1.4.0 Quick Equip)
+    const SKILL_COMBOS_DB = [
+      {
+        id: 'combo_speed_fire',
+        name: '🔥 Bắn Nhanh Càn Quét',
+        active: 'iris',
+        passives: ['ama', 'rolk', 'kelly'],
+        collab: 'madara',
+        desc: 'Tốc bắn cao (+20%), băng đạn lớn (+20%), nạp nhanh (-20%), bắn xuyên keo 7s'
+      },
+      {
+        id: 'combo_immortal_heal',
+        name: '💚 Siêu Hồi Phục Bất Tử',
+        active: 'alok',
+        passives: ['kapella', 'maxim', 'jota'],
+        collab: 'madara',
+        desc: 'Hồi máu liên tục từ Alok, hút máu khi bắn (Jota), cuốn máu 1.8s và +40% lượng hồi'
+      },
+      {
+        id: 'combo_sniper_god',
+        name: '🔭 Xạ Thủ Bắn Tỉa Chuẩn Xác',
+        active: 'mour',
+        passives: ['laura', 'rafaela', 'moco'],
+        collab: 'rinnegan',
+        desc: 'Có sẵn ống ngắm, +50% chính xác khi bật ngắm, đạn tự hút mục tiêu & đánh dấu +12% ST'
+      },
+      {
+        id: 'combo_gloo_destroyer',
+        name: '💥 Công Phá Bom Keo',
+        active: 'skyler',
+        passives: ['nairi', 'kimimaro', 'rolk'],
+        collab: 'itachi',
+        desc: 'Phá sạch Bom keo hồi máu (Skyler + Lửa đen Itachi), giảm 35% hồi chiêu chủ động'
+      },
+      {
+        id: 'combo_shotgun_rush',
+        name: '⚡ Sát Thủ Tốc Độ Shotgun',
+        active: 'tatsuya',
+        passives: ['kelly', 'sophia', 'hayato'],
+        collab: 'sasuke',
+        desc: 'Lướt 2 lần áp sát cực nhanh, Shotgun +50% bạo kích, xuyên giáp Hayato & đốt máu Sasuke'
+      },
+      {
+        id: 'combo_brawler_tank',
+        name: '🩸 Đấu Sĩ Giáp Ảo Cận Chiến',
+        active: 'kayne',
+        passives: ['jota', 'hayato', 'beta'],
+        collab: 'madara',
+        desc: 'Giáp ảo 100 HP + Susanoo giảm 30% ST súng + Hút máu giao tranh Jota & hồi máu di chuyển'
+      }
+    ];
+    window.SKILL_COMBOS_DB = SKILL_COMBOS_DB;
 
     // =========================================================================
     // 1B. NARUTO SHIPPUDEN COLLAB SKILLS DATABASE (KEY G)
@@ -1541,6 +1618,54 @@
         reloadScore: 16100, magSize: 1, // v1.2.0: magSize 12 -> 1
         moveSpeedMod: -0.03,
         range: 75, spread: 0.010, color: 0x06b6d4, soundFreq: 210
+      },
+      // 5 NEW v1.4.0 WEAPONS (Total 32 Weapons)
+      P90: {
+        id: 'P90', name: 'P90', category: 'Tiểu liên (SMG)',
+        allowedScopes: ['x2'],
+        fireRateScore: 20500, pellets: 1, damage: 12,
+        critRate: 0.28, critBonus: 0.50, armorPen: 0.08,
+        accuracy: 0.81, bloomPerShot: 0.010, maxBloom: 0.11,
+        reloadScore: 18500, magSize: 50, moveSpeedMod: 0.02,
+        range: 66, spread: 0.019, color: 0x38bdf8, soundFreq: 430
+      },
+      BIZON: {
+        id: 'BIZON', name: 'Bizon', category: 'Tiểu liên (SMG)',
+        allowedScopes: ['x2'],
+        fireRateScore: 17500, pellets: 1, damage: 13,
+        critRate: 0.26, critBonus: 0.50, armorPen: 0.10,
+        accuracy: 0.83, bloomPerShot: 0.009, maxBloom: 0.10,
+        reloadScore: 17800, magSize: 64, moveSpeedMod: 0.01,
+        range: 68, spread: 0.018, color: 0x2dd4bf, soundFreq: 400
+      },
+      FAMAS: {
+        id: 'FAMAS', name: 'FAMAS', category: 'Trường Chùm 3 Viên (AR)',
+        allowedScopes: ['x2', 'x4'],
+        fireRateScore: 15000, pellets: 3, damage: 16,
+        critRate: 0.25, critBonus: 0.60, armorPen: 0.14,
+        accuracy: 0.87, bloomPerShot: 0.008, maxBloom: 0.09,
+        reloadScore: 18800, magSize: 30, moveSpeedMod: 0.01,
+        range: 88, spread: 0.015, color: 0xf43f5e, soundFreq: 315
+      },
+      SPAS12: {
+        id: 'SPAS12', name: 'SPAS12', category: 'Shotgun', isShotgun: true,
+        allowedScopes: [],
+        fireRateScore: 9200, pellets: 7, damage: 9,
+        critRate: 0.20, critBonus: 0.45, armorPen: 0.12,
+        accuracy: 0.75, bloomPerShot: 0.014, maxBloom: 0.10,
+        reloadScore: 15800, magSize: 7, moveSpeedMod: 0.00,
+        range: 46, spread: 0.062, color: 0xf97316, soundFreq: 155
+      },
+      BARRETT: {
+        id: 'BARRETT', name: 'Barrett M82B', category: 'Bắn tỉa Xuyên Keo (Sniper)', isSniper: true,
+        allowedScopes: ['x8'],
+        naturalPierceGloo: true,
+        shieldDamageMult: 2.0,
+        fireRateScore: 4800, pellets: 1, damage: 145,
+        critRate: 0.42, critBonus: 1.00, armorPen: 0.45,
+        accuracy: 1.00, bloomPerShot: 0.00, maxBloom: 0.00, magnetismMult: 0.75,
+        reloadScore: 11800, magSize: 5, moveSpeedMod: -0.05,
+        range: 145, spread: 0.00, color: 0xa855f7, soundFreq: 105
       }
     };
     window.WEAPONS_DB = WEAPONS_DB;
@@ -1628,6 +1753,49 @@
         critRateMod: 0.08, critBonusMod: 0.20, damageMod: -0.11,
         fireRateMod: 0, armorPenMod: 0, moveSpeedMod: 0, accuracyMod: 0, magSizeMod: 0, reloadSpeedMod: 0,
         desc: '+8% Tỉ lệ bạo kích, +20% ST bạo kích, -11% Sát thương'
+      },
+      // 6 NEW v1.4.0 SKINS (Total 17 Skins: Rank Rewards, Gold, Shards & 100-Match Mission)
+      GROZA_THAN_SAM: {
+        id: 'GROZA_THAN_SAM', weaponId: 'GROZA', name: 'Groza - Thần Sấm',
+        sourceType: 'rank', reqRankIndex: 14, reqRankName: 'Kim Cương I',
+        damageMod: 0.15, fireRateMod: 0.10, magSizeMod: -0.10,
+        armorPenMod: 0, moveSpeedMod: 0, accuracyMod: 0, critRateMod: 0, critBonusMod: 0, reloadSpeedMod: 0,
+        desc: '+15% Sát thương, +10% Tốc bắn, -10% Băng đạn (Thưởng đạt Rank Kim Cương I)'
+      },
+      AWM_LONG_VUONG: {
+        id: 'AWM_LONG_VUONG', weaponId: 'AWM', name: 'AWM - Long Vương',
+        sourceType: 'rank', reqRankIndex: 19, reqRankName: 'Huyền Thoại I',
+        armorPenMod: 0.15, reloadSpeedMod: 0.20, moveSpeedMod: -0.08,
+        damageMod: 0, fireRateMod: 0, accuracyMod: 0, magSizeMod: 0, critRateMod: 0, critBonusMod: 0,
+        desc: '+15% Xuyên giáp, +20% Tốc độ thay đạn, -8% Tốc chạy (Thưởng đạt Rank Huyền Thoại I)'
+      },
+      P90_SIEU_CONG_NGHE: {
+        id: 'P90_SIEU_CONG_NGHE', weaponId: 'P90', name: 'P90 - Siêu Công Nghệ',
+        sourceType: 'gold', goldCost: 60000,
+        fireRateMod: 0.18, accuracyMod: 0.10, damageMod: -0.08,
+        armorPenMod: 0, moveSpeedMod: 0, magSizeMod: 0, critRateMod: 0, critBonusMod: 0, reloadSpeedMod: 0,
+        desc: '+18% Tốc bắn, +10% Chính xác, -8% Sát thương (Quy đổi 60.000 Vàng)'
+      },
+      M249_HOA_PHUONG: {
+        id: 'M249_HOA_PHUONG', weaponId: 'M249', name: 'M249 - Hỏa Phượng',
+        sourceType: 'mission', reqMatches: 100,
+        damageMod: 0.15, armorPenMod: 0.12, moveSpeedMod: -0.10,
+        fireRateMod: 0, accuracyMod: 0, magSizeMod: 0, critRateMod: 0, critBonusMod: 0, reloadSpeedMod: 0,
+        desc: '+15% Sát thương, +12% Xuyên giáp, -10% Tốc chạy (Mốc 100 trận)'
+      },
+      BARRETT_TU_THAN: {
+        id: 'BARRETT_TU_THAN', weaponId: 'BARRETT', name: 'Barrett - Tử Thần',
+        sourceType: 'naruto', shardCost: 150,
+        damageMod: 0.12, critRateMod: 0.15, magSizeMod: -0.15,
+        fireRateMod: 0, armorPenMod: 0, moveSpeedMod: 0, accuracyMod: 0, critBonusMod: 0, reloadSpeedMod: 0,
+        desc: '+12% Sát thương, +15% Tỉ lệ bạo kích, -15% Băng đạn (Đổi 150 Mảnh Naruto)'
+      },
+      FAMAS_HUYET_NGUYET: {
+        id: 'FAMAS_HUYET_NGUYET', weaponId: 'FAMAS', name: 'FAMAS - Huyết Nguyệt',
+        sourceType: 'gold', goldCost: 45000,
+        fireRateMod: 0.12, accuracyMod: 0.12, reloadSpeedMod: -0.10,
+        damageMod: 0, armorPenMod: 0, moveSpeedMod: 0, magSizeMod: 0, critRateMod: 0, critBonusMod: 0,
+        desc: '+12% Tốc bắn, +12% Độ chính xác, -10% Tốc độ thay đạn (Quy đổi 45.000 Vàng)'
       }
     };
     window.SKINS_DB = SKINS_DB;
@@ -1641,17 +1809,66 @@
     };
     window.ARMOR_DB = ARMOR_DB;
 
-    // 8 Map Zones Expanded Across 400x400m Arena (Enlarged islands radius 46-48m)
-    const MAP_ZONES = [
-      { id: 'lang_la', name: 'Làng Lá', x: -120, z: 0, radius: 46, baseHeight: 0.6, hillHeight: 3.8, color: '#16a34a', groundHex: 0x14532d, accentHex: 0x4ade80 },
-      { id: 'lang_cat', name: 'Làng Cát', x: 120, z: 0, radius: 46, baseHeight: 0.5, hillHeight: 3.6, color: '#d97706', groundHex: 0x78350f, accentHex: 0xfbbf24 },
-      { id: 'nha_da', name: 'Nhà Đá', x: -110, z: -110, radius: 46, baseHeight: 0.5, hillHeight: 3.4, color: '#64748b', groundHex: 0x334155, accentHex: 0x94a3b8 },
-      { id: 'lang_thong', name: 'Làng Thông', x: 110, z: -110, radius: 46, baseHeight: 0.4, hillHeight: 3.0, color: '#15803d', groundHex: 0x064e3b, accentHex: 0x22c55e },
-      { id: 'dao_dua', name: 'Đảo Dừa', x: -110, z: 110, radius: 46, baseHeight: 0.2, hillHeight: 2.5, color: '#ca8a04', groundHex: 0x854d0e, accentHex: 0xfacc15 },
-      { id: 'cong_troi', name: 'Cổng Trời', x: 110, z: 110, radius: 46, baseHeight: 1.0, hillHeight: 4.5, color: '#7e22ce', groundHex: 0x3b0764, accentHex: 0xc084fc },
-      { id: 'lang_may', name: 'Làng Mây', x: 0, z: -55, radius: 48, baseHeight: 0.8, hillHeight: 3.8, color: '#0284c7', groundHex: 0x0c4a6e, accentHex: 0x38bdf8 },
-      { id: 'lang_tuyet', name: 'Làng Tuyết', x: 0, z: 110, radius: 48, baseHeight: 0.9, hillHeight: 4.2, color: '#e2e8f0', groundHex: 0x475569, accentHex: 0xf8fafc }
-    ];
+    // 3 Selectable 400x400m Maps (Each with 8 Unique Zones)
+    const MAPS_DB = {
+      dao_thien_duong: {
+        id: 'dao_thien_duong',
+        name: 'Đảo Thiên Đường',
+        icon: '🏝️',
+        skyHex: 0x0f172a,
+        groundHex: 0x1e293b,
+        gridHex: 0x334155,
+        zones: [
+          { id: 'lang_la', name: 'Làng Lá', icon: '🍃', x: -120, z: 0, radius: 46, baseHeight: 0.6, hillHeight: 3.8, color: '#16a34a', groundHex: 0x14532d, accentHex: 0x4ade80 },
+          { id: 'lang_cat', name: 'Làng Cát', icon: '🏜️', x: 120, z: 0, radius: 46, baseHeight: 0.5, hillHeight: 3.6, color: '#d97706', groundHex: 0x78350f, accentHex: 0xfbbf24 },
+          { id: 'nha_da', name: 'Nhà Đá', icon: '🪨', x: -110, z: -110, radius: 46, baseHeight: 0.5, hillHeight: 3.4, color: '#64748b', groundHex: 0x334155, accentHex: 0x94a3b8 },
+          { id: 'lang_thong', name: 'Làng Thông', icon: '🌲', x: 110, z: -110, radius: 46, baseHeight: 0.4, hillHeight: 3.0, color: '#15803d', groundHex: 0x064e3b, accentHex: 0x22c55e },
+          { id: 'dao_dua', name: 'Đảo Dừa', icon: '🌴', x: -110, z: 110, radius: 46, baseHeight: 0.2, hillHeight: 2.5, color: '#ca8a04', groundHex: 0x854d0e, accentHex: 0xfacc15 },
+          { id: 'cong_troi', name: 'Cổng Trời', icon: '⛩️', x: 110, z: 110, radius: 46, baseHeight: 1.0, hillHeight: 4.5, color: '#7e22ce', groundHex: 0x3b0764, accentHex: 0xc084fc },
+          { id: 'lang_may', name: 'Làng Mây', icon: '☁️', x: 0, z: -55, radius: 48, baseHeight: 0.8, hillHeight: 3.8, color: '#0284c7', groundHex: 0x0c4a6e, accentHex: 0x38bdf8 },
+          { id: 'lang_tuyet', name: 'Làng Tuyết', icon: '❄️', x: 0, z: 110, radius: 48, baseHeight: 0.9, hillHeight: 4.2, color: '#e2e8f0', groundHex: 0x475569, accentHex: 0xf8fafc }
+        ]
+      },
+      sa_mac_hoa_long: {
+        id: 'sa_mac_hoa_long',
+        name: 'Sa Mạc Hỏa Long',
+        icon: '🌋',
+        skyHex: 0x1c1008,
+        groundHex: 0x451a03,
+        gridHex: 0x78350f,
+        zones: [
+          { id: 'thung_lung_lua', name: 'Thung Lũng Lửa', icon: '🔥', x: -120, z: 0, radius: 46, baseHeight: 0.7, hillHeight: 4.4, color: '#ea580c', groundHex: 0x7c2d12, accentHex: 0xf97316 },
+          { id: 'dau_truong_cat', name: 'Đấu Trường Cát', icon: '🏟️', x: 120, z: 0, radius: 46, baseHeight: 0.5, hillHeight: 3.5, color: '#d97706', groundHex: 0x78350f, accentHex: 0xfbbf24 },
+          { id: 'phao_dai_do', name: 'Pháo Đài Đỏ', icon: '🏰', x: -110, z: -110, radius: 46, baseHeight: 0.8, hillHeight: 4.2, color: '#dc2626', groundHex: 0x7f1d1d, accentHex: 0xf87171 },
+          { id: 'oc_dao_xanh', name: 'Ốc Đảo Xanh', icon: '🌴', x: 110, z: -110, radius: 46, baseHeight: 0.3, hillHeight: 2.8, color: '#10b981', groundHex: 0x064e3b, accentHex: 0x34d399 },
+          { id: 'ham_mo_vang', name: 'Hầm Mỏ Vàng', icon: '⛏️', x: -110, z: 110, radius: 46, baseHeight: 0.6, hillHeight: 3.9, color: '#eab308', groundHex: 0x713f12, accentHex: 0xfacc15 },
+          { id: 'den_co_dai', name: 'Đền Cổ Đại', icon: '🏛️', x: 110, z: 110, radius: 46, baseHeight: 1.0, hillHeight: 4.6, color: '#c084fc', groundHex: 0x581c87, accentHex: 0xd8b4fe },
+          { id: 'tram_radar', name: 'Trạm Radar', icon: '📡', x: 0, z: -55, radius: 48, baseHeight: 0.8, hillHeight: 4.0, color: '#38bdf8', groundHex: 0x1e3a8a, accentHex: 0x60a5fa },
+          { id: 'dinh_nui_lua', name: 'Đỉnh Núi Lửa', icon: '🌋', x: 0, z: 110, radius: 48, baseHeight: 1.1, hillHeight: 5.0, color: '#f43f5e', groundHex: 0x881337, accentHex: 0xfb7185 }
+        ]
+      },
+      thanh_pho_cyber: {
+        id: 'thanh_pho_cyber',
+        name: 'Thành Phố Cyber',
+        icon: '🌆',
+        skyHex: 0x090d16,
+        groundHex: 0x0f172a,
+        gridHex: 0x1e293b,
+        zones: [
+          { id: 'thap_trung_tam', name: 'Tháp Trung Tâm', icon: '🏙️', x: -120, z: 0, radius: 46, baseHeight: 0.8, hillHeight: 4.5, color: '#38bdf8', groundHex: 0x0c4a6e, accentHex: 0x22d3ee },
+          { id: 'khu_cong_nghe', name: 'Khu Công Nghệ', icon: '💻', x: 120, z: 0, radius: 46, baseHeight: 0.6, hillHeight: 3.8, color: '#a855f7', groundHex: 0x3b0764, accentHex: 0xc084fc },
+          { id: 'cang_tau_ngam', name: 'Cảng Tàu Ngầm', icon: '⚓', x: -110, z: -110, radius: 46, baseHeight: 0.4, hillHeight: 3.2, color: '#06b6d4', groundHex: 0x164e63, accentHex: 0x67e8f9 },
+          { id: 'nha_may_dien', name: 'Nhà Máy Điện', icon: '⚡', x: 110, z: -110, radius: 46, baseHeight: 0.7, hillHeight: 3.9, color: '#eab308', groundHex: 0x713f12, accentHex: 0xfde047 },
+          { id: 'quang_truong_neon', name: 'Quảng Trường Neon', icon: '🎆', x: -110, z: 110, radius: 46, baseHeight: 0.5, hillHeight: 3.4, color: '#ec4899', groundHex: 0x831843, accentHex: 0xf472b6 },
+          { id: 'khu_cho_dem', name: 'Khu Chợ Đêm', icon: '🏮', x: 110, z: 110, radius: 46, baseHeight: 0.6, hillHeight: 3.6, color: '#f97316', groundHex: 0x7c2d12, accentHex: 0xfb923c },
+          { id: 'tram_khong_gian', name: 'Trạm Không Gian', icon: '🚀', x: 0, z: -55, radius: 48, baseHeight: 0.9, hillHeight: 4.6, color: '#6366f1', groundHex: 0x312e81, accentHex: 0x818cf8 },
+          { id: 'cau_anh_sang', name: 'Cầu Ánh Sáng', icon: '🌈', x: 0, z: 110, radius: 48, baseHeight: 0.8, hillHeight: 4.2, color: '#10b981', groundHex: 0x064e3b, accentHex: 0x34d399 }
+        ]
+      }
+    };
+    window.MAPS_DB = MAPS_DB;
+
+    let MAP_ZONES = MAPS_DB.dao_thien_duong.zones;
     window.MAP_ZONES = MAP_ZONES;
 
     // 21 Rank Tiers (Đồng I -> Huyền Thoại V) + Legend Star Tier (1 -> 15 Sao)
@@ -1719,7 +1936,13 @@
         AK47_RONG_XANH: false,
         MP5_SIEU_SAO: false,
         M590_MANH_ME: false,
-        M1887_QUY_LUA: false
+        M1887_QUY_LUA: false,
+        GROZA_THAN_SAM: false,
+        AWM_LONG_VUONG: false,
+        P90_SIEU_CONG_NGHE: false,
+        M249_HOA_PHUONG: false,
+        BARRETT_TU_THAN: false,
+        FAMAS_HUYET_NGUYET: false
       },
       equippedSkins: {
         UMP: null,
@@ -1731,8 +1954,15 @@
         MP40: null,
         MAG7: null,
         SCAR: null,
-        M1014: null
+        M1014: null,
+        GROZA: null,
+        AWM: null,
+        P90: null,
+        M249: null,
+        BARRETT: null,
+        FAMAS: null
       },
+      selectedMapId: 'dao_thien_duong',
       activeSkill: 'kayne',
       passiveSkills: ['laura', 'rolk', 'kelly'],
       collabSkill: 'itachi',
@@ -1769,6 +1999,11 @@
             if (typeof data.isLegendStarTier === 'boolean') this.isLegendStarTier = data.isLegendStarTier;
             if (typeof data.legendStars === 'number') this.legendStars = Math.max(0, Math.min(15, data.legendStars));
             if (typeof data.winStreak === 'number') this.winStreak = Math.max(0, data.winStreak);
+            if (data.selectedMapId && MAPS_DB[data.selectedMapId]) {
+              this.selectedMapId = data.selectedMapId;
+              MAP_ZONES = MAPS_DB[this.selectedMapId].zones;
+              window.MAP_ZONES = MAP_ZONES;
+            }
           }
         } catch (e) {}
       },
@@ -1786,6 +2021,7 @@
             diamondTenSpinsUsed: this.diamondTenSpinsUsed,
             unlockedSkins: this.unlockedSkins,
             equippedSkins: this.equippedSkins,
+            selectedMapId: this.selectedMapId,
             activeSkill: this.activeSkill,
             passiveSkills: this.passiveSkills,
             collabSkill: this.collabSkill,
@@ -1797,6 +2033,26 @@
             winStreak: this.winStreak
           }));
         } catch (e) {}
+      },
+
+      checkAndUnlockRankSkins() {
+        const effIdx = this.isLegendStarTier ? RANK_TIERS.length - 1 : this.rankTierIndex;
+        if (effIdx >= 14) { // Kim Cương I
+          this.unlockedSkins.GROZA_THAN_SAM = true;
+        }
+        if (effIdx >= 19) { // Huyền Thoại I
+          this.unlockedSkins.AWM_LONG_VUONG = true;
+        }
+      },
+
+      applySkillCombo(comboId) {
+        const combo = SKILL_COMBOS_DB.find(c => c.id === comboId);
+        if (!combo) return false;
+        this.activeSkill = combo.active;
+        this.passiveSkills = [...combo.passives];
+        this.collabSkill = combo.collab;
+        this.save();
+        return combo;
       },
 
       getRankInfo() {
@@ -1897,6 +2153,7 @@
         }
 
         this.addRankExp(expDelta);
+        this.checkAndUnlockRankSkins();
         this.save();
         return {
           deltaText: `${expDelta >= 0 ? '+' : ''}${expDelta} EXP`,
@@ -2167,6 +2424,8 @@
     let staticColliders = [];
     let terrainHills = [];
     let vendingMachines = [];
+    let launchpads = [];
+    let repairStations = [];
     let blueZoneBeaconMesh = null;
 
     function getTerrainHeight(x, z) {
@@ -2273,7 +2532,31 @@
       gunGroup.position.set(0.52, 1.32, -0.25);
       group.add(gunGroup);
 
-      group.userData = { torso, torsoMat, headMat, legMat, vest, susanooAura, activeSkillAura, barrelMat, leftLeg, rightLeg, gunGroup };
+      // 3D Parachute Canopy Mesh (Visible while parachuting from Airplane or Launchpad!)
+      const parachuteMesh = new THREE.Group();
+      const canopy = new THREE.Mesh(
+        new THREE.SphereGeometry(2.6, 16, 12),
+        new THREE.MeshLambertMaterial({ color: 0xf97316, side: THREE.DoubleSide })
+      );
+      canopy.scale.set(1.2, 0.35, 0.85);
+      canopy.position.set(0, 4.2, 0);
+      const cordL = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.03, 0.03, 2.6, 6),
+        new THREE.MeshBasicMaterial({ color: 0xe2e8f0 })
+      );
+      cordL.position.set(-0.9, 3.0, 0);
+      cordL.rotation.z = 0.25;
+      const cordR = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.03, 0.03, 2.6, 6),
+        new THREE.MeshBasicMaterial({ color: 0xe2e8f0 })
+      );
+      cordR.position.set(0.9, 3.0, 0);
+      cordR.rotation.z = -0.25;
+      parachuteMesh.add(canopy, cordL, cordR);
+      parachuteMesh.visible = false;
+      group.add(parachuteMesh);
+
+      group.userData = { torso, torsoMat, headMat, legMat, vest, susanooAura, activeSkillAura, parachuteMesh, barrelMat, leftLeg, rightLeg, gunGroup };
       return group;
     }
 
@@ -2285,14 +2568,21 @@
       staticColliders = [];
       terrainHills = [];
       vendingMachines = [];
+      launchpads = [];
+      repairStations = [];
+
+      const mapCfg = MAPS_DB[AccountState.selectedMapId] || MAPS_DB.dao_thien_duong;
+      MAP_ZONES = mapCfg.zones;
+      window.MAP_ZONES = MAP_ZONES;
+      scene.background = new THREE.Color(mapCfg.skyHex);
 
       const groundGeo = new THREE.PlaneGeometry(400, 400, 48, 48);
-      const groundMat = new THREE.MeshLambertMaterial({ color: 0x1e293b });
+      const groundMat = new THREE.MeshLambertMaterial({ color: mapCfg.groundHex });
       const ground = new THREE.Mesh(groundGeo, groundMat);
       ground.rotation.x = -Math.PI / 2;
       worldGroup.add(ground);
 
-      const grid = new THREE.GridHelper(400, 80, 0x334155, 0x1e293b);
+      const grid = new THREE.GridHelper(400, 80, mapCfg.gridHex, mapCfg.groundHex);
       grid.position.y = 0.02;
       worldGroup.add(grid);
 
@@ -2338,6 +2628,48 @@
         worldGroup.add(vmGroup);
         vendingMachines.push({ zoneId: zone.id, zoneName: zone.name, x: vmX, z: vmZ, mesh: vmGroup });
         staticColliders.push({ x: vmX, z: vmZ, r: 1.5, h: vmY + 3.5, type: 'vending' });
+
+        // 1 Launchpad (Bệ Phóng Năng Lượng) per Zone
+        const lpX = zone.x - 10;
+        const lpZ = zone.z + 8;
+        const lpY = getTerrainHeight(lpX, lpZ);
+        const lpGroup = new THREE.Group();
+        const lpBase = new THREE.Mesh(
+          new THREE.CylinderGeometry(1.9, 2.2, 0.45, 20),
+          new THREE.MeshLambertMaterial({ color: 0x7e22ce })
+        );
+        lpBase.position.y = 0.22;
+        const lpRing = new THREE.Mesh(
+          new THREE.RingGeometry(1.3, 1.8, 24),
+          new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide })
+        );
+        lpRing.rotation.x = -Math.PI / 2;
+        lpRing.position.y = 0.48;
+        lpGroup.add(lpBase, lpRing);
+        lpGroup.position.set(lpX, lpY, lpZ);
+        worldGroup.add(lpGroup);
+        launchpads.push({ zoneId: zone.id, zoneName: zone.name, x: lpX, y: lpY, z: lpZ, mesh: lpGroup });
+
+        // 1 Armor Repair Station (Trạm Sửa Giáp / Nấm Năng Lượng) per Zone
+        const rsX = zone.x + 10;
+        const rsZ = zone.z - 8;
+        const rsY = getTerrainHeight(rsX, rsZ);
+        const rsGroup = new THREE.Group();
+        const rsPillar = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.85, 1.05, 2.2, 16),
+          new THREE.MeshLambertMaterial({ color: 0x10b981 })
+        );
+        rsPillar.position.y = 1.1;
+        const rsHalo = new THREE.Mesh(
+          new THREE.RingGeometry(1.1, 1.45, 20),
+          new THREE.MeshBasicMaterial({ color: 0x34d399, side: THREE.DoubleSide })
+        );
+        rsHalo.rotation.x = -Math.PI / 2;
+        rsHalo.position.y = 0.2;
+        rsGroup.add(rsPillar, rsHalo);
+        rsGroup.position.set(rsX, rsY, rsZ);
+        worldGroup.add(rsGroup);
+        repairStations.push({ zoneId: zone.id, zoneName: zone.name, x: rsX, y: rsY, z: rsZ, mesh: rsGroup });
 
         // Buildings & Crates
         const buildingOffsets = [
@@ -2451,6 +2783,9 @@
         skillCooldownUntil: 0,
         invisibleUntil: 0,
         continuousMoveTime: 0,
+        tatsuyaCharges: 2,
+        nextTatsuyaRechargeAt: 0,
+        nextAlokHealTick: 0,
 
         // Naruto Collab Skill Runtime States (G)
         collabCooldownUntil: 0,
@@ -2479,8 +2814,25 @@
         nextStormTick: 0,
         mesh: null
       },
+      // v1.4.0 Airplane & Parachute Drop System
+      dropPhase: 'grounded', // 'in_plane' | 'parachuting' | 'grounded'
+      airplane: {
+        active: false,
+        x: -185,
+        y: 92,
+        z: -140,
+        startX: -185,
+        startZ: -140,
+        endX: 185,
+        endZ: 140,
+        vx: 38,
+        vz: 28,
+        yaw: 0,
+        mesh: null
+      },
 
-      initMatch() {
+      initMatch(skipPlane = false) {
+        buildStaticWorld();
         while (lootGroup.children.length > 0) lootGroup.remove(lootGroup.children[0]);
         while (botsGroup.children.length > 0) botsGroup.remove(botsGroup.children[0]);
         while (bulletsGroup.children.length > 0) bulletsGroup.remove(bulletsGroup.children[0]);
@@ -2560,6 +2912,9 @@
         this.player.skillCooldownUntil = 0;
         this.player.invisibleUntil = 0;
         this.player.continuousMoveTime = 0;
+        this.player.tatsuyaCharges = 2;
+        this.player.nextTatsuyaRechargeAt = 0;
+        this.player.nextAlokHealTick = 0;
         this.player.collabCooldownUntil = 0;
         this.player.susanooActiveUntil = 0;
         this.player.susanooOrbFired = false;
@@ -2569,11 +2924,170 @@
         this.spawnInitialBots();
         this.spawnAirdrop(); // Spawn 1 initial supply airdrop immediately on map!
 
+        if (skipPlane) {
+          this.dropPhase = 'grounded';
+          this.airplane.active = false;
+          if (playerMesh.userData.parachuteMesh) playerMesh.userData.parachuteMesh.visible = false;
+        } else {
+          this.startAirplaneFlight();
+        }
+
         this.active = true;
         this.updateAllHUD();
         const actName = SKILLS_DB[AccountState.activeSkill]?.name || 'Kayne';
         const colName = COLLAB_SKILLS_DB[AccountState.collabSkill]?.shortName || 'Itachi';
-        this.showBanner(`🔵 VÙNG XANH: ${this.blueZone.name.toUpperCase()} | Kỹ năng [E]: ${actName} | Naruto [G]: ${colName}`, 4500);
+        const mapName = (MAPS_DB[AccountState.selectedMapId] || MAPS_DB.dao_thien_duong).name;
+        this.showBanner(`✈️ BẢN ĐỒ: ${mapName.toUpperCase()} | 🔵 VÙNG XANH: ${this.blueZone.name.toUpperCase()} | Bấm [SPACE / F] để Nhảy Dù!`, 5000);
+      },
+
+      startAirplaneFlight() {
+        if (this.airplane.mesh) {
+          effectsGroup.remove(this.airplane.mesh);
+          this.airplane.mesh = null;
+        }
+        // Flight path crosses from one side of the 400x400m map to the opposite side, passing near Blue Zone
+        const angle = Math.random() * Math.PI * 2;
+        const sx = Math.round(-Math.cos(angle) * 185);
+        const sz = Math.round(-Math.sin(angle) * 185);
+        const ex = Math.round(Math.cos(angle) * 185);
+        const ez = Math.round(Math.sin(angle) * 185);
+        const dist = Math.hypot(ex - sx, ez - sz) || 1;
+        const speed = 46; // crosses map in ~8s
+        this.airplane.startX = sx;
+        this.airplane.startZ = sz;
+        this.airplane.endX = ex;
+        this.airplane.endZ = ez;
+        this.airplane.x = sx;
+        this.airplane.y = 92;
+        this.airplane.z = sz;
+        this.airplane.vx = ((ex - sx) / dist) * speed;
+        this.airplane.vz = ((ez - sz) / dist) * speed;
+        this.airplane.yaw = Math.atan2(-(ex - sx), -(ez - sz));
+        this.airplane.active = true;
+        this.dropPhase = 'in_plane';
+
+        // Build 3D Transport Airplane Mesh
+        const planeGroup = new THREE.Group();
+        const fuselage = new THREE.Mesh(
+          new THREE.CylinderGeometry(1.6, 1.6, 16, 16),
+          new THREE.MeshLambertMaterial({ color: 0xe2e8f0 })
+        );
+        fuselage.rotation.x = Math.PI / 2;
+        const wings = new THREE.Mesh(
+          new THREE.BoxGeometry(22, 0.35, 3.6),
+          new THREE.MeshLambertMaterial({ color: 0x38bdf8 })
+        );
+        const tailWing = new THREE.Mesh(
+          new THREE.BoxGeometry(7.5, 0.3, 2.0),
+          new THREE.MeshLambertMaterial({ color: 0xf59e0b })
+        );
+        tailWing.position.set(0, 0.6, 6.8);
+        const tailFin = new THREE.Mesh(
+          new THREE.BoxGeometry(0.4, 3.4, 2.4),
+          new THREE.MeshLambertMaterial({ color: 0xf97316 })
+        );
+        tailFin.position.set(0, 1.9, 6.8);
+        planeGroup.add(fuselage, wings, tailWing, tailFin);
+        planeGroup.position.set(sx, 92, sz);
+        planeGroup.rotation.y = this.airplane.yaw;
+        effectsGroup.add(planeGroup);
+        this.airplane.mesh = planeGroup;
+
+        this.player.x = sx;
+        this.player.y = 90;
+        this.player.z = sz;
+        if (playerMesh.userData.parachuteMesh) playerMesh.userData.parachuteMesh.visible = false;
+        const jumpBtn = document.getElementById('btn-jump-plane');
+        if (jumpBtn) {
+          jumpBtn.classList.remove('hidden');
+          jumpBtn.textContent = '🪂 [PHÍM F / SPACE] NHẢY DÙ XUỐNG ĐẢO NGAY!';
+        }
+      },
+
+      ejectFromPlane() {
+        if (this.dropPhase !== 'in_plane') return;
+        this.dropPhase = 'parachuting';
+        this.player.x = this.airplane.x;
+        this.player.y = 86;
+        this.player.z = this.airplane.z;
+        this.player.vy = -22;
+        this.player.isGrounded = false;
+        if (playerMesh.userData.parachuteMesh) playerMesh.userData.parachuteMesh.visible = true;
+        SoundFX.skillActivate();
+        const jumpBtn = document.getElementById('btn-jump-plane');
+        if (jumpBtn) {
+          jumpBtn.classList.remove('hidden');
+          jumpBtn.textContent = '⏬ [PHÍM F / SPACE] LAO NHANH TIẾP ĐẤT NGAY!';
+        }
+        this.showBanner('🪂 ĐÃ BUNG DÙ! Dùng [WASD] để lượn về khu vực bạn muốn, hoặc bấm [Phím F / Space] để đáp đất ngay!', 3500);
+      },
+
+      landImmediately() {
+        if (this.airplane.mesh) {
+          effectsGroup.remove(this.airplane.mesh);
+          this.airplane.mesh = null;
+        }
+        this.airplane.active = false;
+        this.dropPhase = 'grounded';
+        this.player.y = getTerrainHeight(this.player.x, this.player.z);
+        this.player.vy = 0;
+        this.player.isGrounded = true;
+        if (playerMesh.userData.parachuteMesh) playerMesh.userData.parachuteMesh.visible = false;
+        const jumpBtn = document.getElementById('btn-jump-plane');
+        if (jumpBtn) jumpBtn.classList.add('hidden');
+        SoundFX.respawn();
+        this.showBanner('👟 ĐÃ TIẾP ĐẤT AN TOÀN! Bắt đầu chiến đấu sinh tồn!', 2400);
+      },
+
+      useNearestLaunchpad() {
+        if (!this.active || this.dropPhase !== 'grounded') return false;
+        for (const lp of launchpads) {
+          if (Math.hypot(lp.x - this.player.x, lp.z - this.player.z) <= 5.0) {
+            SoundFX.skillActivate();
+            this.dropPhase = 'parachuting';
+            this.player.y = (lp.y || 0) + 18;
+            this.player.vy = -12;
+            this.player.isGrounded = false;
+            // Push player forward 26m in facing direction
+            const nextP = resolveCircleCollision(
+              this.player.x - Math.sin(this.player.yaw) * 26,
+              this.player.z - Math.cos(this.player.yaw) * 26,
+              0.75
+            );
+            this.player.x = nextP.x;
+            this.player.z = nextP.z;
+            if (playerMesh.userData.parachuteMesh) playerMesh.userData.parachuteMesh.visible = true;
+            const jumpBtn = document.getElementById('btn-jump-plane');
+            if (jumpBtn) {
+              jumpBtn.classList.remove('hidden');
+              jumpBtn.textContent = '⏬ [PHÍM F / SPACE] ĐÁP ĐẤT NGAY!';
+            }
+            this.showBanner(`🚀 ĐÃ PHÓNG TỪ BỆ PHÓNG ${lp.zoneName.toUpperCase()}! Dùng WASD để lượn sang đảo khác!`, 3000);
+            return true;
+          }
+        }
+        return false;
+      },
+
+      useNearestRepairStation() {
+        if (!this.active) return false;
+        for (const rs of repairStations) {
+          if (Math.hypot(rs.x - this.player.x, rs.z - this.player.z) <= 5.0) {
+            SoundFX.healComplete();
+            if (!this.player.armor || this.player.armor.hitsLeft <= 0) {
+              this.player.armor = { ...ARMOR_DB[2], hitsLeft: ARMOR_DB[2].maxHits };
+              playerMesh.userData.vest.visible = true;
+              playerMesh.userData.vest.material.color.setHex(ARMOR_DB[2].color);
+            } else {
+              this.player.armor.hitsLeft = this.player.armor.maxHits;
+            }
+            const healed = this.healPlayer(25, 'Trạm Sửa Giáp');
+            this.updateAllHUD();
+            this.showBanner(`🔧 ĐÃ SỬA ĐẦY 100% ĐỘ BỀN ${this.player.armor.name.toUpperCase()} & HỒI +${healed} HP!`, 2800);
+            return true;
+          }
+        }
+        return false;
       },
 
       setPlayerOpacity(alpha) {
@@ -2748,7 +3262,34 @@
 
         const cdMs = this.getEffectiveSkillCooldownMs(skill.cooldown);
 
-        if (skillId === 'kayne') {
+        if (skillId === 'tatsuya') {
+          if (this.player.tatsuyaCharges <= 0) {
+            const rem = Math.max(1, Math.ceil((this.player.nextTatsuyaRechargeAt - now) / 1000));
+            this.showBanner(`⏳ Tatsuya đang nạp lượt lướt tiếp theo (${rem}s)!`, 1600);
+            return;
+          }
+          this.player.tatsuyaCharges -= 1;
+          if (this.player.tatsuyaCharges === 1 && now >= this.player.nextTatsuyaRechargeAt) {
+            this.player.nextTatsuyaRechargeAt = now + cdMs;
+          } else if (this.player.tatsuyaCharges === 0) {
+            this.player.skillCooldownUntil = this.player.nextTatsuyaRechargeAt > now ? this.player.nextTatsuyaRechargeAt : (now + cdMs);
+          }
+          this.player.skillActiveUntil = now + skill.duration * 1000;
+          const dashX = this.player.x - Math.sin(this.player.yaw) * 12.0;
+          const dashZ = this.player.z - Math.cos(this.player.yaw) * 12.0;
+          const nextPos = resolveCircleCollision(dashX, dashZ, 0.75);
+          this.player.x = nextPos.x;
+          this.player.z = nextPos.z;
+          this.player.y = getTerrainHeight(this.player.x, this.player.z);
+          SoundFX.skillActivate();
+          this.showBanner(`⚡ TATSUYA LƯỚT TỐC ĐỘ (12m): +30% Tốc chạy trong 3s (Còn ${this.player.tatsuyaCharges}/2 lượt lướt)!`, 2600);
+        } else if (skillId === 'alok') {
+          this.player.skillActiveUntil = now + skill.duration * 1000;
+          this.player.nextAlokHealTick = now + 1000;
+          this.player.skillCooldownUntil = now + cdMs;
+          SoundFX.skillActivate();
+          this.showBanner('🎵 ĐÃ BẬT VÒNG TRÒN ÂM NHẠC ALOK (10s): +15% Tốc chạy & Hồi +5 HP / 1s!', 3200);
+        } else if (skillId === 'kayne') {
           this.player.virtualShieldHp = 100;
           this.player.virtualShieldUntil = now + skill.duration * 1000;
           this.player.nextVirtualShieldTick = now + 2000;
@@ -3198,6 +3739,14 @@
 
       jumpPlayer() {
         if (!this.active) return;
+        if (this.dropPhase === 'in_plane') {
+          this.ejectFromPlane();
+          return;
+        }
+        if (this.dropPhase === 'parachuting') {
+          this.landImmediately();
+          return;
+        }
         if (this.player.isGrounded) {
           this.player.vy = 10.5;
           this.player.isGrounded = false;
@@ -3482,6 +4031,24 @@
           damageMod += 0.40;
         }
 
+        // v1.4.0 Alok (+15% speed) & Tatsuya (+30% speed) while active
+        if (AccountState.activeSkill === 'alok' && this.player && now < this.player.skillActiveUntil) {
+          moveSpeedMod += 0.15;
+        }
+        if (AccountState.activeSkill === 'tatsuya' && this.player && now < this.player.skillActiveUntil) {
+          moveSpeedMod += 0.30;
+        }
+
+        // v1.4.0 Hayato Passive: Every 10% HP missing grants +5% Armor Pen and +4% Damage!
+        if (AccountState.hasPassive('hayato') && this.player) {
+          const missingRatio = Math.max(0, (this.player.maxHp - this.player.hp) / this.player.maxHp);
+          const stacks10Pct = Math.floor(missingRatio * 10);
+          if (stacks10Pct > 0) {
+            armorPenMod += stacks10Pct * 0.05;
+            damageMod += stacks10Pct * 0.04;
+          }
+        }
+
         // Ensure Laura default scope is recognized if Laura is equipped
         const effectiveScopeId = attachedScopeId || this.getLauraDefaultScope(weaponId);
         const scopeObj = effectiveScopeId ? SCOPES_DB[effectiveScopeId] : null;
@@ -3512,7 +4079,7 @@
           ...base,
           equippedSkinObj,
           scopeObj,
-          pierceGloo: irisActive,
+          pierceGloo: irisActive || !!base.naturalPierceGloo,
           finalFireScore,
           shotsPerSec,
           shotIntervalMs: 1000 / shotsPerSec,
@@ -3876,6 +4443,20 @@
       tryPickupNearestLoot() {
         if (!this.active) return;
 
+        // 0. If in Airplane or Parachuting, F ejects or dives to land immediately!
+        if (this.dropPhase === 'in_plane') {
+          this.ejectFromPlane();
+          return;
+        }
+        if (this.dropPhase === 'parachuting') {
+          this.landImmediately();
+          return;
+        }
+
+        // 0B. Check nearby Launchpad or Armor Repair Station
+        if (this.useNearestLaunchpad()) return;
+        if (this.useNearestRepairStation()) return;
+
         // 1. Check nearby Airdrop Crate first!
         for (let aIdx = 0; aIdx < this.airdrops.length; aIdx++) {
           const ad = this.airdrops[aIdx];
@@ -3965,6 +4546,17 @@
         let dmg = bullet.damage * (isCrit ? (1 + bullet.critBonus) : 1);
 
         const now = performance.now();
+        // v1.4.0 Moco Passive: +12% damage against marked enemies, and mark enemy for 5s!
+        if (!isTargetPlayer && AccountState.hasPassive('moco')) {
+          if (target.mocoMarkedUntil && now < target.mocoMarkedUntil) {
+            dmg *= 1.12;
+          }
+          target.mocoMarkedUntil = now + 5000;
+        }
+        // v1.4.0 Jota Passive: Each bullet hit heals +2 HP!
+        if (!isTargetPlayer && AccountState.hasPassive('jota')) {
+          this.healPlayer(2, 'Jota');
+        }
         // Orion active: +25% incoming damage
         if (isTargetPlayer && AccountState.activeSkill === 'orion' && now < this.player.skillActiveUntil) {
           dmg *= 1.25;
@@ -4103,6 +4695,10 @@
       handleBotEliminated(bot) {
         this.player.kills += 1;
         this.player.coins += 250;
+        // v1.4.0 Jota Passive: +40 HP immediately upon eliminating a bot!
+        if (AccountState.hasPassive('jota')) {
+          this.healPlayer(40, 'Jota');
+        }
         this.player.matchDiamondsEarned += 25;
         AccountState.diamonds += 25;
         AccountState.primePoints += 25;
@@ -4234,6 +4830,9 @@
         } else if (skill.id === 'orion' && !this.player.orionRedReady) {
           statusEl.textContent = 'Cần 200 HP';
           statusEl.className = 'text-[11px] font-bold text-rose-400';
+        } else if (skill.id === 'tatsuya') {
+          statusEl.textContent = `Sẵn sàng (${this.player.tatsuyaCharges}/2)`;
+          statusEl.className = 'text-[11px] font-bold text-emerald-300';
         } else {
           statusEl.textContent = 'Sẵn sàng';
           statusEl.className = 'text-[11px] font-bold text-emerald-300';
@@ -4596,12 +5195,41 @@
         mmCtx.strokeRect(p.x - 3.5, p.y - 3.5, 7, 7);
       });
 
+      // Draw Launchpads (Purple dots)
+      launchpads.forEach((lp) => {
+        const p = toMM(lp.x, lp.z);
+        mmCtx.fillStyle = '#c084fc';
+        mmCtx.fillRect(p.x - 2, p.y - 2, 4, 4);
+      });
+
+      // Draw Airplane Flight Path & Airplane Icon when active
+      if (Match.active && Match.airplane && Match.airplane.active) {
+        const sp = toMM(Match.airplane.startX, Match.airplane.startZ);
+        const ep = toMM(Match.airplane.endX, Match.airplane.endZ);
+        const ap = toMM(Match.airplane.x, Match.airplane.z);
+        mmCtx.save();
+        mmCtx.setLineDash([4, 3]);
+        mmCtx.beginPath();
+        mmCtx.moveTo(sp.x, sp.y);
+        mmCtx.lineTo(ep.x, ep.y);
+        mmCtx.strokeStyle = '#fde047';
+        mmCtx.lineWidth = 1.2;
+        mmCtx.stroke();
+        mmCtx.restore();
+
+        mmCtx.font = '11px sans-serif';
+        mmCtx.textAlign = 'center';
+        mmCtx.fillText('✈️', ap.x, ap.y + 4);
+      }
+
+      const nowMM = performance.now();
       Match.bots.forEach((bot) => {
         if (bot.hp <= 0) return;
         const p = toMM(bot.x, bot.z);
+        const isMocoMarked = bot.mocoMarkedUntil && nowMM < bot.mocoMarkedUntil;
         mmCtx.beginPath();
-        mmCtx.arc(p.x, p.y, 3, 0, Math.PI * 2);
-        mmCtx.fillStyle = '#f43f5e';
+        mmCtx.arc(p.x, p.y, isMocoMarked ? 4.5 : 3, 0, Math.PI * 2);
+        mmCtx.fillStyle = isMocoMarked ? '#22d3ee' : '#f43f5e';
         mmCtx.fill();
       });
 
@@ -4629,10 +5257,12 @@
       const w = window.innerWidth;
       const h = window.innerHeight;
 
+      const nowTag = performance.now();
       for (const bot of Match.bots) {
         if (bot.hp <= 0) continue;
+        const isMarked = bot.mocoMarkedUntil && nowTag < bot.mocoMarkedUntil;
         const dist = Math.hypot(bot.x - Match.player.x, bot.z - Match.player.z);
-        if (dist > 60) continue;
+        if (dist > (isMarked ? 130 : 60)) continue;
         const v = new THREE.Vector3(bot.x, (bot.y || 0) + 2.8, bot.z);
         v.project(camera);
         if (v.z > 1 || v.x < -1 || v.x > 1 || v.y < -1 || v.y > 1) continue;
@@ -4641,8 +5271,8 @@
         const hpPct = Math.max(0, Math.min(100, (bot.hp / bot.maxHp) * 100));
         html += `
           <div class="world-tag" style="left:${sx}px;top:${sy}px;">
-            <div class="px-1.5 py-0.5 rounded bg-slate-950/85 border border-rose-500/50 text-[10px] text-white font-bold shadow">
-              <span>${bot.name} [${bot.skillName}${bot.collabName ? ' + 🍥' + bot.collabName : ''}] (${bot.weapon.name})</span>
+            <div class="px-1.5 py-0.5 rounded bg-slate-950/85 border ${isMarked ? 'border-cyan-400 shadow-cyan-500/30' : 'border-rose-500/50'} text-[10px] text-white font-bold shadow">
+              <span>${isMarked ? '👁️‍🗨️ [MOCO +12% ST] ' : ''}${bot.name} [${bot.skillName}${bot.collabName ? ' + 🍥' + bot.collabName : ''}] (${bot.weapon.name})</span>
               <div class="w-24 h-1.5 bg-slate-800 rounded-full overflow-hidden mt-0.5">
                 <div class="h-full bg-rose-500" style="width:${hpPct}%"></div>
               </div>
@@ -4805,6 +5435,39 @@
         const stormDmg = elapsedSec > 360 ? 15 : (elapsedSec > 180 ? 8 : 3);
         Match.applyDirectSkillDamageToPlayer(stormDmg);
         Match.showBanner(`⚡ CẢNH BÁO: Bạn đang ở ngoài Vòng Bo (-${stormDmg} HP/s)! Hãy di chuyển vào trong Vòng Bo!`, 1400);
+      }
+
+      // Tatsuya 2-Charge Recharge & Alok +5 HP / 1s Aura
+      if (AccountState.activeSkill === 'tatsuya' && Match.player.tatsuyaCharges < 2 && Match.player.nextTatsuyaRechargeAt > 0 && now >= Match.player.nextTatsuyaRechargeAt) {
+        Match.player.tatsuyaCharges += 1;
+        if (Match.player.tatsuyaCharges < 2) {
+          Match.player.nextTatsuyaRechargeAt = now + Match.getEffectiveSkillCooldownMs(SKILLS_DB.tatsuya.cooldown);
+        } else {
+          Match.player.nextTatsuyaRechargeAt = 0;
+        }
+      }
+      if (AccountState.activeSkill === 'alok' && now < Match.player.skillActiveUntil && now >= Match.player.nextAlokHealTick) {
+        Match.player.nextAlokHealTick += 1000;
+        Match.healPlayer(5, 'Alok');
+      }
+
+      // Airplane Movement & Auto-Eject at End of Flight Path
+      if (Match.airplane.active && Match.airplane.mesh) {
+        Match.airplane.x += Match.airplane.vx * dt;
+        Match.airplane.z += Match.airplane.vz * dt;
+        Match.airplane.mesh.position.set(Match.airplane.x, Match.airplane.y, Match.airplane.z);
+        if (Match.dropPhase === 'in_plane') {
+          Match.player.x = Match.airplane.x;
+          Match.player.y = Match.airplane.y - 2;
+          Match.player.z = Match.airplane.z;
+          if (Math.hypot(Match.airplane.x - Match.airplane.endX, Match.airplane.z - Match.airplane.endZ) < 12) {
+            Match.ejectFromPlane();
+          }
+        } else if (Math.hypot(Match.airplane.x - Match.airplane.endX, Match.airplane.z - Match.airplane.endZ) < 8) {
+          effectsGroup.remove(Match.airplane.mesh);
+          Match.airplane.mesh = null;
+          Match.airplane.active = false;
+        }
       }
 
       // Kayne Virtual Shield: lasts 8s, decays -10 HP every 2s!
@@ -4983,7 +5646,7 @@
 
       const stats = Match.getEffectivePlayerWeaponStats();
       const speedMod = stats ? stats.totalMoveSpeedMod : 0;
-      const baseSpeed = Math.max(5.5, 11.5 * (1 + speedMod));
+      const baseSpeed = Match.dropPhase === 'parachuting' ? 32.0 : Math.max(5.5, 11.5 * (1 + speedMod));
 
       let vx = 0;
       let vz = 0;
@@ -5040,9 +5703,19 @@
         playerMesh.userData.rightLeg.rotation.x = 0;
       }
 
-      // 7. Vertical Physics (Jump & Terrain Height Elevation)
+      // 7. Vertical Physics (Airplane, Parachute Glide, Jump & Terrain Height Elevation)
       const groundY = getTerrainHeight(Match.player.x, Match.player.z);
-      if (!Match.player.isGrounded || Match.player.y > groundY) {
+      if (Match.dropPhase === 'in_plane') {
+        Match.player.x = Match.airplane.x;
+        Match.player.y = Match.airplane.y - 2;
+        Match.player.z = Match.airplane.z;
+      } else if (Match.dropPhase === 'parachuting') {
+        Match.player.vy = -20.0;
+        Match.player.y += Match.player.vy * dt;
+        if (Match.player.y <= groundY) {
+          Match.landImmediately();
+        }
+      } else if (!Match.player.isGrounded || Match.player.y > groundY) {
         Match.player.vy -= 26.0 * dt;
         Match.player.y += Match.player.vy * dt;
         if (Match.player.y <= groundY) {
@@ -5056,11 +5729,18 @@
 
       playerMesh.position.set(Match.player.x, Match.player.y, Match.player.z);
       playerMesh.rotation.y = Match.player.yaw;
-      playerMesh.visible = !Match.cameraFirstPerson && !Match.scopeZoomActive;
+      playerMesh.visible = Match.dropPhase !== 'in_plane' && !Match.cameraFirstPerson && !Match.scopeZoomActive;
 
       const lookDirX = -Math.sin(Match.player.yaw);
       const lookDirZ = -Math.cos(Match.player.yaw);
-      if (Match.cameraFirstPerson || Match.scopeZoomActive) {
+      if (Match.dropPhase === 'in_plane') {
+        camera.position.set(
+          Match.airplane.x - lookDirX * 22,
+          Match.airplane.y + 14,
+          Match.airplane.z - lookDirZ * 22
+        );
+        camera.lookAt(Match.airplane.x + lookDirX * 18, Match.airplane.y - 12, Match.airplane.z + lookDirZ * 18);
+      } else if (Match.cameraFirstPerson || Match.scopeZoomActive) {
         camera.position.set(Match.player.x, Match.player.y + 2.05, Match.player.z);
         camera.lookAt(Match.player.x + lookDirX * 20, Match.player.y + 1.9, Match.player.z + lookDirZ * 20);
       } else {
@@ -5115,6 +5795,26 @@
         }
       }
       document.getElementById('prompt-vending').classList.toggle('hidden', !nearVending);
+
+      let nearLaunchpad = false;
+      for (const lp of launchpads) {
+        if (Math.hypot(lp.x - Match.player.x, lp.z - Match.player.z) <= 5.0) {
+          nearLaunchpad = true;
+          break;
+        }
+      }
+      const lpPrompt = document.getElementById('prompt-launchpad');
+      if (lpPrompt) lpPrompt.classList.toggle('hidden', !nearLaunchpad || Match.dropPhase !== 'grounded');
+
+      let nearRepair = false;
+      for (const rs of repairStations) {
+        if (Math.hypot(rs.x - Match.player.x, rs.z - Match.player.z) <= 5.0) {
+          nearRepair = true;
+          break;
+        }
+      }
+      const rpPrompt = document.getElementById('prompt-repair');
+      if (rpPrompt) rpPrompt.classList.toggle('hidden', !nearRepair || Match.dropPhase !== 'grounded');
 
       // 9. Update AI Bots + Burn DoTs (Ignis 15 HP / 2s & Sasuke Shotgun Burn 2 HP / 1s)
       const playerInvisible = now < Match.player.invisibleUntil;
@@ -5379,7 +6079,42 @@
         : 'Chưa lắp Skin súng';
 
       document.getElementById('btn-toggle-audio').textContent = AccountState.soundEnabled ? '🔊' : '🔇';
+
+      // Render Selected Map & 8 Zone Cards in Lobby
+      const mapCfg = MAPS_DB[AccountState.selectedMapId] || MAPS_DB.dao_thien_duong;
+      const mapTitleEl = document.getElementById('lobby-map-title');
+      if (mapTitleEl) {
+        mapTitleEl.textContent = `${mapCfg.icon} ${mapCfg.name.toUpperCase()} (8 KHU VỰC)`;
+      }
+      document.querySelectorAll('.map-select-btn').forEach(btn => {
+        const mid = btn.getAttribute('data-map-id');
+        if (mid === AccountState.selectedMapId) {
+          btn.className = 'map-select-btn py-1.5 px-2 rounded-xl font-display font-bold border border-amber-400 bg-amber-500/20 text-amber-200 transition truncate';
+        } else {
+          btn.className = 'map-select-btn py-1.5 px-2 rounded-xl font-display font-bold border border-slate-700 bg-slate-900/80 text-slate-300 hover:border-amber-400/60 transition truncate';
+        }
+      });
+      const zGrid = document.getElementById('lobby-zones-grid');
+      if (zGrid) {
+        zGrid.innerHTML = mapCfg.zones.map(z => `
+          <div class="p-1.5 rounded-lg bg-slate-900/90 border border-slate-700">
+            <div class="text-sm">${z.icon || '📍'}</div>
+            <div class="font-semibold text-slate-200 mt-0.5 truncate">${z.name}</div>
+          </div>
+        `).join('');
+      }
     }
+
+    function selectMap(mapId) {
+      if (!MAPS_DB[mapId]) return;
+      AccountState.selectedMapId = mapId;
+      MAP_ZONES = MAPS_DB[mapId].zones;
+      window.MAP_ZONES = MAP_ZONES;
+      AccountState.save();
+      buildStaticWorld();
+      updateLobbyUI();
+    }
+    window.selectMap = selectMap;
 
     function renderEventModal() {
       document.getElementById('event-modal-count').textContent = `${AccountState.matchesPlayed} trận`;
@@ -5419,14 +6154,16 @@
       // Render Section B: Naruto Exchange Shop (6 New Skins)
       const exchGrid = document.getElementById('naruto-exchange-grid');
       exchGrid.innerHTML = '';
-      const exchangeSkins = ['M1887_CUU_VI', 'SKORP_SUSANOO', 'MAG7_MADARA', 'SCAR_NGUYET_DOC', 'M1014_HOA_QUY', 'MP40_MANG_XA'];
+      AccountState.checkAndUnlockRankSkins();
+      const exchangeSkins = ['M1887_CUU_VI', 'SKORP_SUSANOO', 'MAG7_MADARA', 'SCAR_NGUYET_DOC', 'BARRETT_TU_THAN', 'M1014_HOA_QUY', 'MP40_MANG_XA', 'P90_SIEU_CONG_NGHE', 'FAMAS_HUYET_NGUYET', 'GROZA_THAN_SAM', 'AWM_LONG_VUONG'];
       exchangeSkins.forEach((skId) => {
         const sk = SKINS_DB[skId];
         if (!sk) return;
         const unlocked = !!AccountState.unlockedSkins[sk.id];
         const equipped = AccountState.equippedSkins[sk.weaponId] === sk.id;
         const isShard = sk.sourceType === 'naruto';
-        const costLabel = isShard ? `🧩 ${sk.shardCost} Mảnh Naruto` : `🪙 ${sk.goldCost.toLocaleString()} Vàng`;
+        const isRank = sk.sourceType === 'rank';
+        const costLabel = isRank ? `🏆 Rank ${sk.reqRankName}` : (isShard ? `🧩 ${sk.shardCost} Mảnh Naruto` : `🪙 ${sk.goldCost.toLocaleString()} Vàng`);
 
         const card = document.createElement('div');
         card.className = 'p-3.5 rounded-2xl bg-slate-900/95 border flex flex-col justify-between gap-2 ' + (equipped ? 'border-cyan-400' : 'border-slate-700');
@@ -5467,7 +6204,14 @@
             return;
           }
 
-          if (sk.sourceType === 'naruto') {
+          if (sk.sourceType === 'rank') {
+            const effIdx = AccountState.isLegendStarTier ? RANK_TIERS.length - 1 : AccountState.rankTierIndex;
+            if (effIdx < sk.reqRankIndex) {
+              fb.textContent = `⚠️ Bạn cần đạt bậc Rank ${sk.reqRankName} trở lên để nhận miễn phí ${sk.name}!`;
+              fb.className = 'font-bold text-rose-400';
+              return;
+            }
+          } else if (sk.sourceType === 'naruto') {
             if (AccountState.narutoShards < sk.shardCost) {
               fb.textContent = `⚠️ Không đủ Mảnh ghép Naruto! Cần ${sk.shardCost} mảnh để đổi ${sk.name}.`;
               fb.className = 'font-bold text-rose-400';
@@ -5563,12 +6307,48 @@
     }
 
     function renderSkillsModal() {
+      const combosGrid = document.getElementById('skills-combos-grid');
       const collabGrid = document.getElementById('skills-collab-grid');
       const activeGrid = document.getElementById('skills-active-grid');
       const passiveGrid = document.getElementById('skills-passive-grid');
+      if (combosGrid) combosGrid.innerHTML = '';
       collabGrid.innerHTML = '';
       activeGrid.innerHTML = '';
       passiveGrid.innerHTML = '';
+
+      // 0. Render 6 Quick Combos
+      if (combosGrid) {
+        SKILL_COMBOS_DB.forEach((combo) => {
+          const isMatch = AccountState.activeSkill === combo.active &&
+                          AccountState.collabSkill === combo.collab &&
+                          combo.passives.every(p => AccountState.passiveSkills.includes(p));
+          const card = document.createElement('div');
+          card.setAttribute('data-combo-id', combo.id);
+          card.className = `p-2.5 rounded-xl border cursor-pointer transition ${
+            isMatch ? 'bg-amber-950/60 border-amber-400 shadow' : 'bg-slate-900/90 border-slate-700 hover:border-purple-400'
+          }`;
+          const passNames = combo.passives.map(pid => SKILLS_DB[pid]?.name).join(' + ');
+          card.innerHTML = `
+            <div class="flex items-center justify-between">
+              <span class="font-display font-bold text-xs text-white">${combo.name}</span>
+              <span class="px-2 py-0.5 rounded text-[9px] font-bold ${isMatch ? 'bg-amber-400 text-slate-950' : 'bg-purple-600/40 text-purple-200'}">
+                ${isMatch ? 'ĐANG DÙNG' : 'Chọn Nhanh'}
+              </span>
+            </div>
+            <div class="text-[10px] text-amber-300 font-semibold mt-1">[E] ${SKILLS_DB[combo.active]?.name} • Bị động: ${passNames} • [G] ${COLLAB_SKILLS_DB[combo.collab]?.shortName}</div>
+            <p class="text-[10px] text-slate-400 mt-0.5">${combo.desc}</p>
+          `;
+          card.addEventListener('click', () => {
+            AccountState.applySkillCombo(combo.id);
+            SoundFX.pickup();
+            updateLobbyUI();
+            renderSkillsModal();
+            const fb = document.getElementById('skills-feedback');
+            if (fb) fb.textContent = `⚡ Đã trang bị nhanh ${combo.name}: [E] ${SKILLS_DB[combo.active].name} + Bị động (${passNames}) + [G] ${COLLAB_SKILLS_DB[combo.collab].shortName}!`;
+          });
+          combosGrid.appendChild(card);
+        });
+      }
 
       // 1. Render 4 Naruto Collab Skills [Phím G]
       Object.values(COLLAB_SKILLS_DB).forEach((col) => {
@@ -6122,6 +6902,12 @@
     document.getElementById('btn-hud-reload').addEventListener('click', () => Match.startReload());
     document.getElementById('btn-hud-pickup').addEventListener('click', () => Match.tryPickupNearestLoot());
     document.getElementById('prompt-pickup').addEventListener('click', () => Match.tryPickupNearestLoot());
+    document.getElementById('btn-jump-plane').addEventListener('click', () => Match.jumpPlayer());
+    document.getElementById('prompt-launchpad').addEventListener('click', () => Match.useNearestLaunchpad());
+    document.getElementById('prompt-repair').addEventListener('click', () => Match.useNearestRepairStation());
+    document.querySelectorAll('.map-select-btn').forEach(btn => {
+      btn.addEventListener('click', () => selectMap(btn.getAttribute('data-map-id')));
+    });
     document.getElementById('btn-hud-vending').addEventListener('click', toggleVendingModal);
     document.getElementById('prompt-vending').addEventListener('click', toggleVendingModal);
     document.getElementById('btn-close-vending').addEventListener('click', toggleVendingModal);
